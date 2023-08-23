@@ -31,3 +31,13 @@ fn problem_0005() {
 fn problem_0006() {
     run_test(6, "25164150");
 }
+
+#[test]
+fn problem_0018() {
+    run_test(18, "1074");
+}
+
+#[test]
+fn problem_0067() {
+    run_test(67, "7273");
+}
