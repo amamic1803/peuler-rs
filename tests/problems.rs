@@ -21,3 +21,8 @@ fn problem_0003() {
 fn problem_0004() {
     run_test(4, "906609");
 }
+
+#[test]
+fn problem_0005() {
+    run_test(5, "232792560");
+}

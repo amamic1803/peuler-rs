@@ -1,5 +1,34 @@
-//! Functions for working with prime numbers.
+//! Functions for working with numbers.
 
+
+/// Finds the greatest common divisor of two numbers.
+/// Uses the Euclidean algorithm.
+/// # Arguments
+/// * `num1` - The first number.
+/// * `num2` - The second number.
+/// # Returns
+/// * `u128` - The greatest common divisor.
+pub fn gcd(num1: u128, num2: u128) -> u128 {
+    let mut nums = if num1 > num2 { [num1, num2] } else { [num2, num1] };
+    while nums[1] != 0 {
+        (nums[0], nums[1]) = (nums[1], nums[0] % nums[1]);
+    }
+    nums[0]
+}
+
+/// Finds the greatest common divisor of multiple numbers.
+/// # Arguments
+/// * `nums` - The numbers.
+/// # Returns
+/// * `u128` - The greatest common divisor.
+pub fn gcd_multiple(nums: &[u128]) -> u128 {
+    assert!(nums.len() > 1, "There must be at least 2 numbers.");
+    let mut result = gcd(nums[0], nums[1]);
+    for n in nums.iter().skip(2) {
+        result = gcd(result, *n);
+    }
+    result
+}
 
 /// Checks if a number is prime.
 /// # Arguments
@@ -34,6 +63,30 @@ pub fn is_prime(num: u128) -> (bool, u128) {
 /// * `bool` - Whether the number is a palindrome.
 pub fn is_palindrome(num: u128) -> bool {
     num == reverse(num)
+}
+
+/// Finds the least common multiple of two numbers.
+/// # Arguments
+/// * `num1` - The first number.
+/// * `num2` - The second number.
+/// # Returns
+/// * `u128` - The least common multiple.
+pub fn lcm(num1: u128, num2: u128) -> u128 {
+    (num1 / gcd(num1, num2)) * num2
+}
+
+/// Finds the least common multiple of multiple numbers.
+/// # Arguments
+/// * `nums` - The numbers.
+/// # Returns
+/// * `u128` - The least common multiple.
+pub fn lcm_multiple(nums: &[u128]) -> u128 {
+    assert!(nums.len() > 1, "There must be at least 2 numbers.");
+    let mut result = lcm(nums[0], nums[1]);
+    for n in nums.iter().skip(2) {
+        result = lcm(result, *n);
+    }
+    result
 }
 
 /// Reverses a number.
