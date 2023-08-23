@@ -102,3 +102,57 @@ pub fn reverse(mut num: u128) -> u128 {
     }
     new_num
 }
+
+/// Finds the sum of the first n natural numbers.
+/// # Arguments
+/// * `n` - The number of natural numbers to sum.
+/// # Returns
+/// * `u128` - The sum of the first n natural numbers.
+pub fn sum_n(n: u128) -> u128 {
+    n * (n + 1) / 2
+}
+
+/// Finds the sum of the first n even natural numbers.
+/// # Arguments
+/// * `n` - The number of even natural numbers to sum.
+/// # Returns
+/// * `u128` - The sum of the first n even natural numbers.
+pub fn sum_n_even(n: u128) -> u128 {
+    n * (n + 1)
+}
+
+/// Finds the sum of the squares of the first n even natural numbers.
+/// # Arguments
+/// * `n` - The number of even natural numbers to sum.
+/// # Returns
+/// * `u128` - The sum of the squares of the first n even natural numbers.
+pub fn sum_n_even_squares(n: u128) -> u128 {
+    2 * n * (n + 1) * (2 * n + 1) / 3
+}
+
+/// Finds the sum of the first n odd natural numbers.
+/// # Arguments
+/// * `n` - The number of odd natural numbers to sum.
+/// # Returns
+/// * `u128` - The sum of the first n odd natural numbers.
+pub fn sum_n_odd(n: u128) -> u128 {
+    n * n
+}
+
+/// Finds the sum of the squares of the first n odd natural numbers.
+/// # Arguments
+/// * `n` - The number of odd natural numbers to sum.
+/// # Returns
+/// * `u128` - The sum of the squares of the first n odd natural numbers.
+pub fn sum_n_odd_squares(n: u128) -> u128 {
+    n * (2 * n + 1) * (2 * n - 1) / 3
+}
+
+/// Finds the sum of the squares of the first n natural numbers.
+/// # Arguments
+/// * `n` - The number of natural numbers to sum.
+/// # Returns
+/// * `u128` - The sum of the squares of the first n natural numbers.
+pub fn sum_n_squares(n: u128) -> u128 {
+    n * (n + 1) * (2 * n + 1) / 6
+}
