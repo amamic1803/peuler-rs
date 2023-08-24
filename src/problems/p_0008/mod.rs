@@ -32,5 +32,14 @@ fn solve() -> String {
         data = temp;
     }
 
+    if data.len() >= 13 {
+        for i in 0..(data.len() - 12) {
+            let product = data[i..(i + 13)].iter().product::<u64>();
+            if product > max_product {
+                max_product = product;
+            }
+        }
+    }
+
     max_product.to_string()
 }

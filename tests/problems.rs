@@ -48,6 +48,11 @@ fn problem_0010() {
 }
 
 #[test]
+fn problem_0011() {
+    run_test(11, "70600674");
+}
+
+#[test]
 fn problem_0018() {
     run_test(18, "1074");
 }
