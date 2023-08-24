@@ -11,10 +11,10 @@ pub fn get_problem() -> Problem {
 }
 
 
-use crate::shared::numbers::is_palindrome;
+use crate::shared::math::is_palindrome;
 
 fn solve() -> String {
-    let mut largest_palindrome: u128 = 0;
+    let mut largest_palindrome: u64 = 0;
 
     for fact1 in 100..1000 {
         for fact2 in fact1..1000 {

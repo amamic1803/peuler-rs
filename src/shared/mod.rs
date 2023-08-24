@@ -2,4 +2,4 @@
 
 pub mod structures;
 
-pub mod numbers;
+pub mod math;

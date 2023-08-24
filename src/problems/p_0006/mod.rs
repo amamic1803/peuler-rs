@@ -11,7 +11,7 @@ pub fn get_problem() -> Problem {
 }
 
 
-use crate::shared::numbers::{sum_n, sum_n_squares};
+use crate::shared::math::{sum_n, sum_n_squares};
 
 fn solve() -> String {
     let sum_of_squares = sum_n_squares(100);
