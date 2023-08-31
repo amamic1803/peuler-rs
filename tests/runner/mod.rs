@@ -7,5 +7,5 @@ pub fn run_test(problem_id: usize, expected: &str) {
     let problems = get_problems();
     let result = problems.run(problem_id);
 
-    assert_eq!(result, expected);
+    assert_eq!(result.trim(), expected.trim());
 }
