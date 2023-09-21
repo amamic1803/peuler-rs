@@ -2,6 +2,8 @@
 
 
 
+
+
 /// Inverse of the prime-counting function.
 /// Estimates the number for which the prime-counting function is approximately n.
 /// Uses the inverse of the prime number theorem.
@@ -28,6 +30,29 @@ pub fn apcf(n: u64) -> f64 {
             }
             x
         },
+    }
+}
+
+/// Returns the iterator of the Collatz sequence starting at a number.
+pub fn collatz_seq(num: u64) -> CollatzSeq {
+    CollatzSeq { current: num }
+}
+pub struct CollatzSeq {
+    current: u64,
+}
+impl Iterator for CollatzSeq {
+    type Item = u64;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current == 1 {
+            return None;
+        }
+        if self.current % 2 == 0 {
+            self.current /= 2;
+        } else {
+            self.current = 3 * self.current + 1;
+        }
+        Some(self.current)
     }
 }
 
