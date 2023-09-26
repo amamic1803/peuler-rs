@@ -56,6 +56,26 @@ impl Iterator for CollatzSeq {
     }
 }
 
+/// Returns the iterator over the digits of a number.
+pub fn digits(n: u64) -> Digits {
+    Digits { current: n }
+}
+pub struct Digits {
+    current: u64,
+}
+impl Iterator for Digits {
+    type Item = u64;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current == 0 {
+            return None;
+        }
+        let result = self.current % 10;
+        self.current /= 10;
+        Some(result)
+    }
+}
+
 /// Finds the greatest common divisor of two numbers.
 /// Uses the Euclidean algorithm.
 /// # Arguments
