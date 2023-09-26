@@ -14,4 +14,5 @@ opt-level = 3
 
 [dependencies]
 clap = { version = "4.4.4", features = ["cargo"] }
+malachite = "0.4.1"
 # itertools = "0.11.0"
