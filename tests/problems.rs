@@ -103,6 +103,11 @@ fn problem_0054() {
 }
 
 #[test]
+fn problem_0056() {
+    run_test(56, "972");
+}
+
+#[test]
 fn problem_0067() {
     run_test(67, "7273");
 }
