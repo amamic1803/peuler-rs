@@ -76,6 +76,15 @@ impl Iterator for Digits {
     }
 }
 
+/// Calculates the factorial of a number.
+/// # Arguments
+/// * `n` - The number to find the factorial of.
+/// # Returns
+/// * `u64` - The factorial of the number.
+pub fn factorial(n: u64) -> u64 {
+    (1..(n + 1)).product()
+}
+
 /// Finds the greatest common divisor of two numbers.
 /// Uses the Euclidean algorithm.
 /// # Arguments
