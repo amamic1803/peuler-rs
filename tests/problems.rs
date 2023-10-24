@@ -168,6 +168,11 @@ fn problem_0081() {
 }
 
 #[test]
+fn problem_0097() {
+    run_test(97, "8739992577");
+}
+
+#[test]
 fn problem_0099() {
     run_test(99, "709");
 }
