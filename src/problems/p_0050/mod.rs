@@ -10,68 +10,94 @@ pub fn get_problem() -> Problem {
     )
 }
 
-// TODO: optimize
 
+use std::collections::HashSet;
 use crate::shared::math::sieve_of_eratosthenes;
 
+const LIMIT: u64 = 1_000_000;
+
 fn solve() -> String {
-    let primes = sieve_of_eratosthenes(1_000_000 - 1);  // generate all primes less than 1_000_000
+    let primes = sieve_of_eratosthenes(LIMIT - 1);  // generate all primes less than 1_000_000
+    let primes_set = primes.iter().copied().collect::<HashSet<_>>();  // store primes in a set for faster lookup
+    let biggest_prime = primes[primes.len() - 1];  // get biggest prime from primes vector
 
-    let mut max_consec_primes = 0;  // maximum number of consecutive primes found to sum to a prime
-    let mut max_num = 0;  // the prime that has the maximum number of consecutive primes that sum to it
+    // we will use a sliding window to find the longest consecutive prime sum
+    // we will start with the biggest window and shrink it by one and slide until we find a consecutive prime sum
 
-    // each iteration we check one prime number
-    for i in &primes {
-        // we start by summing the primes from the start until we would be over the prime we are checking
-        // so end with the sum that is lower than the prime we are checking
-        // the we add the next number to the sum (so the sum surpasses the prime we are checking)
-        // and then we keep removing the prime numbers from the start from sum (until the sum is less than the prime we are checking)
-        // if manage to get the sum to equal the prime, then we check if the number of primes we added is greater than the current max
-        // if we don't manage to get the sum to equal the prime, we just continue to the next prime
+    let mut sum: u64 = 0;  // sum of consecutive primes
+    let mut i: usize = 0;  // first index of window
+    let mut j: usize = 0;  // first index after window
+    // create initial window (intentionally bigger than biggest_prime -> it is definitely not a consecutive prime sum)
+    while sum <= biggest_prime {
+        sum += primes[j];
+        j += 1;
+    }
 
-        let mut sum = 0;
-        let mut curr_ind = 0;
+    // flag that indicates where our window is located
+    // true = window is on the left (from index 0 to something)
+    // false = window is on the right
+    let mut flag = true;
 
-        // sum primes while sum is less than prime we are checking
-        while sum + primes[curr_ind] < *i {
-            sum += primes[curr_ind];
-            curr_ind += 1;
-        }
+    // each iteration of this loop, window gets smaller by one
+    'outer: loop {
+        if flag {
+            // window is on the left
+            // we need to remove the last element (right)
+            // and then slide the window to the right
 
-        // if we managed to get the sum to equal the prime we are checking, then check if the number of primes we added is greater than the current max
-        if sum == *i {
-            if max_consec_primes < curr_ind {
-                max_consec_primes = curr_ind;
-                max_num = *i;
-            }
-        } else {
-            // we add the next prime in the sequence to the sum
-            // now the sum is greater than the prime we are checking for
-            // then we subtract primes from the start of the sequence until the sum is less than the prime we are checking for
-            // we stop if we get the sum to equal the prime we are checking for
-            // or if we get the min and max indexes to match
+            // remove last element
+            sum -= primes[j - 1];
+            j -= 1;
 
-            let mut curr_min_ind = 0;
-            while (sum != *i) && (curr_min_ind != curr_ind) {
-                sum += primes[curr_ind];
-                curr_ind += 1;
-                while sum > *i {
-                    sum -= primes[curr_min_ind];
-                    curr_min_ind += 1;
+            // slide window to the right
+            while sum < biggest_prime {
+                if primes_set.contains(&sum) {
+                    break 'outer;
                 }
+
+                sum += primes[j];
+                j += 1;
+                sum -= primes[i];
+                i += 1;
             }
 
-            // now we calculate the number of consecutive primes that sum to the prime we are checking for
-            // it is not necessary to check if the sum is equal to the prime we are checking for
-            // because by the time we get here, the sum is equal to the prime we are checking for (*)
-            // (*) the sum might not be equal to the prime we are checking for if we get the min and max indexes to match,
-            // but in that case the number of consecutive primes that sum to the prime we are checking for is 0 so it won't change the max
-            if max_consec_primes < (curr_ind - curr_min_ind) {
-                max_consec_primes = curr_ind - curr_min_ind;
-                max_num = *i;
+            // check if the last sum is a prime (not done in the loop above)
+            if primes_set.contains(&sum) {
+                break 'outer;
             }
+
+            // set flag to false, as the window is now on the right
+            flag = false;
+        } else {
+            // window is on the right
+            // we need to remove the first element (left)
+            // and then slide the window to the left
+
+            // remove first element
+            sum -= primes[i];
+            i += 1;
+
+            // slide window to the left
+            while i > 0 {
+                if primes_set.contains(&sum) {
+                    break 'outer;
+                }
+
+                sum -= primes[j - 1];
+                j -= 1;
+                sum += primes[i - 1];
+                i -= 1;
+            }
+
+            // check if the last sum is a prime (not done in the loop above)
+            if primes_set.contains(&sum) {
+                break 'outer;
+            }
+
+            // set flag to true, as the window is now on the left
+            flag = true;
         }
     }
 
-    max_num.to_string()
+    sum.to_string()
 }
