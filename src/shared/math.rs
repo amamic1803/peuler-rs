@@ -173,6 +173,31 @@ pub fn lcm_multiple(nums: &[u64]) -> u64 {
     result
 }
 
+/// Calculates the zero of a function using Newton's method.
+/// Note that this will run forever if the function does not converge to a zero.
+/// # Arguments
+/// * `x0` - The initial guess.
+/// * `precision` - The precision of the answer (the error will be less than this).
+/// * `function` - The function to find the zero of.
+/// * `derivative` - The derivative of the function.
+/// # Returns
+/// * `f64` - The zero of the function.
+pub fn newtons_method<F, D>(x0: f64, precision: f64, function: F, derivative: D) -> f64
+where
+    F: Fn(f64) -> f64,
+    D: Fn(f64) -> f64,
+{
+    let mut x = x0;
+    let mut prev_x = f64::NEG_INFINITY;
+
+    while (x - prev_x).abs() > precision {
+        prev_x = x;
+        x = prev_x - function(prev_x) / derivative(prev_x);
+    }
+
+    x
+}
+
 /// Simple prime-counting function.
 /// Estimates the number of primes less than or equal to x.
 /// Uses the prime number theorem which states that the number of primes less than or equal to x is approximately x / ln(x).
