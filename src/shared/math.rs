@@ -92,12 +92,14 @@ pub fn factorial(n: u64) -> u64 {
 /// * `num2` - The second number.
 /// # Returns
 /// * `u64` - The greatest common divisor.
-pub fn gcd(num1: u64, num2: u64) -> u64 {
-    let mut nums = if num1 > num2 { [num1, num2] } else { [num2, num1] };
-    while nums[1] != 0 {
-        (nums[0], nums[1]) = (nums[1], nums[0] % nums[1]);
+pub fn gcd(mut num1: u64, mut num2: u64) -> u64 {
+    if num1 < num2 {
+        (num1, num2) = (num2, num1);
     }
-    nums[0]
+    while num2 != 0 {
+        (num1, num2) = (num2, num1 % num2);
+    }
+    num1
 }
 
 /// Finds the greatest common divisor of multiple numbers.
