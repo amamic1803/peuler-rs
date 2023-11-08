@@ -231,6 +231,46 @@ pub fn pcf_exact(x: u64) -> u64 {
     sieve_of_eratosthenes(x).len() as u64
 }
 
+/// Finds the prime factors of a number.
+/// # Arguments
+/// * `x` - The number to find the prime factors of.
+/// # Returns
+/// * `Vec<[u64; 2]>` - The prime factors of the number. In the form [prime factor, power].
+pub fn prime_factors(mut x: u64) -> Vec<[u64; 2]> {
+    // calculate primes that are less than or equal to the square root of x
+    // these are the only possible prime factors
+    let prime_table = sieve_of_eratosthenes((x as f64).sqrt().floor() as u64);
+    let mut factors = Vec::new();
+
+    // for every prime factor divide x by that prime factor until it is no longer divisible by that prime factor
+    // if x becomes 1 then we have found all prime factors and don't need to check further
+    for prime_fact in prime_table {
+        let mut fact_info = [prime_fact, 0];
+
+        while x % prime_fact == 0 {
+            fact_info[1] += 1;
+            x /= prime_fact;
+        }
+
+        if fact_info[1] > 0 {
+            factors.push(fact_info);
+        }
+
+        if x == 1 {
+            break;
+        }
+    }
+
+    // if x is not 1 here, then there are two options
+    // 1. x is prime -> we add it to the list of prime factors
+    // 2. x is zero -> we do nothing
+    if x != 1 && x != 0 {
+        factors.push([x, 1]);
+    }
+
+    factors
+}
+
 /// Reverses a number.
 /// # Arguments
 /// * `num` - The number to reverse.
