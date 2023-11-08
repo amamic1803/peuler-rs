@@ -14,7 +14,8 @@ impl Problems {
     /// * `problems` - The vector containing the problems.
     /// # Returns
     /// A new `Problems`.
-    pub fn new(problems: Vec<Problem>) -> Self {
+    pub fn new(mut problems: Vec<Problem>) -> Self {
+        problems.sort_by_key(|problem| problem.id);
         Self {
             problems,
         }
@@ -24,12 +25,50 @@ impl Problems {
     /// # Returns
     /// The `String` with the list of available problems.
     pub fn list(&self) -> String {
-        let mut list = String::new();
-        for problem in &self.problems {
-            list.push_str(&format!("{}\n", problem.name()));
-        }
-        let mut max_line_len = list.lines().map(|line| line.chars().count()).max().unwrap();
+        let mut result = self.print_header();
 
+        for problem in &self.problems {
+            result.push_str(&problem.name());
+            result.push('\n');
+        }
+
+        result.trim().to_string()
+    }
+
+    /// Calculates and prints the solutions for all problems.
+    /// # Returns
+    /// The `String` with the solutions for all problems.
+    pub fn solutions(&self) -> String {
+        let mut result = self.print_header();
+
+        for problem in &self.problems {
+            result.push_str(&problem.name());
+            result.push('\n');
+            result.push_str(&problem.run());
+            result.push('\n');
+        }
+
+        result.trim().to_string()
+    }
+
+    /// Runs the problem's solution function.
+    /// # Arguments
+    /// * `problem_id` - The problem's ID.
+    /// # Returns
+    /// The `String` with the problem's solution.
+    /// Or a message if the problem is not available.
+    pub fn run(&self, problem_id: usize) -> String {
+        match self.problems.iter().find(|problem| problem.id == problem_id) {
+            Some(problem) => problem.run(),
+            None => format!("Problem {:04} not available!\n", problem_id),
+        }
+    }
+
+    /// Generates pretty header for console output.
+    /// # Returns
+    /// The `String` with the header.
+    fn print_header(&self) -> String {
+        let mut max_line_len = self.problems.iter().map(|problem| problem.name().chars().count()).max().unwrap();
         let mut result = String::new();
         if max_line_len < 21 {
             max_line_len = 21;
@@ -52,22 +91,7 @@ impl Problems {
             result.push('#');
         }
         result.push('\n');
-
-        result.push_str(&list);
-        result.trim().to_string()
-    }
-
-    /// Runs the problem's solution function.
-    /// # Arguments
-    /// * `problem_id` - The problem's ID.
-    /// # Returns
-    /// The `String` with the problem's solution.
-    /// Or a message if the problem is not available.
-    pub fn run(&self, problem_id: usize) -> String {
-        match self.problems.iter().find(|problem| problem.id == problem_id) {
-            Some(problem) => problem.run(),
-            None => format!("Problem {:04} not available!\n", problem_id),
-        }
+        result
     }
 }
 
