@@ -37,24 +37,19 @@ fn solve() -> String {
     // now we need to determine how many of these values are distinct
     // since those are floating point numbers, we can't just test them for equality
     // because they have some error
-    // we create a vector of booleans, where the i-th element is true if the i-th value is distinct
-    // by looping we will go over all elements and mark the ones that are not distinct from that one as false
+    // we start by sorting the values
+    // for every element we will check if the element before it is within 1e-7 of it
+    // if it is, it is not distinct and we don't count it
 
-    let mut distinct_values = Vec::with_capacity(values.len());
-    distinct_values.resize(values.len(), true);
-
-    for i in 0..values.len() {
-        if distinct_values[i] {
-            for j in (i + 1)..values.len() {
-                if (values[i] - values[j]).abs() <= 1e-7 {
-                    distinct_values[j] = false;
-                }
-            }
+    values.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    let mut distinct = 1;
+    for i in 1..values.len() {
+        if (values[i] - values[i - 1]).abs() > 1e-7 {
+            distinct += 1;
         }
     }
 
-    // now we just count the number of true values in the vector
-    distinct_values.into_iter().filter(|&val| val).count().to_string()
+    distinct.to_string()
 }
 
 
