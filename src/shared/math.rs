@@ -200,6 +200,32 @@ where
     x
 }
 
+/// Finds the number of divisors of a number.
+/// # Arguments
+/// * `n` - The number to find the number of divisors of.
+/// # Returns
+/// * `u64` - The number of divisors of the number.
+pub fn num_of_divisors(n: u64) -> u64 {
+    // let n be a natural number
+    // we can factorise n
+    // n = p1^a1 * p2^a2 * p3^a3 * ... * pn^an
+    // (where p1, p2, p3, ..., pn are prime numbers)
+    // a function d(n) returns the number of divisors of n
+    // obviously, d(n) = (a1 + 1) * (a2 + 1) * (a3 + 1) * ... * (an + 1)
+
+    prime_factors(n).into_iter().map(|(_, a)| a + 1).product()
+}
+
+/// Finds the number of proper divisors of a number.
+/// Proper divisors are all divisors of a number except the number itself.
+/// # Arguments
+/// * `n` - The number to find the number of proper divisors of.
+/// # Returns
+/// * `u64` - The number of proper divisors of the number.
+pub fn num_of_proper_divisors(n: u64) -> u64 {
+    num_of_divisors(n) - 1
+}
+
 /// Simple prime-counting function.
 /// Estimates the number of primes less than or equal to x.
 /// Uses the prime number theorem which states that the number of primes less than or equal to x is approximately x / ln(x).
@@ -232,11 +258,12 @@ pub fn pcf_exact(x: u64) -> u64 {
 }
 
 /// Finds the prime factors of a number.
+/// If the number is 0 or 1, then an empty vector is returned.
 /// # Arguments
 /// * `x` - The number to find the prime factors of.
 /// # Returns
 /// * `Vec<[u64; 2]>` - The prime factors of the number. In the form [prime factor, power].
-pub fn prime_factors(mut x: u64) -> Vec<[u64; 2]> {
+pub fn prime_factors(mut x: u64) -> Vec<(u64, u64)> {
     // calculate primes that are less than or equal to the square root of x
     // these are the only possible prime factors
     let prime_table = sieve_of_eratosthenes((x as f64).sqrt().floor() as u64);
@@ -245,14 +272,14 @@ pub fn prime_factors(mut x: u64) -> Vec<[u64; 2]> {
     // for every prime factor divide x by that prime factor until it is no longer divisible by that prime factor
     // if x becomes 1 then we have found all prime factors and don't need to check further
     for prime_fact in prime_table {
-        let mut fact_info = [prime_fact, 0];
+        let mut fact_info = (prime_fact, 0);
 
         while x % prime_fact == 0 {
-            fact_info[1] += 1;
+            fact_info.1 += 1;
             x /= prime_fact;
         }
 
-        if fact_info[1] > 0 {
+        if fact_info.1 > 0 {
             factors.push(fact_info);
         }
 
@@ -265,7 +292,7 @@ pub fn prime_factors(mut x: u64) -> Vec<[u64; 2]> {
     // 1. x is prime -> we add it to the list of prime factors
     // 2. x is zero -> we do nothing
     if x != 1 && x != 0 {
-        factors.push([x, 1]);
+        factors.push((x, 1));
     }
 
     factors
@@ -386,4 +413,46 @@ pub fn sum_n_odd_squares(n: u64) -> u64 {
 /// * `u64` - The sum of the squares of the first n natural numbers.
 pub fn sum_n_squares(n: u64) -> u64 {
     n * (n + 1) * (2 * n + 1) / 6
+}
+
+/// Finds the sum of the divisors of a number.
+/// # Arguments
+/// * `n` - The number to find the sum of the divisors of.
+/// # Returns
+/// * `u64` - The sum of the divisors of the number.
+pub fn sum_of_divisors(n: u64) -> u64 {
+    // let σ(n) be the sum of the divisors of n
+    // let p be a prime number
+    // then σ(p) = p + 1
+    // and σ(p^a) = 1 + p + p^2 + ... + p^a = Σ(k=0, a)p^k = (p^(a + 1) - 1) / (p - 1)
+    // we can see that
+    // σ(p1^a * p2^b) = 1 + p1 + p1^2 + ... + p1^a + p1*p2 + p1^2*p2 + ... + p1^a*p2 + p1*p2^2 + ... + p1^a*p2^2 + ... + p1^a*p2^b
+    // = Σ(k=0, a)p1^k * Σ(k=0, b)p2^k = σ(p1^a) * σ(p2^b)
+    // = (p1^(a + 1) - 1) / (p1 - 1) * (p2^(b + 1) - 1) / (p2 - 1)
+    // we can also increase this to more than 2 prime factors
+
+    // first we check if n is 0, if it is then we return 0
+    if n == 0 {
+        0
+    } else {
+        // if n is not zero then we proceed to find the sum of the divisors
+        // note that σ(1) = 1
+
+        // we find the prime factors of n
+        // for each we calculate the sum of the divisors of that prime factor
+        // and multiply them together
+
+        prime_factors(n).into_iter().map(|(p, a)| (p.pow(a as u32  + 1) - 1) / (p - 1)).product()
+    }
+}
+
+/// Finds the sum of the proper divisors of a number.
+/// Proper divisors are all divisors of a number except the number itself.
+/// # Arguments
+/// * `n` - The number to find the sum of the proper divisors of.
+/// # Returns
+/// * `u64` - The sum of the proper divisors of the number.
+pub fn sum_of_proper_divisors(n: u64) -> u64 {
+    // sum of proper divisors is equal to the sum of all divisors minus the number itself
+    sum_of_divisors(n) - n
 }
