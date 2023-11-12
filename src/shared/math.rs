@@ -151,6 +151,15 @@ pub fn is_palindrome(num: u64) -> bool {
     num == reverse(num)
 }
 
+/// Checks if a u128 number is a palindrome.
+/// # Arguments
+/// * `num` - The number to check.
+/// # Returns
+/// * `bool` - Whether the number is a palindrome.
+pub fn is_palindrome_128(num: u128) -> bool {
+    num == reverse_128(num)
+}
+
 /// Finds the least common multiple of two numbers.
 /// # Arguments
 /// * `num1` - The first number.
@@ -304,6 +313,20 @@ pub fn prime_factors(mut x: u64) -> Vec<(u64, u64)> {
 /// # Returns
 /// * `u64` - The reversed number.
 pub fn reverse(mut num: u64) -> u64 {
+    let mut new_num = 0;
+    while num > 0 {
+        new_num = new_num * 10 + num % 10;
+        num /= 10;
+    }
+    new_num
+}
+
+/// Reverses a u128 number.
+/// # Arguments
+/// * `num` - The number to reverse.
+/// # Returns
+/// * `u128` - The reversed number.
+pub fn reverse_128(mut num: u128) -> u128 {
     let mut new_num = 0;
     while num > 0 {
         new_num = new_num * 10 + num % 10;

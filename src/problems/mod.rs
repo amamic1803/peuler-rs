@@ -40,6 +40,7 @@ pub mod p_0048;
 pub mod p_0050;
 pub mod p_0053;
 pub mod p_0054;
+pub mod p_0055;
 pub mod p_0056;
 pub mod p_0057;
 pub mod p_0058;
@@ -89,6 +90,7 @@ use p_0048::get_problem as problem_0048;
 use p_0050::get_problem as problem_0050;
 use p_0053::get_problem as problem_0053;
 use p_0054::get_problem as problem_0054;
+use p_0055::get_problem as problem_0055;
 use p_0056::get_problem as problem_0056;
 use p_0057::get_problem as problem_0057;
 use p_0058::get_problem as problem_0058;
@@ -142,6 +144,7 @@ pub fn get_problems() -> Problems {
         problem_0050(),
         problem_0053(),
         problem_0054(),
+        problem_0055(),
         problem_0056(),
         problem_0057(),
         problem_0058(),

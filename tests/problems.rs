@@ -188,6 +188,11 @@ fn problem_0054() {
 }
 
 #[test]
+fn problem_0055() {
+    run_test(55, "249");
+}
+
+#[test]
 fn problem_0056() {
     run_test(56, "972");
 }
