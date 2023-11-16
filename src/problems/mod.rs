@@ -54,6 +54,7 @@ pub mod p_0081;
 pub mod p_0092;
 pub mod p_0097;
 pub mod p_0099;
+pub mod p_0102;
 
 use p_0001::get_problem as problem_0001;
 use p_0002::get_problem as problem_0002;
@@ -106,6 +107,7 @@ use p_0081::get_problem as problem_0081;
 use p_0092::get_problem as problem_0092;
 use p_0097::get_problem as problem_0097;
 use p_0099::get_problem as problem_0099;
+use p_0102::get_problem as problem_0102;
 
 
 /// Returns a `Problems` struct containing all the problems.
@@ -162,5 +164,6 @@ pub fn get_problems() -> Problems {
         problem_0092(),
         problem_0097(),
         problem_0099(),
+        problem_0102(),
     ])
 }

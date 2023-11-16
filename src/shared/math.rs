@@ -266,6 +266,36 @@ pub fn pcf_exact(x: u64) -> u64 {
     sieve_of_eratosthenes(x).len() as u64
 }
 
+/// Represents a point in 2D space.
+pub struct Point2D {
+    /// The x coordinate.
+    pub x: f64,
+    /// The y coordinate.
+    pub y: f64,
+}
+impl Point2D {
+    /// Creates a new point.
+    pub fn new(x: f64, y: f64) -> Self {
+        Self { x, y }
+    }
+}
+
+/// Represents a point in 3D space.
+pub struct Point3D {
+    /// The x coordinate.
+    pub x: f64,
+    /// The y coordinate.
+    pub y: f64,
+    /// The z coordinate.
+    pub z: f64,
+}
+impl Point3D {
+    /// Creates a new point.
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
+        Self { x, y, z }
+    }
+}
+
 /// Finds the prime factors of a number.
 /// If the number is 0 or 1, then an empty vector is returned.
 /// # Arguments
@@ -478,4 +508,83 @@ pub fn sum_of_divisors(n: u64) -> u64 {
 pub fn sum_of_proper_divisors(n: u64) -> u64 {
     // sum of proper divisors is equal to the sum of all divisors minus the number itself
     sum_of_divisors(n) - n
+}
+
+/// Represents a vector in 2D space.
+pub struct Vector2D {
+    /// The factor of the x unit vector.
+    pub x: f64,
+    /// The factor of the y unit vector.
+    pub y: f64,
+}
+impl Vector2D {
+    /// Creates a new vector.
+    pub fn new(x_factor: f64, y_factor: f64) -> Self {
+        Self { x: x_factor, y: y_factor }
+    }
+
+    /// Creates a new vector from two points.
+    pub fn from_points(point1: Point2D, point2: Point2D) -> Self {
+        Self { x: point2.x - point1.x, y: point2.y - point1.y }
+    }
+
+    /// Calculates the magnitude of the vector.
+    pub fn magnitude(&self) -> f64 {
+        (self.x.powi(2) + self.y.powi(2)).sqrt()
+    }
+
+    /// Calculates the dot product of two vectors.
+    pub fn dot_product(&self, other: &Self) -> f64 {
+        self.x * other.x + self.y * other.y
+    }
+
+    /// Calculates the angle between two vectors.
+    pub fn angle_between(&self, other: &Self) -> f64 {
+        (self.dot_product(other) / (self.magnitude() * other.magnitude())).acos()
+    }
+}
+
+/// Represents a vector in 3D space.
+pub struct Vector3D {
+    /// The factor of the x unit vector.
+    pub x: f64,
+    /// The factor of the y unit vector.
+    pub y: f64,
+    /// The factor of the z unit vector.
+    pub z: f64,
+}
+impl Vector3D {
+    /// Creates a new vector.
+    pub fn new(x_factor: f64, y_factor: f64, z_factor: f64) -> Self {
+        Self { x: x_factor, y: y_factor, z: z_factor }
+    }
+
+    /// Creates a new vector from two points.
+    pub fn from_points(point1: Point3D, point2: Point3D) -> Self {
+        Self { x: point2.x - point1.x, y: point2.y - point1.y, z: point2.z - point1.z }
+    }
+
+    /// Calculates the magnitude of the vector.
+    pub fn magnitude(&self) -> f64 {
+        (self.x.powi(2) + self.y.powi(2) + self.z.powi(2)).sqrt()
+    }
+
+    /// Calculates the dot product of two vectors.
+    pub fn dot_product(&self, other: &Self) -> f64 {
+        self.x * other.x + self.y * other.y + self.z * other.z
+    }
+
+    /// Calculates the angle between two vectors.
+    pub fn angle_between(&self, other: &Self) -> f64 {
+        (self.dot_product(other) / (self.magnitude() * other.magnitude())).acos()
+    }
+
+    /// Calculates the cross product of two vectors.
+    pub fn cross_product(&self, other: &Self) -> Self {
+        Self {
+            x: self.y * other.z - self.z * other.y,
+            y: self.z * other.x - self.x * other.z,
+            z: self.x * other.y - self.y * other.x,
+        }
+    }
 }

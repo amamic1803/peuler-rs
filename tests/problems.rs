@@ -256,3 +256,8 @@ fn problem_0097() {
 fn problem_0099() {
     run_test(99, "709");
 }
+
+#[test]
+fn problem_0102() {
+    run_test(102, "228");
+}
