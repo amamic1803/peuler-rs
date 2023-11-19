@@ -243,6 +243,11 @@ fn problem_0081() {
 }
 
 #[test]
+fn problem_0091() {
+    run_test(91, "14234");
+}
+
+#[test]
 fn problem_0092() {
     run_test(92, "8581146");
 }
