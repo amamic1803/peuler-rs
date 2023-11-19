@@ -64,6 +64,11 @@ impl Problems {
         }
     }
 
+    /// Returns the number of available problems.
+    pub fn count(&self) -> usize {
+        self.problems.len()
+    }
+
     /// Generates pretty header for console output.
     /// # Returns
     /// The `String` with the header.
