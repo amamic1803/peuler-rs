@@ -57,6 +57,7 @@ impl Iterator for CollatzSeq {
 }
 
 /// Returns the iterator over the digits of a number.
+/// Iterates from the least significant digit to the most significant digit.
 pub fn digits(n: u64) -> Digits {
     Digits { current: n }
 }
@@ -72,6 +73,18 @@ impl Iterator for Digits {
         }
         let result = self.current % 10;
         self.current /= 10;
+        Some(result)
+    }
+}
+impl DoubleEndedIterator for Digits {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        if self.current == 0 {
+            return None;
+        }
+        let mut reversed = reverse(self.current);
+        let result = reversed % 10;
+        reversed /= 10;
+        self.current = reverse(reversed);
         Some(result)
     }
 }
