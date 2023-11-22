@@ -5,7 +5,7 @@
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Problems {
     /// A vector containing the problems.
-    pub problems: Vec<Problem>,
+    problems: Vec<Problem>,
 }
 
 impl Problems {
@@ -19,6 +19,11 @@ impl Problems {
         Self {
             problems,
         }
+    }
+
+    /// Get access to the inner vector of problems.
+    pub fn problems(&self) -> &Vec<Problem> {
+        &self.problems
     }
 
     /// Returns the list of available problems.
