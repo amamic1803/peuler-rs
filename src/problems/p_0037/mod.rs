@@ -12,7 +12,7 @@ pub fn get_problem() -> Problem {
 
 
 use itertools::Itertools;
-use crate::shared::math::{digits, is_prime};
+use crate::shared::math::{digits, is_prime, slice_to_int};
 
 const TRUNC_PRIMES: u8 = 11;
 const FIRST_DIGIT: [u8; 4] = [2, 3, 5, 7];
@@ -51,7 +51,7 @@ fn solve() -> String {
 
         // iterate over cartesian product of these iterators over digits (they make numbers)
         for i in iterables.into_iter().multi_cartesian_product() {
-            let num = vec_to_int(&i);  // convert vector of digits to number
+            let num = slice_to_int(&i);  // convert vector of digits to number
 
             // check if number is truncatable prime
             if is_trunc_prime(num) {
@@ -78,14 +78,4 @@ fn is_trunc_prime(x: u64) -> bool {
         { return false; }
     }
     true
-}
-
-/// Convert a vector of digits to an integer.
-fn vec_to_int(n: &[u8]) -> u64 {
-    let mut sum: u64 = 0;
-    for digit in n {
-        sum *= 10;
-        sum += *digit as u64;
-    }
-    sum
 }

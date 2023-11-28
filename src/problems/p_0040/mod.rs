@@ -17,7 +17,7 @@ use crate::shared::math::digits;
 const POSITIONS: [u64; 7] = [1, 10, 100, 1_000, 10_000, 100_000, 1_000_000];
 
 fn solve() -> String {
-    POSITIONS.into_iter().map(get_digit).product::<u64>().to_string()
+    POSITIONS.into_iter().map(|pos| get_digit(pos) as u64).product::<u64>().to_string()
 }
 
 /// This function calculates the digit at the given position in Champernowne's Constant.
@@ -25,7 +25,7 @@ fn solve() -> String {
 /// * `pos` - The position of the digit to calculate.
 /// # Returns
 /// The digit at the given position.
-fn get_digit(pos: u64) -> u64 {
+fn get_digit(pos: u64) -> u8 {
     // there are 9 single digit numbers, 90 two digit numbers, 900 three digit numbers, etc.
     // 9 * n * 10^(n-1) is the number of digits in all numbers with n digits
     // iterate and sum until the sum is greater than the position

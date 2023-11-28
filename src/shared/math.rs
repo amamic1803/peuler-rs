@@ -65,7 +65,7 @@ pub struct Digits {
     current: u64,
 }
 impl Iterator for Digits {
-    type Item = u64;
+    type Item = u8;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.current == 0 {
@@ -73,7 +73,7 @@ impl Iterator for Digits {
         }
         let result = self.current % 10;
         self.current /= 10;
-        Some(result)
+        Some(result as u8)
     }
 }
 impl DoubleEndedIterator for Digits {
@@ -85,7 +85,7 @@ impl DoubleEndedIterator for Digits {
         let result = reversed % 10;
         reversed /= 10;
         self.current = reverse(reversed);
-        Some(result)
+        Some(result as u8)
     }
 }
 
@@ -521,6 +521,20 @@ pub fn sum_of_divisors(n: u64) -> u64 {
 pub fn sum_of_proper_divisors(n: u64) -> u64 {
     // sum of proper divisors is equal to the sum of all divisors minus the number itself
     sum_of_divisors(n) - n
+}
+
+/// Converts a slice of digits to an integer.
+/// # Arguments
+/// * `n` - The slice of digits to convert. Type must be u8.
+/// # Returns
+/// * `u64` - The integer.
+pub fn slice_to_int(n: &[u8]) -> u64 {
+    let mut sum: u64 = 0;
+    for digit in n {
+        sum *= 10;
+        sum += *digit as u64;
+    }
+    sum
 }
 
 /// Represents a vector in 2D space.

@@ -46,7 +46,7 @@ fn process_number(num: u64, cache: &mut Vec<Option<bool>>) -> bool {
         1 => false,
         89 => true,
         _ => {
-            let next = digits(num).map(|x| x * x).sum();
+            let next = digits(num).map(|x| x as u64 * x as u64).sum();
 
             if next as usize >= cache.len() {
                 process_number(next, cache)
