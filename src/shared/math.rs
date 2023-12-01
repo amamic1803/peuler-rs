@@ -173,6 +173,20 @@ pub fn is_palindrome_128(num: u128) -> bool {
     num == reverse_128(num)
 }
 
+/// Creates an integer from an iterator over digits.
+/// # Arguments
+/// * `digits` - The iterator over digits.
+/// # Returns
+/// * `u64` - The integer.
+pub fn iter_to_int<T: IntoIterator<Item=u8>>(digits: T) -> u64 {
+    let mut result = 0;
+    for digit in digits {
+        result *= 10;
+        result += digit as u64;
+    }
+    result
+}
+
 /// Finds the least common multiple of two numbers.
 /// # Arguments
 /// * `num1` - The first number.
