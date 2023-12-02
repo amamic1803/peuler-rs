@@ -128,6 +128,11 @@ fn problem_0025() {
 }
 
 #[test]
+fn problem_0026() {
+    run_test(26, "983");
+}
+
+#[test]
 fn problem_0027() {
     run_test(27, "-59231");
 }

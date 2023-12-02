@@ -262,6 +262,36 @@ pub fn num_of_proper_divisors(n: u64) -> u64 {
     num_of_divisors(n) - 1
 }
 
+/// Calculates multiplicative order.
+/// Finds the smallest positive integer k such that a^k ≡ 1 (mod n).
+/// a and n must be coprime.
+/// # Arguments
+/// * `a` - The base.
+/// * `n` - The modulus.
+/// # Returns
+/// * `u64` - The multiplicative order.
+/// # Panics
+/// Panics if a and n are not coprime.
+pub fn ord(a: u64, n: u64) -> u64 {
+    assert_eq!(gcd(a, n), 1, "a and n must be coprime.");
+
+    // a^k ≡ 1 (mod n)
+    // a^k (mod n) = ((a^(k-1) (mod n)) * a) (mod n)
+    // example: 8^2 mod 7 = ((8 mod 7) * 8) mod 7
+    // k <= n - 1 (Fermat's little theorem)
+
+    let mut result = 1;
+    for k in 1..n {
+        result = (result * a) % n;
+        if result == 1 {
+            return k;
+        }
+    }
+
+    // since a and n are coprime, multiplicative order must exist
+    unreachable!("Multiplicative order not found.");
+}
+
 /// Simple prime-counting function.
 /// Estimates the number of primes less than or equal to x.
 /// Uses the prime number theorem which states that the number of primes less than or equal to x is approximately x / ln(x).
