@@ -1,4 +1,4 @@
-//! Functions for working with numbers.
+//! Mathematical functions.
 
 
 
