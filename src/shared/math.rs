@@ -358,7 +358,7 @@ impl Point3D {
 /// # Arguments
 /// * `x` - The number to find the prime factors of.
 /// # Returns
-/// * `Vec<[u64; 2]>` - The prime factors of the number. In the form [prime factor, power].
+/// * `Vec<(u64, u64)>` - The prime factors of the number. In the form (prime_factor, power).
 pub fn prime_factors(mut x: u64) -> Vec<(u64, u64)> {
     // calculate primes that are less than or equal to the square root of x
     // these are the only possible prime factors
