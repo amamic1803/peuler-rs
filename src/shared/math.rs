@@ -4,6 +4,14 @@
 
 
 
+use std::collections::HashMap;
+use std::sync::Mutex;
+use once_cell::sync::Lazy;
+
+
+
+
+
 /// Inverse of the prime-counting function.
 /// Estimates the number for which the prime-counting function is approximately n.
 /// Uses the inverse of the prime number theorem.
@@ -290,6 +298,59 @@ pub fn ord(a: u64, n: u64) -> u64 {
 
     // since a and n are coprime, multiplicative order must exist
     unreachable!("Multiplicative order not found.");
+}
+
+/// Calculates the partition function.
+/// Finds the number of ways a number can be written as a sum of positive integers.
+/// Uses the recurrence relation p(n) = Σ(k=1, n)(-1)^(k+1) * (p(n - k(3k - 1) / 2) + p(n - k(3k + 1) / 2)).
+/// Uses memoization to speed up the calculation.
+/// # Arguments
+/// * `n` - The number to find the number of partitions of.
+/// # Returns
+/// * `u64` - The number of partitions of the number.
+/// # Example
+/// Partitions of 5: {5}, {4, 1}, {3, 2}, {3, 1, 1}, {2, 2, 1}, {2, 1, 1, 1}, {1, 1, 1, 1, 1}
+///
+/// partition_p(5) = 7
+pub fn partition_p(n: u64) -> u64 {
+    // memoization hashmap
+    static MEMO_MAP: Lazy<Mutex<HashMap<u64, u64>>> = Lazy::new(|| {
+        let mut new_map = HashMap::new();
+        new_map.insert(0, 1);
+        new_map.insert(1, 1);
+        Mutex::new(new_map)
+    });
+
+    // if n is already in the hashmap, then return the value
+    if let Some(&value) = MEMO_MAP.lock().unwrap().get(&n) {
+        return value;
+    }
+
+    // if n is not in the hashmap, then calculate the value
+    let mut sum = 0;
+    for k in 1..=n {
+        let left_value = match n.checked_sub(k * (3 * k - 1) / 2) {
+            Some(sub_val) => partition_p(sub_val),
+            None => 0,
+        };
+        let right_value = match n.checked_sub(k * (3 * k + 1) / 2) {
+            Some(sub_val) => partition_p(sub_val),
+            None => 0,
+        };
+        let value = left_value + right_value;
+
+        if k % 2 == 0 {
+            sum -= value;
+        } else {
+            sum += value;
+        }
+    }
+
+    // insert the newly calculated value into the hashmap
+    MEMO_MAP.lock().unwrap().insert(n, sum);
+
+    // return the value
+    sum
 }
 
 /// Simple prime-counting function.
