@@ -4,7 +4,6 @@
 
 
 
-use std::collections::HashMap;
 use std::sync::Mutex;
 use once_cell::sync::Lazy;
 
@@ -313,44 +312,52 @@ pub fn ord(a: u64, n: u64) -> u64 {
 ///
 /// partition_p(5) = 7
 pub fn partition_p(n: u64) -> u64 {
-    // memoization hashmap
-    static MEMO_MAP: Lazy<Mutex<HashMap<u64, u64>>> = Lazy::new(|| {
-        let mut new_map = HashMap::new();
-        new_map.insert(0, 1);
-        new_map.insert(1, 1);
-        Mutex::new(new_map)
-    });
+    // get n as usize
+    let n = usize::try_from(n).expect("Number too large.");
 
-    // if n is already in the hashmap, then return the value
-    if let Some(&value) = MEMO_MAP.lock().unwrap().get(&n) {
+    // since calculating p(n) also requires calculating p of every number less than n
+    // we can just calculate all values and store them in a vector
+
+    // memoization
+    static CACHE_VEC: Lazy<Mutex<Vec<u64>>> = Lazy::new(|| {
+        Mutex::new(vec![1_u64, 1_u64])
+    });
+    let mut cache = CACHE_VEC.lock().unwrap();
+
+    // if n is already in the cache vector, then return the value
+    if let Some(&value) = cache.get(n) {
         return value;
     }
 
-    // if n is not in the hashmap, then calculate the value
-    let mut sum = 0;
-    for k in 1..=n {
-        let left_value = match n.checked_sub(k * (3 * k - 1) / 2) {
-            Some(sub_val) => partition_p(sub_val),
-            None => 0,
-        };
-        let right_value = match n.checked_sub(k * (3 * k + 1) / 2) {
-            Some(sub_val) => partition_p(sub_val),
-            None => 0,
-        };
-        let value = left_value + right_value;
+    while cache.len() <= n {
+        // calculate next value and add it to vector
 
-        if k % 2 == 0 {
-            sum -= value;
-        } else {
-            sum += value;
+        let curr_n = cache.len();
+        let mut next_val = 0;
+        for k in 1..=curr_n {
+            let left_value = match curr_n.checked_sub((k * (3 * k - 1)) >> 1) {
+                Some(ind) => cache[ind],
+                None => break,  // larger of the indices is below zero, so any larger k will only be 0, we can break
+            };
+            let right_value = match curr_n.checked_sub((k * (3 * k + 1)) >> 1) {
+                Some(ind) => cache[ind],
+                None => 0,
+            };
+            let value = left_value + right_value;
+
+            if k % 2 == 0 {
+                next_val -= value;
+            } else {
+                next_val += value;
+            }
         }
+
+        // push the newly calculated value to the cache vector
+        cache.push(next_val);
     }
 
-    // insert the newly calculated value into the hashmap
-    MEMO_MAP.lock().unwrap().insert(n, sum);
-
     // return the value
-    sum
+    cache[n]
 }
 
 /// Simple prime-counting function.
