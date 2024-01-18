@@ -360,6 +360,34 @@ pub fn partition_p(n: u64) -> u64 {
     cache[n]
 }
 
+/// Calculates the number of prime partitions.
+/// Finds the number of ways a number can be written as a sum of primes.
+/// # Arguments
+/// * `n` - The number to find the number of prime partitions of.
+/// # Returns
+/// * `u64` - The number of prime partitions of the number.
+/// # Example
+/// Prime partitions of 7: {7}, {5, 2}, {3, 2, 2}
+///
+/// partition_prime(7) = 3
+pub fn partition_prime(n: u64) -> u64 {
+    let n = usize::try_from(n).expect("Number too large.");
+    let primes = sieve_of_eratosthenes(n as u64);
+
+    let mut dp = vec![0; n + 1];
+
+    // 0 can be represented in 1 way = {} (1 can't be represented as a sum of primes so dp[1] stays 0)
+    dp[0] = 1;
+
+    for prime in primes {
+        for i in (prime as usize)..=n {
+            dp[i] += dp[i - prime as usize];
+        }
+    }
+
+    dp[n]
+}
+
 /// Simple prime-counting function.
 /// Estimates the number of primes less than or equal to x.
 /// Uses the prime number theorem which states that the number of primes less than or equal to x is approximately x / ln(x).
