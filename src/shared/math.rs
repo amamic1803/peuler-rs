@@ -142,24 +142,26 @@ pub fn gcd_multiple(nums: &[u64]) -> u64 {
 /// # Returns
 /// * `bool` - Whether the number is prime.
 /// * `u64` - The smallest divisor if the number is not prime, otherwise 1.
-pub fn is_prime(num: u64) -> (bool, u64) {
-    assert!(num >= 2, "Number must be greater than or equal to 2.");
+pub fn is_prime(n: u64) -> (bool, u64) {
+    assert!(n >= 2, "Number must be greater than or equal to 2.");
 
-    if num == 2 {
-        return (true, 0);
-    } else if num % 2 == 0 {
-        return (false, 2);
-    }
-
-    let mut i = 3;
-    while i * i <= num {
-        if num % i == 0 {
-            return (false, i);
+    if n == 2 || n == 3 {
+        (true, 1)
+    } else if n % 2 == 0 {
+        (false, 2)
+    } else if n % 3 == 0 {
+        (false, 3)
+    } else {
+        for i in (5..=((n as f64).sqrt().floor() as u64)).step_by(6) {
+            if n % i == 0 {
+                return (false, i);
+            } else if n % (i + 2) == 0 {
+                return (false, i + 2);
+            }
         }
-        i += 2;
-    }
 
-    (true, 1)
+        (true, 1)
+    }
 }
 
 /// Checks if a number is a palindrome.
