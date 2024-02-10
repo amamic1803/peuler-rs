@@ -11,20 +11,21 @@ pub fn get_problem() -> Problem {
 }
 
 
-use malachite::Rational;
-use malachite::num::basic::traits::{One, Two};
+use malachite::Natural;
 use malachite::num::conversion::traits::Digits;
+use crate::shared::math::ContinuedFraction;
 
 fn solve() -> String {
-    let mut fraction = Rational::from_unsigneds(0_u8, 1_u8);
+    // generate the values for the continued fraction (2, 1, 2, 1, 1, 4, 1, 1, 6, 1, 1, 8, ...)
+    let mut frac_vals = vec![2];
+    frac_vals.extend((0..99).map(|i| if i % 3 == 1 { 2 * (i / 3 + 1) } else { 1 }));
 
-    // uses 99 here since the first iteration is done outside the loop (the fraction is initialized to 0/1)
-    for i in (0..99).rev() {
-        let fraction_sum_part = if i % 3 == 1 { Rational::TWO * Rational::from(i / 3 + 1) } else { Rational::ONE };
-        fraction = Rational::ONE / (fraction_sum_part + &fraction);
-    }
-
-    let result = Rational::TWO + &fraction;
-
-    result.numerator_ref().to_digits_desc(&10_u32).iter().sum::<u32>().to_string()
+    // get the 100th convergent and sum its digits
+    ContinuedFraction::new(frac_vals, None)
+        .convergent_n(99).unwrap()
+        .into_numerator()
+        .to_digits_asc(&Natural::from(10_u8))
+        .iter()
+        .sum::<Natural>()
+        .to_string()
 }

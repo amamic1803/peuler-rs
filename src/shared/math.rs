@@ -4,7 +4,13 @@
 
 
 
+use std::collections::HashSet;
+use std::iter;
+use std::mem;
 use std::sync::Mutex;
+use malachite::num::basic::traits::{Zero, One};
+use malachite::Integer;
+use malachite::Rational;
 use once_cell::sync::Lazy;
 
 
@@ -60,6 +66,97 @@ impl Iterator for CollatzSeq {
             self.current = 3 * self.current + 1;
         }
         Some(self.current)
+    }
+}
+
+/// Represents a continued fraction.
+pub struct ContinuedFraction {
+    non_periodic: Vec<i64>,
+    periodic: Option<Vec<i64>>,
+}
+impl ContinuedFraction {
+    /// Creates a new continued fraction.
+    pub fn new(non_periodic: Vec<i64>, periodic: Option<Vec<i64>>) -> Self {
+        Self { non_periodic, periodic }
+    }
+
+    /// Creates the continued fraction by taking the square root of a number.
+    pub fn from_sqrt(n: i64) -> Self {
+        assert!(n >= 0, "Number must be non-negative.");
+
+        // integer square root of n
+        let root = (n as f64).sqrt().floor() as i64;
+
+        let non_periodic = vec![root];
+        let mut periodic = None;
+
+        // if n is not a perfect square, then find the periodic part of the continued fraction
+        if root * root != n {
+            // vector for storing the periodic part of the continued fraction
+            periodic = Some(Vec::new());
+
+            // set for storing the rational part of the numerator and the denominator
+            // used for detecting the period
+            let mut set = HashSet::new();
+
+            // rational part of the numerator, it is negative number such that -root < num < 0
+            // here it is stored as positive because calculations take into account the negative sign
+            let mut num = root;
+            // denominator, starts with 1
+            let mut denom = 1;
+
+            // calculate next iteration of the continued fraction
+            // until the set contains the numerator and the denominator
+            // which means the period is found
+            while !set.contains(&(num, denom)) {
+                set.insert((num, denom));
+
+                denom = (n - num * num) / denom;
+                let expanded_val = (num + root) / denom;
+
+                // push the expanded value to the periodic part of the continued fraction
+                periodic.as_mut().unwrap().push(expanded_val);
+
+                num = -(num - denom * expanded_val);
+            }
+        }
+
+        Self { non_periodic, periodic }
+    }
+
+    /// Returns the reference to the non-periodic part of the continued fraction.
+    pub fn non_periodic(&self) -> &[i64] {
+        &self.non_periodic
+    }
+
+    /// Returns the reference to the periodic part of the continued fraction.
+    pub fn periodic(&self) -> Option<&[i64]> {
+        self.periodic.as_deref()
+    }
+
+    /// Iterator over the convergents of the continued fraction.
+    /// If the continued fraction is finite, then the iterator is also finite.
+    /// If the continued fraction is infinite, then the iterator is infinite.
+    pub fn convergents(&self) -> impl Iterator<Item=Rational> + '_ {
+        let mut prev_num = Integer::ZERO;
+        let mut prev_den = Integer::ONE;
+        let mut num = Integer::ONE;
+        let mut den = Integer::ZERO;
+        let mut values = self.non_periodic.iter().chain(self.periodic.iter().flat_map(|v| v.iter().cycle()));
+
+        iter::from_fn(move || {
+            let next_value = values.next()?;
+            let next_num = Integer::const_from_signed(*next_value) * &num + &prev_num;
+            let next_den = Integer::const_from_signed(*next_value) * &den + &prev_den;
+            prev_num = mem::replace(&mut num, next_num);
+            prev_den = mem::replace(&mut den, next_den);
+            Some(Rational::from_integers_ref(&num, &den))
+        })
+    }
+
+    /// Returns the convergent at index n.
+    pub fn convergent_n(&self, n: usize) -> Option<Rational> {
+        self.convergents().nth(n)
     }
 }
 

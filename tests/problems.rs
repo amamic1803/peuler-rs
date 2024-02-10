@@ -303,8 +303,18 @@ fn problem_0063() {
 }
 
 #[test]
+fn problem_0064() {
+    run_test(64, "1322");
+}
+
+#[test]
 fn problem_0065() {
     run_test(65, "272");
+}
+
+#[test]
+fn problem_0066() {
+    run_test(66, "661");
 }
 
 #[test]
