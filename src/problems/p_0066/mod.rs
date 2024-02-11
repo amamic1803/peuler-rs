@@ -18,6 +18,10 @@ use crate::shared::math::ContinuedFraction;
 const MAX: u16 = 1000;
 
 fn solve() -> String {
+    // this is Pell's equation
+    // the solution to Pell's equation, minimizing x, is one of the convergents of the continued fraction of sqrt(d)
+    // so we just need to try out convergents of sqrt(d) in increasing order until we find one that satisfies the equation
+
     let mut max_x = Natural::ZERO;
     let mut max_d = 0;
     for d in 1..MAX {
