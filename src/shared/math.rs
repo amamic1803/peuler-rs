@@ -518,6 +518,35 @@ pub fn pcf_exact(x: u64) -> u64 {
     sieve_of_eratosthenes(x).len() as u64
 }
 
+/// Calculate the Euler's totient function.
+pub fn phi(n: u64) -> u64 {
+    let mut result = n;
+    let mut curr_fact = 0;
+    for fact in prime_factors_iter(n) {
+        if curr_fact != fact {
+            curr_fact = fact;
+            result -= result / fact;
+        }
+    }
+    result
+}
+
+/// Calculate the Euler's totient function for numbers from 1 to n.
+/// Returns a vector of the results, index 0 is unused (set to 0), other indices represent the number.
+pub fn phi_1_to_n(n: u64) -> Vec<u64> {
+    let mut phi_values: Vec<u64> = (0..=n).collect();
+
+    for i in 2..=n {
+        if phi_values[i as usize] == i {
+            for j in (i..=n).step_by(i as usize) {
+                phi_values[j as usize] -= phi_values[j as usize] / i;
+            }
+        }
+    }
+
+    phi_values
+}
+
 /// Represents a point in 2D space.
 pub struct Point2D {
     /// The x coordinate.
@@ -587,6 +616,28 @@ pub fn prime_factors(mut x: u64) -> Vec<(u64, u64)> {
     }
 
     factors
+}
+
+/// Returns the prime factors as an iterator.
+/// If the prime factor appears multiple times, then it will appear multiple times in the iterator.
+/// Factors are returned in ascending order.
+/// Makes no memory allocations, therefore, it is better for small numbers.
+/// For big numbers, prime_factors should be faster because it uses prime sieve.
+pub fn prime_factors_iter(mut x: u64) -> impl Iterator<Item=u64> {
+    let mut factor = 2;
+    iter::from_fn(move || {
+        while factor <= x {
+            if x % factor == 0 {
+                x /= factor;
+                return Some(factor);
+            }
+            match factor {
+                2 => factor += 1,
+                _ => factor += 2,
+            };
+        }
+        None
+    })
 }
 
 /// Reverses a number.
