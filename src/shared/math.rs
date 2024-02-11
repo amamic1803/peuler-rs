@@ -233,6 +233,39 @@ pub fn gcd_multiple(nums: &[u64]) -> u64 {
     result
 }
 
+/// Checks if a number is a palindrome.
+/// # Arguments
+/// * `num` - The number to check.
+/// # Returns
+/// * `bool` - Whether the number is a palindrome.
+pub fn is_palindrome(num: u64) -> bool {
+    num == reverse(num)
+}
+
+/// Checks if a u128 number is a palindrome.
+/// # Arguments
+/// * `num` - The number to check.
+/// # Returns
+/// * `bool` - Whether the number is a palindrome.
+pub fn is_palindrome_128(num: u128) -> bool {
+    num == reverse_128(num)
+}
+
+/// Checks if two numbers are permutations of each other.
+pub fn is_permutation(n: u64, m: u64) -> bool {
+    let mut n_digits = [0_u8; 10];
+    let mut m_digits = [0_u8; 10];
+
+    for digit in digits(n) {
+        n_digits[digit as usize] += 1;
+    }
+    for digit in digits(m) {
+        m_digits[digit as usize] += 1;
+    }
+
+    n_digits == m_digits
+}
+
 /// Checks if a number is prime.
 /// # Arguments
 /// * `num` - The number to check.
@@ -259,24 +292,6 @@ pub fn is_prime(n: u64) -> (bool, u64) {
 
         (true, 1)
     }
-}
-
-/// Checks if a number is a palindrome.
-/// # Arguments
-/// * `num` - The number to check.
-/// # Returns
-/// * `bool` - Whether the number is a palindrome.
-pub fn is_palindrome(num: u64) -> bool {
-    num == reverse(num)
-}
-
-/// Checks if a u128 number is a palindrome.
-/// # Arguments
-/// * `num` - The number to check.
-/// # Returns
-/// * `bool` - Whether the number is a palindrome.
-pub fn is_palindrome_128(num: u128) -> bool {
-    num == reverse_128(num)
 }
 
 /// Creates an integer from an iterator over digits.
