@@ -11,7 +11,7 @@ pub fn get_problem() -> Problem {
 }
 
 
-use crate::shared::math::digits;
+use crate::shared::math::digits_rev;
 
 
 const POSITIONS: [u64; 7] = [1, 10, 100, 1_000, 10_000, 100_000, 1_000_000];
@@ -59,7 +59,7 @@ fn get_digit(pos: u64) -> u8 {
     // if the digits_to_move is zero, that means that we are at the digit we need to return, so that is index 0
     // we are also sure that the index won't be longer than the number of digits in the number
     // because that was checked before
-    digits(number).nth_back(digits_to_move as usize).unwrap()
+    digits_rev(number).nth(digits_to_move as usize).unwrap()
 }
 
 

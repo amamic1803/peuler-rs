@@ -398,6 +398,11 @@ fn problem_0097() {
 }
 
 #[test]
+fn problem_0098() {
+    run_test(98, "18769");
+}
+
+#[test]
 fn problem_0099() {
     run_test(99, "709");
 }

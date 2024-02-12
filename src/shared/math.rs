@@ -81,26 +81,19 @@ pub fn isqrt_128(n: u128) -> u128 {
 }
 
 /// Returns the iterator of the Collatz sequence starting at a number.
-pub fn collatz_seq(num: u64) -> CollatzSeq {
-    CollatzSeq { current: num }
-}
-pub struct CollatzSeq {
-    current: u64,
-}
-impl Iterator for CollatzSeq {
-    type Item = u64;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.current == 1 {
+pub fn collatz_seq(num: u64) -> impl Iterator<Item=u64> {
+    let mut current = num;
+    iter::from_fn(move || {
+        if current == 1 {
             return None;
         }
-        if self.current % 2 == 0 {
-            self.current /= 2;
+        if current % 2 == 0 {
+            current >>= 1;
         } else {
-            self.current = 3 * self.current + 1;
+            current = 3 * current + 1;
         }
-        Some(self.current)
-    }
+        Some(current)
+    })
 }
 
 /// Represents a continued fraction.
@@ -196,35 +189,32 @@ impl ContinuedFraction {
 
 /// Returns the iterator over the digits of a number.
 /// Iterates from the least significant digit to the most significant digit.
-pub fn digits(n: u64) -> Digits {
-    Digits { current: n }
+pub fn digits(n: u64) -> impl Iterator<Item=u8> {
+    let mut current = n;
+    iter::from_fn(move || {
+        if current == 0 {
+            return None;
+        }
+        let result = current % 10;
+        current /= 10;
+        Some(result as u8)
+    })
 }
-pub struct Digits {
-    current: u64,
-}
-impl Iterator for Digits {
-    type Item = u8;
 
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.current == 0 {
+/// Returns the iterator over the digits of a number in reverse order.
+/// Iterates from the most significant digit to the least significant digit.
+pub fn digits_rev(n: u64) -> impl Iterator<Item=u8> {
+    let mut digits_count = n.ilog10() + 1;
+    let mut current = reverse(n);
+    iter::from_fn(move || {
+        if current == 0 && digits_count == 0 {
             return None;
         }
-        let result = self.current % 10;
-        self.current /= 10;
+        let result = current % 10;
+        current /= 10;
+        digits_count -= 1;
         Some(result as u8)
-    }
-}
-impl DoubleEndedIterator for Digits {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        if self.current == 0 {
-            return None;
-        }
-        let mut reversed = reverse(self.current);
-        let result = reversed % 10;
-        reversed /= 10;
-        self.current = reverse(reversed);
-        Some(result as u8)
-    }
+    })
 }
 
 /// Calculates the factorial of a number.
