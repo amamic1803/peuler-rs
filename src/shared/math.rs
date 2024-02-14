@@ -204,7 +204,7 @@ pub fn digits(n: u64) -> impl Iterator<Item=u8> {
 /// Returns the iterator over the digits of a number in reverse order.
 /// Iterates from the most significant digit to the least significant digit.
 pub fn digits_rev(n: u64) -> impl Iterator<Item=u8> {
-    let mut digits_count = n.ilog10() + 1;
+    let mut digits_count = n.checked_ilog10().unwrap_or(0) + 1;
     let mut current = reverse(n);
     iter::from_fn(move || {
         if current == 0 && digits_count == 0 {
@@ -397,6 +397,22 @@ pub fn num_of_divisors(n: u64) -> u64 {
     prime_factors(n).into_iter().map(|(_, a)| a + 1).product()
 }
 
+/// Finds the number of divisors of numbers from 1 to n.
+/// # Arguments
+/// * `n` - The number to find the number of divisors of.
+/// # Returns
+/// * `Vec<u64>` - The number of divisors of numbers from 1 to n. Index 0 is unused (set to 0), other indices represent the number.
+pub fn num_of_divisors_1_to_n(n: u64) -> Vec<u64> {
+    let mut divisors = vec![1; (n + 1) as usize];
+    divisors[0] = 0;
+    for i in 2..=n {
+        for j in (i..=n).step_by(i as usize) {
+            divisors[j as usize] += 1;
+        }
+    }
+    divisors
+}
+
 /// Finds the number of proper divisors of a number.
 /// Proper divisors are all divisors of a number except the number itself.
 /// # Arguments
@@ -405,6 +421,22 @@ pub fn num_of_divisors(n: u64) -> u64 {
 /// * `u64` - The number of proper divisors of the number.
 pub fn num_of_proper_divisors(n: u64) -> u64 {
     num_of_divisors(n) - 1
+}
+
+/// Finds the number of proper divisors of numbers from 1 to n.
+/// Proper divisors are all divisors of a number except the number itself.
+/// # Arguments
+/// * `n` - The number to find the number of proper divisors of.
+/// # Returns
+/// * `Vec<u64>` - The number of proper divisors of numbers from 1 to n. Index 0 is unused (set to 0), other indices represent the number.
+pub fn num_of_proper_divisors_1_to_n(n: u64) -> Vec<u64> {
+    let mut divisors = vec![0; (n + 1) as usize];
+    for i in 2..=n {
+        for j in (i..=n).step_by(i as usize) {
+            divisors[j as usize] += 1;
+        }
+    }
+    divisors
 }
 
 /// Calculates multiplicative order.
@@ -839,6 +871,21 @@ pub fn sum_of_divisors(n: u64) -> u64 {
     }
 }
 
+/// Finds the sum of the divisors of numbers from 1 to n.
+/// # Arguments
+/// * `n` - The number to find the sum of the divisors of.
+/// # Returns
+/// * `Vec<u64>` - The sum of the divisors of numbers from 1 to n. Index 0 is unused (set to 0), other indices represent the number.
+pub fn sum_of_divisors_1_to_n(n: u64) -> Vec<u64> {
+    let mut divisors = vec![0; (n + 1) as usize];
+    for i in 1..=n {
+        for j in (i..=n).step_by(i as usize) {
+            divisors[j as usize] += i;
+        }
+    }
+    divisors
+}
+
 /// Finds the sum of the proper divisors of a number.
 /// Proper divisors are all divisors of a number except the number itself.
 /// # Arguments
@@ -848,6 +895,22 @@ pub fn sum_of_divisors(n: u64) -> u64 {
 pub fn sum_of_proper_divisors(n: u64) -> u64 {
     // sum of proper divisors is equal to the sum of all divisors minus the number itself
     sum_of_divisors(n) - n
+}
+
+/// Finds the sum of the proper divisors of numbers from 1 to n.
+/// Proper divisors are all divisors of a number except the number itself.
+/// # Arguments
+/// * `n` - The number to find the sum of the proper divisors of.
+/// # Returns
+/// * `Vec<u64>` - The sum of the proper divisors of numbers from 1 to n. Index 0 is unused (set to 0), other indices represent the number.
+pub fn sum_of_proper_divisors_1_to_n(n: u64) -> Vec<u64> {
+    let mut divisors = vec![0; (n + 1) as usize];
+    for i in 1..=n {
+        for j in ((2 * i)..=n).step_by(i as usize) {
+            divisors[j as usize] += i;
+        }
+    }
+    divisors
 }
 
 /// Converts a slice of digits to an integer.
