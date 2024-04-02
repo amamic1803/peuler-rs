@@ -3,18 +3,12 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        49,
-        "Prime Permutations",
-        solve,
-    )
+    Problem::new(49, "Prime Permutations", solve)
 }
 
-
-use std::collections::BTreeSet;
-use itertools::Itertools;
 use crate::shared::math::{digits, sieve_of_eratosthenes, slice_to_int};
-
+use itertools::Itertools;
+use std::collections::BTreeSet;
 
 fn solve() -> String {
     // store all 4-digit primes in a set
@@ -70,7 +64,12 @@ fn solve() -> String {
     }
 
     // assert that there are exactly 2 sequences
-    assert_eq!(found_sequences.len(), 2, "Found {} sequences, expected 2", found_sequences.len());
+    assert_eq!(
+        found_sequences.len(),
+        2,
+        "Found {} sequences, expected 2",
+        found_sequences.len()
+    );
 
     // result string
     let mut result = String::new();

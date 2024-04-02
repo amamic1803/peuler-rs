@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        24,
-        "Lexicographic Permutations",
-        solve,
-    )
+    Problem::new(24, "Lexicographic Permutations", solve)
 }
-
 
 use crate::shared::math::factorial;
 

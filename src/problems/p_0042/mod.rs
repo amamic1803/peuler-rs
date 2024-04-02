@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        42,
-        "Coded Triangle Numbers",
-        solve,
-    )
+    Problem::new(42, "Coded Triangle Numbers", solve)
 }
-
 
 fn solve() -> String {
     let input = include_str!("0042_words.txt");
@@ -17,12 +12,12 @@ fn solve() -> String {
     input
         .trim()
         .split(',')
-        .map(|word| word
-            .trim_matches('"')
-            .chars()
-            .map(letter_value)
-            .sum::<u32>()
-        )
+        .map(|word| {
+            word.trim_matches('"')
+                .chars()
+                .map(letter_value)
+                .sum::<u32>()
+        })
         .filter(is_triangle_num)
         .count()
         .to_string()

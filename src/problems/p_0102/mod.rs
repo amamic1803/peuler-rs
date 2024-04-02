@@ -3,16 +3,11 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        102,
-        "Triangle Containment",
-        solve,
-    )
+    Problem::new(102, "Triangle Containment", solve)
 }
 
-
-use std::f64::consts::PI;
 use crate::shared::math::{Point2D, Vector2D};
+use std::f64::consts::PI;
 
 const FULL_ANGLE: f64 = 2.0 * PI;
 
@@ -54,12 +49,12 @@ fn parse_input(input: &str) -> Vec<(Point2D, Point2D, Point2D)> {
             let mut line_iter = line
                 .trim()
                 .split(',')
-                .map(|num_str| num_str
-                    .parse::<f64>().unwrap()
-                );
-            (Point2D::new(line_iter.next().unwrap(), line_iter.next().unwrap()),
-             Point2D::new(line_iter.next().unwrap(), line_iter.next().unwrap()),
-             Point2D::new(line_iter.next().unwrap(), line_iter.next().unwrap()))
+                .map(|num_str| num_str.parse::<f64>().unwrap());
+            (
+                Point2D::new(line_iter.next().unwrap(), line_iter.next().unwrap()),
+                Point2D::new(line_iter.next().unwrap(), line_iter.next().unwrap()),
+                Point2D::new(line_iter.next().unwrap(), line_iter.next().unwrap()),
+            )
         })
         .collect::<Vec<(Point2D, Point2D, Point2D)>>()
 }

@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        5,
-        "Smallest Multiple",
-        solve,
-    )
+    Problem::new(5, "Smallest Multiple", solve)
 }
-
 
 use crate::shared::math::lcm_multiple;
 

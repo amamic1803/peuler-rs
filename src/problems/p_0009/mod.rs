@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        9,
-        "Special Pythagorean Triplet",
-        solve,
-    )
+    Problem::new(9, "Special Pythagorean Triplet", solve)
 }
-
 
 fn solve() -> String {
     let limit = 1000;

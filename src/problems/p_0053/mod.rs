@@ -3,16 +3,11 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        53,
-        "Combinatoric Selections",
-        solve,
-    )
+    Problem::new(53, "Combinatoric Selections", solve)
 }
 
-
-use malachite::Natural;
 use malachite::num::basic::traits::One;
+use malachite::Natural;
 use once_cell::sync::Lazy;
 
 const LOW_N: usize = 23;
@@ -29,7 +24,9 @@ fn solve() -> String {
             let value = &FACT_CACHE[n] / (&FACT_CACHE[r] * &FACT_CACHE[n - r]);
             if value > limit {
                 result += (limit_r - r) << 1;
-                if n % 2 == 0 { result -= 1; }
+                if n % 2 == 0 {
+                    result -= 1;
+                }
                 break;
             }
         }

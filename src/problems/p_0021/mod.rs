@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        21,
-        "Amicable Numbers",
-        solve,
-    )
+    Problem::new(21, "Amicable Numbers", solve)
 }
-
 
 use crate::shared::math::sum_of_proper_divisors;
 
@@ -31,7 +26,10 @@ fn solve() -> String {
     // now it is checked whether the number is amicable, and if it is, it is added to the sum
     let mut sum = 0;
     for (i, sum_of_divisors) in sums.iter().enumerate().skip(1) {
-        if (*sum_of_divisors < MAX as u64) && (sums[*sum_of_divisors as usize] == i as u64) && (i as u64 != *sum_of_divisors) {
+        if (*sum_of_divisors < MAX as u64)
+            && (sums[*sum_of_divisors as usize] == i as u64)
+            && (i as u64 != *sum_of_divisors)
+        {
             sum += i as u64;
         }
     }

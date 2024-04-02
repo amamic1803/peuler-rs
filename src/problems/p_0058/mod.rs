@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        58,
-        "Spiral Primes",
-        solve,
-    )
+    Problem::new(58, "Spiral Primes", solve)
 }
-
 
 use crate::shared::math::is_prime;
 

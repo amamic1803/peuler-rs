@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        22,
-        "Names Scores",
-        solve,
-    )
+    Problem::new(22, "Names Scores", solve)
 }
-
 
 fn solve() -> String {
     let input = include_str!("0022_names.txt");
@@ -37,10 +32,7 @@ fn parse_input(input: &str) -> Vec<&str> {
 }
 
 fn name_value(name: &str) -> u32 {
-    name
-        .chars()
-        .map(letter_value)
-        .sum()
+    name.chars().map(letter_value).sum()
 }
 
 fn letter_value(letter: char) -> u32 {

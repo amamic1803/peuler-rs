@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        46,
-        "Goldbach's Other Conjecture",
-        solve,
-    )
+    Problem::new(46, "Goldbach's Other Conjecture", solve)
 }
-
 
 use crate::shared::math::is_prime;
 

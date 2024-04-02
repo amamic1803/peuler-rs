@@ -3,11 +3,7 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        1,
-        "Multiples of 3 or 5",
-        solve,
-    )
+    Problem::new(1, "Multiples of 3 or 5", solve)
 }
 
 const UPPER_LIMIT: usize = 1000;
@@ -47,7 +43,6 @@ fn solve() -> String {
 
     (sum_3 + sum_5 - sum_15).to_string()
 }
-
 
 // this is the straight forward solution, but the above is better
 //fn solve() -> String {

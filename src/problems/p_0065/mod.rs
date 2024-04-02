@@ -3,17 +3,12 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        65,
-        "Convergents of e",
-        solve,
-    )
+    Problem::new(65, "Convergents of e", solve)
 }
 
-
-use malachite::Natural;
-use malachite::num::conversion::traits::Digits;
 use crate::shared::math::ContinuedFraction;
+use malachite::num::conversion::traits::Digits;
+use malachite::Natural;
 
 fn solve() -> String {
     // generate the values for the continued fraction (2, 1, 2, 1, 1, 4, 1, 1, 6, 1, 1, 8, ...)
@@ -22,7 +17,8 @@ fn solve() -> String {
 
     // get the 100th convergent and sum its digits
     ContinuedFraction::new(frac_vals, None)
-        .convergent_n(99).unwrap()
+        .convergent_n(99)
+        .unwrap()
         .into_numerator()
         .to_digits_asc(&Natural::from(10_u8))
         .iter()

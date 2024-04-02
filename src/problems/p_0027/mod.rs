@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        27,
-        "Quadratic Primes",
-        solve,
-    )
+    Problem::new(27, "Quadratic Primes", solve)
 }
-
 
 use crate::shared::math::{is_prime, sieve_of_eratosthenes};
 
@@ -35,21 +30,31 @@ fn solve() -> String {
     // when primes_list[b_ind] > 1000, there is no need to check further
     for b in &primes_list {
         let b = *b as i64;
-        if b > 1000 { break; }
+        if b > 1000 {
+            break;
+        }
 
         // for every prime from primes_list calculate a and check the number of consecutive primes
         // if the a is greater than 1000, there is no need to check further
         // because primes are generated in ascending order, next a will be even greater
         for prime in &primes_list {
             let a = *prime as i64 - b - 1;
-            if a >= 1000 { break; }
+            if a >= 1000 {
+                break;
+            }
 
             // find the number of consecutive primes
             let mut consecutive_primes = 0;
             for n in 0.. {
                 let polynomial = (n * n) + (a * n) + b;
-                if polynomial < 2 { break; }
-                if is_prime(polynomial as u64).0 { consecutive_primes += 1; } else { break; }
+                if polynomial < 2 {
+                    break;
+                }
+                if is_prime(polynomial as u64).0 {
+                    consecutive_primes += 1;
+                } else {
+                    break;
+                }
             }
 
             // if the number of consecutive primes is greater than the previous maximum, update the maximum

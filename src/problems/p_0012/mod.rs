@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        12,
-        "Highly Divisible Triangular Number",
-        solve,
-    )
+    Problem::new(12, "Highly Divisible Triangular Number", solve)
 }
-
 
 use crate::shared::math::num_of_divisors;
 

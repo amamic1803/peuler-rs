@@ -3,22 +3,20 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        20,
-        "Factorial Digit Sum",
-        solve,
-    )
+    Problem::new(20, "Factorial Digit Sum", solve)
 }
 
-
-use malachite::Natural;
 use malachite::num::arithmetic::traits::Factorial;
 use malachite::num::conversion::traits::Digits;
+use malachite::Natural;
 
 fn solve() -> String {
-    Natural::factorial(100).to_digits_desc(&10_u64).iter().sum::<u64>().to_string()
+    Natural::factorial(100)
+        .to_digits_desc(&10_u64)
+        .iter()
+        .sum::<u64>()
+        .to_string()
 }
-
 
 // this is slow, pen and paper style solution
 

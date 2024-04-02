@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        3,
-        "Largest Prime Factor",
-        solve,
-    )
+    Problem::new(3, "Largest Prime Factor", solve)
 }
-
 
 use crate::shared::math::is_prime;
 

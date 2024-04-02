@@ -1,21 +1,13 @@
 //! Mathematical functions.
 
-
-
-
-
+use malachite::num::basic::traits::{One, Zero};
+use malachite::Integer;
+use malachite::Rational;
+use once_cell::sync::Lazy;
 use std::collections::HashSet;
 use std::iter;
 use std::mem;
 use std::sync::Mutex;
-use malachite::num::basic::traits::{Zero, One};
-use malachite::Integer;
-use malachite::Rational;
-use once_cell::sync::Lazy;
-
-
-
-
 
 /// Inverse of the prime-counting function.
 /// Estimates the number for which the prime-counting function is approximately n.
@@ -42,7 +34,7 @@ pub fn apcf(n: u64) -> f64 {
                 x = newtons(x);
             }
             x
-        },
+        }
     }
 }
 
@@ -81,7 +73,7 @@ pub fn isqrt_128(n: u128) -> u128 {
 }
 
 /// Returns the iterator of the Collatz sequence starting at a number.
-pub fn collatz_seq(num: u64) -> impl Iterator<Item=u64> {
+pub fn collatz_seq(num: u64) -> impl Iterator<Item = u64> {
     let mut current = num;
     iter::from_fn(move || {
         if current == 1 {
@@ -104,7 +96,10 @@ pub struct ContinuedFraction {
 impl ContinuedFraction {
     /// Creates a new continued fraction.
     pub fn new(non_periodic: Vec<i64>, periodic: Option<Vec<i64>>) -> Self {
-        Self { non_periodic, periodic }
+        Self {
+            non_periodic,
+            periodic,
+        }
     }
 
     /// Creates the continued fraction by taking the square root of a number.
@@ -148,7 +143,10 @@ impl ContinuedFraction {
             }
         }
 
-        Self { non_periodic, periodic }
+        Self {
+            non_periodic,
+            periodic,
+        }
     }
 
     /// Returns the reference to the non-periodic part of the continued fraction.
@@ -164,12 +162,15 @@ impl ContinuedFraction {
     /// Iterator over the convergents of the continued fraction.
     /// If the continued fraction is finite, then the iterator is also finite.
     /// If the continued fraction is infinite, then the iterator is infinite.
-    pub fn convergents(&self) -> impl Iterator<Item=Rational> + '_ {
+    pub fn convergents(&self) -> impl Iterator<Item = Rational> + '_ {
         let mut prev_num = Integer::ZERO;
         let mut prev_den = Integer::ONE;
         let mut num = Integer::ONE;
         let mut den = Integer::ZERO;
-        let mut values = self.non_periodic.iter().chain(self.periodic.iter().flat_map(|v| v.iter().cycle()));
+        let mut values = self
+            .non_periodic
+            .iter()
+            .chain(self.periodic.iter().flat_map(|v| v.iter().cycle()));
 
         iter::from_fn(move || {
             let next_value = values.next()?;
@@ -189,7 +190,7 @@ impl ContinuedFraction {
 
 /// Returns the iterator over the digits of a number.
 /// Iterates from the least significant digit to the most significant digit.
-pub fn digits(n: u64) -> impl Iterator<Item=u8> {
+pub fn digits(n: u64) -> impl Iterator<Item = u8> {
     let mut current = n;
     iter::from_fn(move || {
         if current == 0 {
@@ -203,7 +204,7 @@ pub fn digits(n: u64) -> impl Iterator<Item=u8> {
 
 /// Returns the iterator over the digits of a number in reverse order.
 /// Iterates from the most significant digit to the least significant digit.
-pub fn digits_rev(n: u64) -> impl Iterator<Item=u8> {
+pub fn digits_rev(n: u64) -> impl Iterator<Item = u8> {
     let mut digits_count = n.checked_ilog10().unwrap_or(0) + 1;
     let mut current = reverse(n);
     iter::from_fn(move || {
@@ -323,7 +324,7 @@ pub fn is_prime(n: u64) -> (bool, u64) {
 /// * `digits` - The iterator over digits.
 /// # Returns
 /// * `u64` - The integer.
-pub fn iter_to_int<T: IntoIterator<Item=u8>>(digits: T) -> u64 {
+pub fn iter_to_int<T: IntoIterator<Item = u8>>(digits: T) -> u64 {
     let mut result = 0;
     for digit in digits {
         result *= 10;
@@ -489,9 +490,7 @@ pub fn partition_p(n: u64) -> u64 {
     // we can just calculate all values and store them in a vector
 
     // memoization
-    static CACHE_VEC: Lazy<Mutex<Vec<u64>>> = Lazy::new(|| {
-        Mutex::new(vec![1_u64, 1_u64])
-    });
+    static CACHE_VEC: Lazy<Mutex<Vec<u64>>> = Lazy::new(|| Mutex::new(vec![1_u64, 1_u64]));
     let mut cache = CACHE_VEC.lock().unwrap();
 
     // if n is already in the cache vector, then return the value
@@ -507,7 +506,7 @@ pub fn partition_p(n: u64) -> u64 {
         for k in 1..=curr_n {
             let left_value = match curr_n.checked_sub((k * (3 * k - 1)) >> 1) {
                 Some(ind) => cache[ind],
-                None => break,  // larger of the indices is below zero, so any larger k will only be 0, we can break
+                None => break, // larger of the indices is below zero, so any larger k will only be 0, we can break
             };
             let right_value = match curr_n.checked_sub((k * (3 * k + 1)) >> 1) {
                 Some(ind) => cache[ind],
@@ -694,7 +693,7 @@ pub fn prime_factors(mut x: u64) -> Vec<(u64, u64)> {
 /// Factors are returned in ascending order.
 /// Makes no memory allocations, therefore, it is better for small numbers.
 /// For big numbers, prime_factors should be faster because it uses prime sieve.
-pub fn prime_factors_iter(mut x: u64) -> impl Iterator<Item=u64> {
+pub fn prime_factors_iter(mut x: u64) -> impl Iterator<Item = u64> {
     let mut factor = 2;
     iter::from_fn(move || {
         while factor <= x {
@@ -753,8 +752,8 @@ pub fn sieve_of_eratosthenes(n: u64) -> Vec<u64> {
             let mut results = vec![2];
             let mut sieve = vec![true; (n - 1) as usize / 2];
 
-            let ind_to_val = |i: usize| ((i as u64) << 1) + 3;  // calculate number value from index in sieve
-            let val_to_ind = |v: u64| ((v - 3) >> 1) as usize;  // calculate index in sieve from number value
+            let ind_to_val = |i: usize| ((i as u64) << 1) + 3; // calculate number value from index in sieve
+            let val_to_ind = |v: u64| ((v - 3) >> 1) as usize; // calculate index in sieve from number value
 
             for prime_ind in 0..sieve.len() {
                 if sieve[prime_ind] {
@@ -765,7 +764,9 @@ pub fn sieve_of_eratosthenes(n: u64) -> Vec<u64> {
                     // start checking at prime_val^2 (all smaller multiples have already been checked by smaller primes)
                     let mut check_val = prime_val * prime_val;
                     let mut check_ind = val_to_ind(check_val);
-                    if check_ind >= sieve.len() { break; }
+                    if check_ind >= sieve.len() {
+                        break;
+                    }
 
                     while check_ind < sieve.len() {
                         sieve[check_ind] = false;
@@ -778,11 +779,17 @@ pub fn sieve_of_eratosthenes(n: u64) -> Vec<u64> {
             }
 
             // convert sieve indices that are true to their corresponding number values and add them to results
-            results.extend(sieve.into_iter().enumerate().filter_map(|(i, prime)| if prime { Some(ind_to_val(i)) } else { None }));
+            results.extend(sieve.into_iter().enumerate().filter_map(|(i, prime)| {
+                if prime {
+                    Some(ind_to_val(i))
+                } else {
+                    None
+                }
+            }));
 
             // return results
             results
-        },
+        }
     }
 }
 
@@ -867,7 +874,10 @@ pub fn sum_of_divisors(n: u64) -> u64 {
         // for each we calculate the sum of the divisors of that prime factor
         // and multiply them together
 
-        prime_factors(n).into_iter().map(|(p, a)| (p.pow(a as u32  + 1) - 1) / (p - 1)).product()
+        prime_factors(n)
+            .into_iter()
+            .map(|(p, a)| (p.pow(a as u32 + 1) - 1) / (p - 1))
+            .product()
     }
 }
 
@@ -937,12 +947,18 @@ pub struct Vector2D {
 impl Vector2D {
     /// Creates a new vector.
     pub fn new(x_factor: f64, y_factor: f64) -> Self {
-        Self { x: x_factor, y: y_factor }
+        Self {
+            x: x_factor,
+            y: y_factor,
+        }
     }
 
     /// Creates a new vector from two points.
     pub fn from_points(point1: Point2D, point2: Point2D) -> Self {
-        Self { x: point2.x - point1.x, y: point2.y - point1.y }
+        Self {
+            x: point2.x - point1.x,
+            y: point2.y - point1.y,
+        }
     }
 
     /// Calculates the magnitude of the vector.
@@ -973,12 +989,20 @@ pub struct Vector3D {
 impl Vector3D {
     /// Creates a new vector.
     pub fn new(x_factor: f64, y_factor: f64, z_factor: f64) -> Self {
-        Self { x: x_factor, y: y_factor, z: z_factor }
+        Self {
+            x: x_factor,
+            y: y_factor,
+            z: z_factor,
+        }
     }
 
     /// Creates a new vector from two points.
     pub fn from_points(point1: Point3D, point2: Point3D) -> Self {
-        Self { x: point2.x - point1.x, y: point2.y - point1.y, z: point2.z - point1.z }
+        Self {
+            x: point2.x - point1.x,
+            y: point2.y - point1.y,
+            z: point2.z - point1.z,
+        }
     }
 
     /// Calculates the magnitude of the vector.

@@ -3,16 +3,11 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        95,
-        "Amicable Chains",
-        solve,
-    )
+    Problem::new(95, "Amicable Chains", solve)
 }
 
-
 use crate::shared::math::sum_of_proper_divisors_1_to_n;
-const LIMIT: usize = 1_000_000;  // upper limit for numbers to check
+const LIMIT: usize = 1_000_000; // upper limit for numbers to check
 
 fn solve() -> String {
     // find the sum of proper divisors for each number 1 to LIMIT
@@ -72,7 +67,11 @@ fn solve() -> String {
     // find the longest chain (maximum value in chain_lengths)
     let max_chain_length = *chain_lengths.iter().flatten().max().unwrap();
     // find the first element with that chain length and return it
-    for (num, length) in chain_lengths.into_iter().enumerate().filter_map(|(i, length)| length.map(|length| (i, length))) {
+    for (num, length) in chain_lengths
+        .into_iter()
+        .enumerate()
+        .filter_map(|(i, length)| length.map(|length| (i, length)))
+    {
         if length == max_chain_length {
             return num.to_string();
         }

@@ -1,6 +1,5 @@
 //! A module containing the structures used in the project.
 
-
 /// A structure containing the problems.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Problems {
@@ -16,9 +15,7 @@ impl Problems {
     /// A new `Problems`.
     pub fn new(mut problems: Vec<Problem>) -> Self {
         problems.sort_by_key(|problem| problem.id);
-        Self {
-            problems,
-        }
+        Self { problems }
     }
 
     /// Get access to the inner vector of problems.
@@ -63,7 +60,11 @@ impl Problems {
     /// The `String` with the problem's solution.
     /// Or a message if the problem is not available.
     pub fn run(&self, problem_id: usize) -> String {
-        match self.problems.iter().find(|problem| problem.id == problem_id) {
+        match self
+            .problems
+            .iter()
+            .find(|problem| problem.id == problem_id)
+        {
             Some(problem) => problem.run(),
             None => format!("Problem {:04} not available!\n", problem_id),
         }
@@ -78,7 +79,12 @@ impl Problems {
     /// # Returns
     /// The `String` with the header.
     fn print_header(&self) -> String {
-        let mut max_line_len = self.problems.iter().map(|problem| problem.name().chars().count()).max().unwrap();
+        let mut max_line_len = self
+            .problems
+            .iter()
+            .map(|problem| problem.name().chars().count())
+            .max()
+            .unwrap();
         let mut result = String::new();
         if max_line_len < 21 {
             max_line_len = 21;

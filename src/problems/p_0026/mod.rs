@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        26,
-        "Reciprocal Cycles",
-        solve,
-    )
+    Problem::new(26, "Reciprocal Cycles", solve)
 }
-
 
 use crate::shared::math::{gcd, ord};
 
@@ -37,7 +32,6 @@ fn solve() -> String {
 
     longest_d.to_string()
 }
-
 
 // old solution, uses long division
 // fn solve() -> String {

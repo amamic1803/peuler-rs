@@ -3,16 +3,10 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        44,
-        "Pentagon Numbers",
-        solve,
-    )
+    Problem::new(44, "Pentagon Numbers", solve)
 }
 
-
 use std::collections::HashSet;
-
 
 fn solve() -> String {
     // P(n + 1) - P(n) = 3n + 1
@@ -38,7 +32,6 @@ fn solve() -> String {
     // when we find such number, we return it
 
     for curr_ind in 1.. {
-
         // find the sum of current and previous pentagonal number
         let sum = sequence[curr_ind] + sequence[curr_ind - 1];
         // while last pentagonal number in sequence is less than sum, generate and add new pentagonal numbers

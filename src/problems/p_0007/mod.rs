@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        7,
-        "10001st Prime",
-        solve,
-    )
+    Problem::new(7, "10001st Prime", solve)
 }
-
 
 use crate::shared::math::{apcf, sieve_of_eratosthenes};
 

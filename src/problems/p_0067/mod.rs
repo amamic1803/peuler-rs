@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        67,
-        "Maximum Path Sum II",
-        solve,
-    )
+    Problem::new(67, "Maximum Path Sum II", solve)
 }
-
 
 use std::cmp::max;
 
@@ -32,10 +27,10 @@ fn parse_input(input: &str) -> Vec<Vec<u64>> {
     input
         .trim()
         .lines()
-        .map(|line| line
-            .split_whitespace()
-            .map(|num_str| num_str
-                .parse::<u64>().unwrap()
-            ).collect::<Vec<u64>>()
-        ).collect::<Vec<Vec<u64>>>()
+        .map(|line| {
+            line.split_whitespace()
+                .map(|num_str| num_str.parse::<u64>().unwrap())
+                .collect::<Vec<u64>>()
+        })
+        .collect::<Vec<Vec<u64>>>()
 }

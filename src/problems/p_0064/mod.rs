@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        64,
-        "Odd Period Square Roots",
-        solve,
-    )
+    Problem::new(64, "Odd Period Square Roots", solve)
 }
-
 
 use crate::shared::math::ContinuedFraction;
 const MAX: i64 = 10_000;

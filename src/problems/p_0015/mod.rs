@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        15,
-        "Lattice Paths",
-        solve,
-    )
+    Problem::new(15, "Lattice Paths", solve)
 }
-
 
 fn solve() -> String {
     // there are 40 steps in total, 20 of which are right and 20 of which are down

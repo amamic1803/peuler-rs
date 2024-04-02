@@ -1,7 +1,6 @@
 mod runner;
 use runner::run_test;
 
-
 #[test]
 fn problem_0001() {
     run_test(1, "233168");

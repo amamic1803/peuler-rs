@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        81,
-        "Path Sum: Two Ways",
-        solve,
-    )
+    Problem::new(81, "Path Sum: Two Ways", solve)
 }
-
 
 use std::cmp::min;
 
@@ -49,11 +44,11 @@ fn parse_input(input: &str) -> Vec<Vec<u32>> {
     input
         .trim()
         .lines()
-        .map(|line| line
-            .trim()
-            .split(',')
-            .map(|num_str| num_str
-                .parse::<u32>().unwrap()
-            ).collect::<Vec<u32>>()
-        ).collect::<Vec<Vec<u32>>>()
+        .map(|line| {
+            line.trim()
+                .split(',')
+                .map(|num_str| num_str.parse::<u32>().unwrap())
+                .collect::<Vec<u32>>()
+        })
+        .collect::<Vec<Vec<u32>>>()
 }

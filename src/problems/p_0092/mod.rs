@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        92,
-        "Square Digit Chains",
-        solve,
-    )
+    Problem::new(92, "Square Digit Chains", solve)
 }
-
 
 use crate::shared::math::digits;
 
@@ -32,7 +27,11 @@ fn solve() -> String {
     }
 
     // count the number of true values in the cache
-    cache.iter().filter(|&&x| x == Some(true)).count().to_string()
+    cache
+        .iter()
+        .filter(|&&x| x == Some(true))
+        .count()
+        .to_string()
 }
 
 fn process_number(num: u64, cache: &mut Vec<Option<bool>>) -> bool {
@@ -58,7 +57,7 @@ fn process_number(num: u64, cache: &mut Vec<Option<bool>>) -> bool {
                         let result = process_number(next, cache);
                         cache[next as usize] = Some(result);
                         result
-                    },
+                    }
                 }
             }
         }

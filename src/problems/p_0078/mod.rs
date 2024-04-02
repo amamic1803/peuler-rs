@@ -3,11 +3,7 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        78,
-        "Coin Partitions",
-        solve,
-    )
+    Problem::new(78, "Coin Partitions", solve)
 }
 
 const DIVISOR: u32 = 1_000_000;
@@ -29,7 +25,7 @@ fn solve() -> String {
         for k in 1..(n + 1) {
             let left_value = match n.checked_sub((k * (3 * k - 1)) >> 1) {
                 Some(ind) => cache[ind],
-                None => break,  // larger of the indices is below zero, so any larger k will only be 0, we can break
+                None => break, // larger of the indices is below zero, so any larger k will only be 0, we can break
             };
             let right_value = match n.checked_sub((k * (3 * k + 1)) >> 1) {
                 Some(ind) => cache[ind],
@@ -38,7 +34,7 @@ fn solve() -> String {
             let value = (left_value + right_value) % DIVISOR;
 
             if k % 2 == 0 {
-                next_val = (next_val + (DIVISOR - value)) % DIVISOR;  // sum with complement == subtract
+                next_val = (next_val + (DIVISOR - value)) % DIVISOR; // sum with complement == subtract
             } else {
                 next_val = (next_val + value) % DIVISOR;
             }

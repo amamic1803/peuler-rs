@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        36,
-        "Double-base Palindromes",
-        solve,
-    )
+    Problem::new(36, "Double-base Palindromes", solve)
 }
-
 
 use crate::shared::math::is_palindrome;
 

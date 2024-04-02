@@ -3,16 +3,11 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        38,
-        "Pandigital Multiples",
-        solve,
-    )
+    Problem::new(38, "Pandigital Multiples", solve)
 }
 
-
-use itertools::Itertools;
 use crate::shared::math::{digits, slice_to_int};
+use itertools::Itertools;
 
 fn solve() -> String {
     // to solve this one we will use this logic:
@@ -41,7 +36,9 @@ fn solve() -> String {
                 n += 1;
                 let next_digit_count = digit_count + digits(next_product).count();
 
-                if (next_digit_count > 9) || (next_product != slice_to_int(&perm[digit_count..next_digit_count])) {
+                if (next_digit_count > 9)
+                    || (next_product != slice_to_int(&perm[digit_count..next_digit_count]))
+                {
                     pandigital_multiple = false;
                     break;
                 }

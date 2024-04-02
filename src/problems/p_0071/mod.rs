@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        71,
-        "Ordered Fractions",
-        solve,
-    )
+    Problem::new(71, "Ordered Fractions", solve)
 }
-
 
 const MAX: u32 = 1_000_000;
 const C: u32 = 3;

@@ -3,16 +3,11 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        91,
-        "Right Triangles with Integer Coordinates",
-        solve,
-    )
+    Problem::new(91, "Right Triangles with Integer Coordinates", solve)
 }
 
-
-use std::cmp::min;
 use crate::shared::math::gcd;
+use std::cmp::min;
 
 const GRID_SIZE: u32 = 50;
 
@@ -74,11 +69,11 @@ fn solve() -> String {
     // symmetric and equal to (GRID_SIZE / 2) * ((GRID_SIZE / 2) + 1)
     // the number of right triangles when GRID_SIZE is even can be calculated by subtracting GRID_SIZE / 2
     // from the number of right triangles when GRID_SIZE is odd
-    let mut n3 = (GRID_SIZE / 2) * ((GRID_SIZE / 2) + 1);  // num of triangles when GRID_SIZE is odd
+    let mut n3 = (GRID_SIZE / 2) * ((GRID_SIZE / 2) + 1); // num of triangles when GRID_SIZE is odd
     if GRID_SIZE % 2 == 0 {
-        n3 -= GRID_SIZE / 2;  // subtract GRID_SIZE / 2 if GRID_SIZE is even
+        n3 -= GRID_SIZE / 2; // subtract GRID_SIZE / 2 if GRID_SIZE is even
     }
-    n3 *= 2;  // multiply by 2 to get the total number of right triangles with right angle at diagonal (above and below)
+    n3 *= 2; // multiply by 2 to get the total number of right triangles with right angle at diagonal (above and below)
 
     // 4. is the hardest, two points need to be chosen somewhere in the field
     // the first point can be chosen somewhere in the field, not on the diagonal
@@ -118,11 +113,11 @@ fn solve() -> String {
             let gcd_val = gcd(x as u64, y as u64) as u32;
             let i = x / gcd_val;
             let j = y / gcd_val;
-            n4 += min(y / i, (GRID_SIZE - x) / j);  // moving right/down
-            n4 += min(x / j, (GRID_SIZE - y) / i);  // moving up/left
+            n4 += min(y / i, (GRID_SIZE - x) / j); // moving right/down
+            n4 += min(x / j, (GRID_SIZE - y) / i); // moving up/left
         }
     }
-    n4 *= 2;  // multiply by 2 to get the total number of right triangles (above and below diagonal)
+    n4 *= 2; // multiply by 2 to get the total number of right triangles (above and below diagonal)
 
     // at the end, sum the number of right triangles
     (n1 + n2 + n3 + n4).to_string()

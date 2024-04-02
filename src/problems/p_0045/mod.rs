@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        45,
-        "Triangular, Pentagonal, and Hexagonal",
-        solve,
-    )
+    Problem::new(45, "Triangular, Pentagonal, and Hexagonal", solve)
 }
-
 
 fn solve() -> String {
     // we can think of T(n), P(n) and H(n) as sequences of natural numbers
@@ -42,7 +37,7 @@ fn solve() -> String {
     // each iteration we increase n by 1 and calculate next hexagonal number
     while !is_pentagonal(hex_num) {
         n += 1;
-        hex_num = n * ((n << 1) - 1);  // n * (2n - 1)
+        hex_num = n * ((n << 1) - 1); // n * (2n - 1)
     }
 
     hex_num.to_string()

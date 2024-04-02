@@ -3,28 +3,26 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        98,
-        "Anagramic Squares",
-        solve,
-    )
+    Problem::new(98, "Anagramic Squares", solve)
 }
 
-
-use itertools::Itertools;
 use crate::shared::math::{digits_rev, is_permutation};
+use itertools::Itertools;
 
 fn solve() -> String {
     // input string of words
     let input_str = include_str!("0098_words.txt");
 
     // split input string into vector of tuples of (word, sorted characters of word)
-    let mut words_vec: Vec<(&str, Vec<char>)> = input_str.split(',').map(|word| {
-        let word = word.trim_matches('"');
-        let mut word_chars: Vec<char> = word.chars().collect();
-        word_chars.sort();
-        (word, word_chars)
-    }).collect();
+    let mut words_vec: Vec<(&str, Vec<char>)> = input_str
+        .split(',')
+        .map(|word| {
+            let word = word.trim_matches('"');
+            let mut word_chars: Vec<char> = word.chars().collect();
+            word_chars.sort();
+            (word, word_chars)
+        })
+        .collect();
 
     // we first want to find pairs of words that are anagrams
     let mut anagram_pairs = Vec::new();
@@ -88,9 +86,9 @@ fn solve() -> String {
         let (mut storage1, mut storage2) = (Vec::new(), Vec::new());
 
         // iterator over squares with the same number of digits as the words
-        let squares_iter = (
-            ((10_u64.pow(word1.len() as u32 - 1) as f64).sqrt().ceil() as u64)..=((10_u64.pow(word1.len() as u32) as f64).sqrt().floor() as u64)
-        ).map(|i| i * i);
+        let squares_iter = (((10_u64.pow(word1.len() as u32 - 1) as f64).sqrt().ceil() as u64)
+            ..=((10_u64.pow(word1.len() as u32) as f64).sqrt().floor() as u64))
+            .map(|i| i * i);
 
         // for each square number, find if it can represent each word
         // if it can, push it and the array to the storage vector of that word

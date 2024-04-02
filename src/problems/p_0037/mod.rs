@@ -3,16 +3,11 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        37,
-        "Truncatable Primes",
-        solve,
-    )
+    Problem::new(37, "Truncatable Primes", solve)
 }
 
-
-use itertools::Itertools;
 use crate::shared::math::{digits, is_prime, slice_to_int};
+use itertools::Itertools;
 
 const TRUNC_PRIMES: u8 = 11;
 const FIRST_DIGIT: [u8; 4] = [2, 3, 5, 7];
@@ -37,7 +32,6 @@ fn solve() -> String {
 
     // start with 2 digit numbers and go up
     'outer: for n_len in 2_usize.. {
-
         // generate a vector of iterators for each digit
         // first element will be iterator over FIRST_DIGIT
         // middle elements (if any) will be iterator over MIDDLE_DIGIT
@@ -51,7 +45,7 @@ fn solve() -> String {
 
         // iterate over cartesian product of these iterators over digits (they make numbers)
         for i in iterables.into_iter().multi_cartesian_product() {
-            let num = slice_to_int(&i);  // convert vector of digits to number
+            let num = slice_to_int(&i); // convert vector of digits to number
 
             // check if number is truncatable prime
             if is_trunc_prime(num) {
@@ -73,9 +67,9 @@ fn is_trunc_prime(x: u64) -> bool {
         return false;
     }
     for i in 1..digits(x).count() {
-        if !is_prime(x % 10_u64.pow(i as u32)).0 ||
-           !is_prime(x / 10_u64.pow(i as u32)).0
-        { return false; }
+        if !is_prime(x % 10_u64.pow(i as u32)).0 || !is_prime(x / 10_u64.pow(i as u32)).0 {
+            return false;
+        }
     }
     true
 }

@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        30,
-        "Digit Fifth Powers",
-        solve,
-    )
+    Problem::new(30, "Digit Fifth Powers", solve)
 }
-
 
 use crate::shared::math::newtons_method;
 
@@ -31,7 +26,8 @@ fn solve() -> String {
         1e-10,
         |n| 10.0_f64.powf(n) - n * (9_u32.pow(5) as f64),
         |n| 10.0_f64.powf(n) * 10.0_f64.ln() - (9_u32.pow(5) as f64),
-    ).ceil() as u32;
+    )
+    .ceil() as u32;
 
     // we now know that the number x can have at most max_digits digits
     // but what value of x should be the upper bound?

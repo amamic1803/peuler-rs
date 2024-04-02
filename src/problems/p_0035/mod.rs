@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        35,
-        "Circular Primes",
-        solve,
-    )
+    Problem::new(35, "Circular Primes", solve)
 }
-
 
 use crate::shared::math::{digits, sieve_of_eratosthenes};
 use std::collections::HashMap;
@@ -63,5 +58,9 @@ fn solve() -> String {
     }
 
     // count primes marked as circular
-    primes_map.into_iter().filter(|(_, primality)| *primality).count().to_string()
+    primes_map
+        .into_iter()
+        .filter(|(_, primality)| *primality)
+        .count()
+        .to_string()
 }

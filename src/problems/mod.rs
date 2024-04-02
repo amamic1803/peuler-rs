@@ -2,7 +2,6 @@
 
 use crate::shared::structures::Problems;
 
-
 pub mod p_0001;
 pub mod p_0002;
 pub mod p_0003;
@@ -172,7 +171,6 @@ use p_0098::get_problem as problem_0098;
 use p_0099::get_problem as problem_0099;
 use p_0100::get_problem as problem_0100;
 use p_0102::get_problem as problem_0102;
-
 
 /// Returns a `Problems` struct containing all the problems.
 pub fn get_problems() -> Problems {

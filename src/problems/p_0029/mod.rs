@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        29,
-        "Distinct Powers",
-        solve,
-    )
+    Problem::new(29, "Distinct Powers", solve)
 }
-
 
 fn solve() -> String {
     // let a and b be integers such that 2 <= a <= 100 and 2 <= b <= 100
@@ -51,7 +46,6 @@ fn solve() -> String {
 
     distinct.to_string()
 }
-
 
 // this is slow, manual solution that actually calculates the powers
 // fn solve() {

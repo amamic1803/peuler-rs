@@ -3,31 +3,26 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        50,
-        "Consecutive Prime Sum",
-        solve,
-    )
+    Problem::new(50, "Consecutive Prime Sum", solve)
 }
 
-
-use std::collections::HashSet;
 use crate::shared::math::sieve_of_eratosthenes;
+use std::collections::HashSet;
 
 const LIMIT: u64 = 1_000_000;
 
 fn solve() -> String {
-    let primes = sieve_of_eratosthenes(LIMIT - 1);  // generate all primes less than 1_000_000
-    let primes_set = primes.iter().copied().collect::<HashSet<_>>();  // store primes in a set for faster lookup
-    let biggest_prime = primes[primes.len() - 1];  // get biggest prime from primes vector
+    let primes = sieve_of_eratosthenes(LIMIT - 1); // generate all primes less than 1_000_000
+    let primes_set = primes.iter().copied().collect::<HashSet<_>>(); // store primes in a set for faster lookup
+    let biggest_prime = primes[primes.len() - 1]; // get biggest prime from primes vector
 
     // we will use a sliding window to find the longest consecutive prime sum
     // we will start with the biggest window and shrink it by one and slide until we find a consecutive prime sum
 
-    let mut sum: u64 = 0;  // sum of consecutive primes
-    let mut i: usize = 0;  // first index of window
-    let mut j: usize = 0;  // first index after window
-    // create initial window (intentionally bigger than biggest_prime -> it is definitely not a consecutive prime sum)
+    let mut sum: u64 = 0; // sum of consecutive primes
+    let mut i: usize = 0; // first index of window
+    let mut j: usize = 0; // first index after window
+                          // create initial window (intentionally bigger than biggest_prime -> it is definitely not a consecutive prime sum)
     while sum <= biggest_prime {
         sum += primes[j];
         j += 1;

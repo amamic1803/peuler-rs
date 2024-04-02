@@ -3,23 +3,20 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        17,
-        "Number Letter Counts",
-        solve,
-    )
+    Problem::new(17, "Number Letter Counts", solve)
 }
 
-
+use once_cell::sync::Lazy;
 use std::collections::HashMap;
 use std::sync::Mutex;
-use once_cell::sync::Lazy;
-
 
 fn solve() -> String {
     let mut sum = 0;
     for n in 1..1001 {
-        sum += num_to_string(n).chars().filter(|c| ![' ', '-'].contains(c)).count();
+        sum += num_to_string(n)
+            .chars()
+            .filter(|c| ![' ', '-'].contains(c))
+            .count();
     }
     sum.to_string()
 }
@@ -33,7 +30,7 @@ fn num_to_string(mut n: u64) -> String {
     if n == 1000 {
         name.push_str("one thousand");
     } else {
-        let hundreds: u64 =  n / 100;
+        let hundreds: u64 = n / 100;
         if hundreds != 0 {
             name.push_str(DIGIT_SINGLE.lock().unwrap().get(&hundreds).unwrap());
             name.push_str(" hundred")

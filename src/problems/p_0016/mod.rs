@@ -3,22 +3,20 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        16,
-        "Power Digit Sum",
-        solve,
-    )
+    Problem::new(16, "Power Digit Sum", solve)
 }
 
-
-use malachite::Natural;
 use malachite::num::arithmetic::traits::PowerOf2;
 use malachite::num::conversion::traits::Digits;
+use malachite::Natural;
 
 fn solve() -> String {
-    Natural::power_of_2(1000).to_digits_desc(&10_u64).iter().sum::<u64>().to_string()
+    Natural::power_of_2(1000)
+        .to_digits_desc(&10_u64)
+        .iter()
+        .sum::<u64>()
+        .to_string()
 }
-
 
 // this is slow, pen and paper style solution
 

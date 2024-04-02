@@ -3,19 +3,14 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        70,
-        "Totient Permutation",
-        solve,
-    )
+    Problem::new(70, "Totient Permutation", solve)
 }
 
-
 use crate::shared::math::{is_permutation, phi_1_to_n};
-const MAX_N: u64 = 10_000_000;  // maximum n value
+const MAX_N: u64 = 10_000_000; // maximum n value
 
 fn solve() -> String {
-    let phi_values = phi_1_to_n(MAX_N);  // precompute phi values
+    let phi_values = phi_1_to_n(MAX_N); // precompute phi values
 
     // find the minimum n/phi(n) ratio for (n, phi(n)) that are permutations of each other
     let mut min_ratio = f64::INFINITY;

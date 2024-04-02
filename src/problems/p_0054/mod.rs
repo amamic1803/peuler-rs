@@ -3,23 +3,22 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        54,
-        "Poker Hands",
-        solve,
-    )
+    Problem::new(54, "Poker Hands", solve)
 }
 
-
 use once_cell::sync::Lazy;
-use std::collections::HashMap;
 use std::cmp::{Ordering, Reverse};
+use std::collections::HashMap;
 
 fn solve() -> String {
     let input = include_str!("0054_poker.txt");
     let parsed_input = parse_input(input);
 
-    parsed_input.into_iter().filter(|&game| game_result(game)).count().to_string()
+    parsed_input
+        .into_iter()
+        .filter(|&game| game_result(game))
+        .count()
+        .to_string()
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -63,81 +62,95 @@ fn game_result(game: Game) -> bool {
     match player1_score.cmp(&player2_score) {
         Ordering::Greater => true,
         Ordering::Less => false,
-        Ordering::Equal => {
-            match player1 {
-                Hand::HighCard(play1_val) => {
-                    if let Hand::HighCard(play2_val) = player2 {
-                        play1_val[0] > play2_val[0]
-                    } else {unreachable!("Player 2 must have a high card here.")}
-                },
-                Hand::OnePair(play1_val) => {
-                    if let Hand::OnePair(play2_val) = player2 {
-                        match play1_val.0.cmp(&play2_val.0) {
-                            Ordering::Greater => true,
-                            Ordering::Less => false,
-                            Ordering::Equal => play1_val.1 > play2_val.1,
-                        }
-                    } else {unreachable!("Player 2 must have a pair here.")}
-                },
-                Hand::TwoPairs(play1_val) => {
-                    if let Hand::TwoPairs(play2_val) = player2 {
-                        match play1_val.0.cmp(&play2_val.0) {
-                            Ordering::Greater => true,
-                            Ordering::Less => false,
-                            Ordering::Equal => {
-                                match play1_val.1.cmp(&play2_val.1) {
-                                    Ordering::Greater => true,
-                                    Ordering::Less => false,
-                                    Ordering::Equal => play1_val.2 > play2_val.2,
-                                }
-                            },
-                        }
-                    } else {unreachable!("Player 2 must have two pairs here.")}
-                },
-                Hand::ThreeOfAKind(play1_val) => {
-                    if let Hand::ThreeOfAKind(play2_val) = player2 {
-                        match play1_val.0.cmp(&play2_val.0) {
-                            Ordering::Greater => true,
-                            Ordering::Less => false,
-                            Ordering::Equal => play1_val.1 > play2_val.1,
-                        }
-                    } else {unreachable!("Player 2 must have a three of a kind here.")}
-                },
-                Hand::Straight(play1_val) => {
-                    if let Hand::Straight(play2_val) = player2 {
-                        play1_val[0] > play2_val[0]
-                    } else {unreachable!("Player 2 must have a straight here.")}
-                },
-                Hand::Flush(play1_val) => {
-                    if let Hand::Flush(play2_val) = player2 {
-                        play1_val[0] > play2_val[0]
-                    } else {unreachable!("Player 2 must have a flush here.")}
-                },
-                Hand::FullHouse(play1_val) => {
-                    if let Hand::FullHouse(play2_val) = player2 {
-                        match play1_val.0.cmp(&play2_val.0) {
-                            Ordering::Greater => true,
-                            Ordering::Less => false,
-                            Ordering::Equal => play1_val.1 > play2_val.1,
-                        }
-                    } else {unreachable!("Player 2 must have a full house here.")}
-                },
-                Hand::FourOfAKind(play1_val) => {
-                    if let Hand::FourOfAKind(play2_val) = player2 {
-                        match play1_val.0.cmp(&play2_val.0) {
-                            Ordering::Greater => true,
-                            Ordering::Less => false,
-                            Ordering::Equal => play1_val.1 > play2_val.1,
-                        }
-                    } else {unreachable!("Player 2 must have a four of a kind here.")}
-                },
-                Hand::StraightFlush(play1_val) => {
-                    if let Hand::StraightFlush(play2_val) = player2 {
-                        play1_val[0] > play2_val[0]
-                    } else {unreachable!("Player 2 must have a straight flush here.")}
-                },
-                Hand::RoyalFlush => panic!("There should not be ties in the input."),
+        Ordering::Equal => match player1 {
+            Hand::HighCard(play1_val) => {
+                if let Hand::HighCard(play2_val) = player2 {
+                    play1_val[0] > play2_val[0]
+                } else {
+                    unreachable!("Player 2 must have a high card here.")
+                }
             }
+            Hand::OnePair(play1_val) => {
+                if let Hand::OnePair(play2_val) = player2 {
+                    match play1_val.0.cmp(&play2_val.0) {
+                        Ordering::Greater => true,
+                        Ordering::Less => false,
+                        Ordering::Equal => play1_val.1 > play2_val.1,
+                    }
+                } else {
+                    unreachable!("Player 2 must have a pair here.")
+                }
+            }
+            Hand::TwoPairs(play1_val) => {
+                if let Hand::TwoPairs(play2_val) = player2 {
+                    match play1_val.0.cmp(&play2_val.0) {
+                        Ordering::Greater => true,
+                        Ordering::Less => false,
+                        Ordering::Equal => match play1_val.1.cmp(&play2_val.1) {
+                            Ordering::Greater => true,
+                            Ordering::Less => false,
+                            Ordering::Equal => play1_val.2 > play2_val.2,
+                        },
+                    }
+                } else {
+                    unreachable!("Player 2 must have two pairs here.")
+                }
+            }
+            Hand::ThreeOfAKind(play1_val) => {
+                if let Hand::ThreeOfAKind(play2_val) = player2 {
+                    match play1_val.0.cmp(&play2_val.0) {
+                        Ordering::Greater => true,
+                        Ordering::Less => false,
+                        Ordering::Equal => play1_val.1 > play2_val.1,
+                    }
+                } else {
+                    unreachable!("Player 2 must have a three of a kind here.")
+                }
+            }
+            Hand::Straight(play1_val) => {
+                if let Hand::Straight(play2_val) = player2 {
+                    play1_val[0] > play2_val[0]
+                } else {
+                    unreachable!("Player 2 must have a straight here.")
+                }
+            }
+            Hand::Flush(play1_val) => {
+                if let Hand::Flush(play2_val) = player2 {
+                    play1_val[0] > play2_val[0]
+                } else {
+                    unreachable!("Player 2 must have a flush here.")
+                }
+            }
+            Hand::FullHouse(play1_val) => {
+                if let Hand::FullHouse(play2_val) = player2 {
+                    match play1_val.0.cmp(&play2_val.0) {
+                        Ordering::Greater => true,
+                        Ordering::Less => false,
+                        Ordering::Equal => play1_val.1 > play2_val.1,
+                    }
+                } else {
+                    unreachable!("Player 2 must have a full house here.")
+                }
+            }
+            Hand::FourOfAKind(play1_val) => {
+                if let Hand::FourOfAKind(play2_val) = player2 {
+                    match play1_val.0.cmp(&play2_val.0) {
+                        Ordering::Greater => true,
+                        Ordering::Less => false,
+                        Ordering::Equal => play1_val.1 > play2_val.1,
+                    }
+                } else {
+                    unreachable!("Player 2 must have a four of a kind here.")
+                }
+            }
+            Hand::StraightFlush(play1_val) => {
+                if let Hand::StraightFlush(play2_val) = player2 {
+                    play1_val[0] > play2_val[0]
+                } else {
+                    unreachable!("Player 2 must have a straight flush here.")
+                }
+            }
+            Hand::RoyalFlush => panic!("There should not be ties in the input."),
         },
     }
 }
@@ -159,7 +172,7 @@ fn hand(player: [(u8, u8); 5]) -> Hand {
         match count {
             2 => {
                 pairs.push(rank);
-            },
+            }
             3 => {
                 let mut other_cards: Vec<u8> = Vec::with_capacity(2);
                 for card in player {
@@ -189,10 +202,14 @@ fn hand(player: [(u8, u8); 5]) -> Hand {
     if let Hand::HighCard(_) = result {
         match pairs.len() {
             1 => {
-                let mut other_cards = player.into_iter().map(|card| card.0).filter(|&rank| rank != pairs[0]).collect::<Vec<u8>>();
+                let mut other_cards = player
+                    .into_iter()
+                    .map(|card| card.0)
+                    .filter(|&rank| rank != pairs[0])
+                    .collect::<Vec<u8>>();
                 other_cards.sort_by_key(|&rank| Reverse(rank));
                 result = Hand::OnePair((pairs[0], other_cards.try_into().unwrap()));
-            },
+            }
             2 => {
                 let mut left_card: Option<u8> = None;
                 for card in player {
@@ -204,8 +221,8 @@ fn hand(player: [(u8, u8); 5]) -> Hand {
                 assert!(left_card.is_some());
 
                 result = Hand::TwoPairs((pairs[0], pairs[1], left_card.unwrap()));
-            },
-            _ => {},
+            }
+            _ => {}
         }
     } else if let Hand::ThreeOfAKind(value) = result {
         for pair in &pairs {
@@ -220,7 +237,8 @@ fn hand(player: [(u8, u8); 5]) -> Hand {
         // straight
         let mut straight_cards = player.iter().map(|card| card.0).collect::<Vec<u8>>();
         straight_cards.sort();
-        let straight = (straight_cards[0]..(straight_cards[0] + 5)).collect::<Vec<u8>>() == straight_cards;
+        let straight =
+            (straight_cards[0]..(straight_cards[0] + 5)).collect::<Vec<u8>>() == straight_cards;
         if straight {
             let mut hand = player.into_iter().map(|card| card.0).collect::<Vec<u8>>();
             hand.sort_by_key(|&rank| Reverse(rank));
@@ -234,7 +252,7 @@ fn hand(player: [(u8, u8); 5]) -> Hand {
                 flush = false;
                 break;
             }
-        };
+        }
         if flush {
             let mut hand = player.into_iter().map(|card| card.0).collect::<Vec<u8>>();
             hand.sort_by_key(|&rank| Reverse(rank));
@@ -246,7 +264,11 @@ fn hand(player: [(u8, u8); 5]) -> Hand {
         if straight_flush {
             let mut hand = player.into_iter().map(|card| card.0).collect::<Vec<u8>>();
             hand.sort_by_key(|&rank| Reverse(rank));
-            result = if hand[0] != 12 { Hand::StraightFlush(hand.try_into().unwrap()) } else { Hand::RoyalFlush };
+            result = if hand[0] != 12 {
+                Hand::StraightFlush(hand.try_into().unwrap())
+            } else {
+                Hand::RoyalFlush
+            };
         }
     }
 
@@ -263,8 +285,18 @@ fn parse_input(input: &str) -> Vec<Game> {
         .map(|line| {
             let mut line_elements = line.split_whitespace();
 
-            let player1: [(u8, u8); 5] = line_elements.by_ref().take(5).map(parse_card).collect::<Vec<(u8, u8)>>().try_into().unwrap();
-            let player2: [(u8, u8); 5] = line_elements.map(parse_card).collect::<Vec<(u8, u8)>>().try_into().unwrap();
+            let player1: [(u8, u8); 5] = line_elements
+                .by_ref()
+                .take(5)
+                .map(parse_card)
+                .collect::<Vec<(u8, u8)>>()
+                .try_into()
+                .unwrap();
+            let player2: [(u8, u8); 5] = line_elements
+                .map(parse_card)
+                .collect::<Vec<(u8, u8)>>()
+                .try_into()
+                .unwrap();
 
             (player1, player2)
         })

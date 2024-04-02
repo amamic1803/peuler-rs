@@ -3,11 +3,7 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        2,
-        "Even Fibonacci Numbers",
-        solve,
-    )
+    Problem::new(2, "Even Fibonacci Numbers", solve)
 }
 
 fn solve() -> String {

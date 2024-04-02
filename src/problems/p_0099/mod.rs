@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        99,
-        "Largest Exponential",
-        solve,
-    )
+    Problem::new(99, "Largest Exponential", solve)
 }
-
 
 fn solve() -> String {
     let input_str = include_str!("0099_base_exp.txt");
@@ -45,9 +40,7 @@ fn parse_input(input: &str) -> Vec<(u32, u32)> {
             let mut line_iter = line
                 .trim()
                 .split(',')
-                .map(|num_str| num_str
-                    .parse::<u32>().unwrap()
-                );
+                .map(|num_str| num_str.parse::<u32>().unwrap());
             (line_iter.next().unwrap(), line_iter.next().unwrap())
         })
         .collect::<Vec<(u32, u32)>>()

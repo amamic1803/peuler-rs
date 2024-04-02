@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        55,
-        "Lychrel Numbers",
-        solve,
-    )
+    Problem::new(55, "Lychrel Numbers", solve)
 }
-
 
 use crate::shared::math::{is_palindrome_128, reverse_128};
 
@@ -27,7 +22,7 @@ fn solve() -> String {
     // we will use the value of u8::MAX to represent a Lychrel number
 
     let mut iterations: Vec<Option<u8>> = vec![None; MAX_VALUE as usize];
-    iterations[0] = Some(0);  // set index zero to 0 so that it is not a Lychrel number
+    iterations[0] = Some(0); // set index zero to 0 so that it is not a Lychrel number
 
     // iterate through all numbers and find the number of iterations to become a palindrome
     // if the number is already analysed, skip it
@@ -38,11 +33,14 @@ fn solve() -> String {
     }
 
     // count number of u8::MAX values (Lychrel numbers)
-    iterations.into_iter().filter(|&x| match x {
-        None => false,
-        Some(val) => val == u8::MAX,
-
-    }).count().to_string()
+    iterations
+        .into_iter()
+        .filter(|&x| match x {
+            None => false,
+            Some(val) => val == u8::MAX,
+        })
+        .count()
+        .to_string()
 }
 
 /// Analyse a number to find the number of iterations to become a palindrome
@@ -65,7 +63,7 @@ fn analyse_lychrel(n: u128, depth: u8, iterations: &mut [Option<u8>]) -> u8 {
 
     // if none of these are the case, the number is evaluated
     } else {
-        let next = n + reverse_128(n);  // next number (n + reverse(n))
+        let next = n + reverse_128(n); // next number (n + reverse(n))
 
         // in the next part before every return it is checked whether the number is smaller than MAX_VALUE
         // if it is, the result, is also stored in the vector (besides being returned)

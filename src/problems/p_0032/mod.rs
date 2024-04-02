@@ -3,17 +3,12 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        32,
-        "Pandigital Products",
-        solve,
-    )
+    Problem::new(32, "Pandigital Products", solve)
 }
 
-
-use std::collections::HashSet;
-use itertools::Itertools;
 use crate::shared::math::slice_to_int;
+use itertools::Itertools;
+use std::collections::HashSet;
 
 fn solve() -> String {
     // if we list combinations of multiplicand and multiplier digits:

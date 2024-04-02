@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        19,
-        "Counting Sundays",
-        solve,
-    )
+    Problem::new(19, "Counting Sundays", solve)
 }
-
 
 fn solve() -> String {
     // how many sundays fell on the first of the month during the twentieth century (1 Jan 1901 to 31 Dec 2000)?

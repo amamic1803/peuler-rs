@@ -3,18 +3,12 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        43,
-        "Sub-string Divisibility",
-        solve,
-    )
+    Problem::new(43, "Sub-string Divisibility", solve)
 }
 
-
-use std::collections::HashMap;
-use once_cell::sync::Lazy;
 use crate::shared::math::slice_to_int;
-
+use once_cell::sync::Lazy;
+use std::collections::HashMap;
 
 /// The digits that can be used in each position.
 static DIGITS: Lazy<HashMap<u8, Vec<u8>>> = Lazy::new(|| {
@@ -60,7 +54,7 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
                 recursive_search(working, sum, depth + 1);
                 working.pop();
             }
-        },
+        }
         2..=4 | 6 => {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
@@ -69,7 +63,7 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
                     working.pop();
                 }
             }
-        },
+        }
         5 => {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
@@ -80,7 +74,7 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
                     working.pop();
                 }
             }
-        },
+        }
         7 => {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
@@ -91,7 +85,7 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
                     working.pop();
                 }
             }
-        },
+        }
         8 => {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
@@ -102,7 +96,7 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
                     working.pop();
                 }
             }
-        },
+        }
         9 => {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
@@ -113,7 +107,7 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
                     working.pop();
                 }
             }
-        },
+        }
         10 => {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
@@ -124,7 +118,7 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
                     working.pop();
                 }
             }
-        },
+        }
         11 => *sum += slice_to_int(working),
         _ => unreachable!("Invalid depth"),
     }

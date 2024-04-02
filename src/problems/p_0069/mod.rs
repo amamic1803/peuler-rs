@@ -3,18 +3,14 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        69,
-        "Totient Maximum",
-        solve,
-    )
+    Problem::new(69, "Totient Maximum", solve)
 }
 
 use crate::shared::math::phi_1_to_n;
-const MAX_N: u64 = 1_000_000;  // maximum n value
+const MAX_N: u64 = 1_000_000; // maximum n value
 
 fn solve() -> String {
-    let phi_values = phi_1_to_n(MAX_N);  // precompute phi values
+    let phi_values = phi_1_to_n(MAX_N); // precompute phi values
 
     // find the maximum n/phi(n) ratio
     let mut max_ratio = 0.0;

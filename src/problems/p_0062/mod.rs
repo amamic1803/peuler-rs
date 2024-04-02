@@ -3,16 +3,11 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        62,
-        "Cubic Permutations",
-        solve,
-    )
+    Problem::new(62, "Cubic Permutations", solve)
 }
 
-
-use std::collections::{HashMap, HashSet};
 use crate::shared::math::digits;
+use std::collections::{HashMap, HashSet};
 
 const PERM_COUNT: usize = 5;
 
@@ -58,7 +53,10 @@ fn solve() -> String {
         for cube in &cubes {
             let mut cube_digits = digits(*cube).collect::<Vec<_>>();
             cube_digits.sort();
-            cube_counts.entry(cube_digits).and_modify(|e| *e += 1).or_insert(1);
+            cube_counts
+                .entry(cube_digits)
+                .and_modify(|e| *e += 1)
+                .or_insert(1);
         }
 
         // the class that contains the solution may contain more than one collection of 5 cubes with the same digits

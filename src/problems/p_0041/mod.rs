@@ -3,17 +3,11 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        41,
-        "Pandigital Prime",
-        solve,
-    )
+    Problem::new(41, "Pandigital Prime", solve)
 }
 
-
-use itertools::Itertools;
 use crate::shared::math::{is_prime, slice_to_int};
-
+use itertools::Itertools;
 
 fn solve() -> String {
     // since a 4 digit pandigital prime is given in the problem,

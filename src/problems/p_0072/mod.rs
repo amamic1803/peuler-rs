@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        72,
-        "Counting Fractions",
-        solve,
-    )
+    Problem::new(72, "Counting Fractions", solve)
 }
-
 
 use crate::shared::math::phi_1_to_n;
 

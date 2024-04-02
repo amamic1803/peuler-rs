@@ -3,16 +3,11 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        39,
-        "Integer Right Triangles",
-        solve,
-    )
+    Problem::new(39, "Integer Right Triangles", solve)
 }
 
-
-use itertools::Itertools;
 use crate::shared::math::gcd;
+use itertools::Itertools;
 
 const MAX_P: u64 = 1000;
 
@@ -74,7 +69,9 @@ fn solve() -> String {
         for n in 1..m {
             if gcd(m, n) == 1 && (m - n) % 2 == 1 {
                 let p = 2 * m * (m + n);
-                if p > MAX_P { break; }
+                if p > MAX_P {
+                    break;
+                }
                 let mut k = p;
                 while k <= MAX_P {
                     solutions[k as usize] += 1;

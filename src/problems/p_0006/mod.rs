@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        6,
-        "Sum Square Difference",
-        solve,
-    )
+    Problem::new(6, "Sum Square Difference", solve)
 }
-
 
 use crate::shared::math::{sum_n, sum_n_squares};
 

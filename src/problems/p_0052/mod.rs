@@ -3,17 +3,12 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        52,
-        "Permuted Multiples",
-        solve,
-    )
+    Problem::new(52, "Permuted Multiples", solve)
 }
 
 use crate::shared::math::digits;
 
 fn solve() -> String {
-
     // temp vectors for storing digits
     let mut digits1 = Vec::new();
     let mut digits2 = Vec::new();

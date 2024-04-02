@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        63,
-        "Powerful Digit Counts",
-        solve,
-    )
+    Problem::new(63, "Powerful Digit Counts", solve)
 }
-
 
 use crate::shared::math::newtons_method;
 
@@ -50,7 +45,8 @@ fn solve() -> String {
             1e-10,
             |n: f64| 10.0_f64.powf(n - 1.0) - (y as f64).powf(n),
             |n: f64| 10.0_f64.powf(n - 1.0) * 10.0_f64.ln() - (y as f64).powf(n) * (y as f64).ln(),
-        ).floor() as u64;
+        )
+        .floor() as u64;
 
         count += n;
     }

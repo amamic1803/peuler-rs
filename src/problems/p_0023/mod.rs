@@ -3,16 +3,11 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        23,
-        "Non-Abundant Sums",
-        solve,
-    )
+    Problem::new(23, "Non-Abundant Sums", solve)
 }
 
-
-use std::collections::HashSet;
 use crate::shared::math::sum_of_proper_divisors;
+use std::collections::HashSet;
 
 const MIN_ABUNDANT: u64 = 12;
 const UPPER_BOUND: u64 = 28123;

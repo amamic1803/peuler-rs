@@ -3,21 +3,19 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        40,
-        "Champernowne's Constant",
-        solve,
-    )
+    Problem::new(40, "Champernowne's Constant", solve)
 }
 
-
 use crate::shared::math::digits_rev;
-
 
 const POSITIONS: [u64; 7] = [1, 10, 100, 1_000, 10_000, 100_000, 1_000_000];
 
 fn solve() -> String {
-    POSITIONS.into_iter().map(|pos| get_digit(pos) as u64).product::<u64>().to_string()
+    POSITIONS
+        .into_iter()
+        .map(|pos| get_digit(pos) as u64)
+        .product::<u64>()
+        .to_string()
 }
 
 /// This function calculates the digit at the given position in Champernowne's Constant.
@@ -61,7 +59,6 @@ fn get_digit(pos: u64) -> u8 {
     // because that was checked before
     digits_rev(number).nth(digits_to_move as usize).unwrap()
 }
-
 
 // this is a little slower, but more straightforward solution that just stores all the digits in a vector
 // fn solve() -> String {

@@ -3,13 +3,8 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        48,
-        "Self Powers",
-        solve,
-    )
+    Problem::new(48, "Self Powers", solve)
 }
-
 
 fn solve() -> String {
     // full manual calculation method commented out below, this is better

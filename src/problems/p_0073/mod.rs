@@ -3,15 +3,10 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        73,
-        "Counting Fractions in a Range",
-        solve,
-    )
+    Problem::new(73, "Counting Fractions in a Range", solve)
 }
 
-
-const MAX_DEN: u16 = 12_000;  // maximum denominator
+const MAX_DEN: u16 = 12_000; // maximum denominator
 
 fn solve() -> String {
     // this is Farey sequence

@@ -3,16 +3,10 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        75,
-        "Singular Integer Right Triangles",
-        solve,
-    )
+    Problem::new(75, "Singular Integer Right Triangles", solve)
 }
 
-
 use crate::shared::math::gcd;
-
 
 // maximum perimeter
 const L_MAX: u32 = 1_500_000;
@@ -52,8 +46,10 @@ fn solve() -> String {
 
     for m in 1..upper_m {
         for n in 1..m {
-            let l = 2 * m * (m + n);       // perimeter
-            if l > L_MAX { break; }             // if perimeter is too big, we can stop checking bigger n
+            let l = 2 * m * (m + n); // perimeter
+            if l > L_MAX {
+                break;
+            } // if perimeter is too big, we can stop checking bigger n
 
             // if m and n are coprime and m + n is odd (primitive triple)
             if gcd(m as u64, n as u64) == 1 && (m + n) % 2 == 1 {

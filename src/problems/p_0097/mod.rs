@@ -3,19 +3,14 @@ use crate::shared::structures::Problem;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
-    Problem::new(
-        97,
-        "Large Non-Mersenne Prime",
-        solve,
-    )
+    Problem::new(97, "Large Non-Mersenne Prime", solve)
 }
-
 
 fn solve() -> String {
     let mut result = MULTIPLIER;
 
     for _ in 0..EXPONENT {
-        result = (result << 1) % MODULO;  // using bitshift to multiply by 2 faster
+        result = (result << 1) % MODULO; // using bitshift to multiply by 2 faster
     }
 
     result = (result + 1) % MODULO;
