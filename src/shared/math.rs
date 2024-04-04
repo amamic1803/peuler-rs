@@ -96,10 +96,7 @@ pub struct ContinuedFraction {
 impl ContinuedFraction {
     /// Creates a new continued fraction.
     pub fn new(non_periodic: Vec<i64>, periodic: Option<Vec<i64>>) -> Self {
-        Self {
-            non_periodic,
-            periodic,
-        }
+        Self { non_periodic, periodic }
     }
 
     /// Creates the continued fraction by taking the square root of a number.
@@ -143,10 +140,7 @@ impl ContinuedFraction {
             }
         }
 
-        Self {
-            non_periodic,
-            periodic,
-        }
+        Self { non_periodic, periodic }
     }
 
     /// Returns the reference to the non-periodic part of the continued fraction.
@@ -167,10 +161,7 @@ impl ContinuedFraction {
         let mut prev_den = Integer::ONE;
         let mut num = Integer::ONE;
         let mut den = Integer::ZERO;
-        let mut values = self
-            .non_periodic
-            .iter()
-            .chain(self.periodic.iter().flat_map(|v| v.iter().cycle()));
+        let mut values = self.non_periodic.iter().chain(self.periodic.iter().flat_map(|v| v.iter().cycle()));
 
         iter::from_fn(move || {
             let next_value = values.next()?;
@@ -779,13 +770,7 @@ pub fn sieve_of_eratosthenes(n: u64) -> Vec<u64> {
             }
 
             // convert sieve indices that are true to their corresponding number values and add them to results
-            results.extend(sieve.into_iter().enumerate().filter_map(|(i, prime)| {
-                if prime {
-                    Some(ind_to_val(i))
-                } else {
-                    None
-                }
-            }));
+            results.extend(sieve.into_iter().enumerate().filter_map(|(i, prime)| if prime { Some(ind_to_val(i)) } else { None }));
 
             // return results
             results
@@ -874,10 +859,7 @@ pub fn sum_of_divisors(n: u64) -> u64 {
         // for each we calculate the sum of the divisors of that prime factor
         // and multiply them together
 
-        prime_factors(n)
-            .into_iter()
-            .map(|(p, a)| (p.pow(a as u32 + 1) - 1) / (p - 1))
-            .product()
+        prime_factors(n).into_iter().map(|(p, a)| (p.pow(a as u32 + 1) - 1) / (p - 1)).product()
     }
 }
 
@@ -947,10 +929,7 @@ pub struct Vector2D {
 impl Vector2D {
     /// Creates a new vector.
     pub fn new(x_factor: f64, y_factor: f64) -> Self {
-        Self {
-            x: x_factor,
-            y: y_factor,
-        }
+        Self { x: x_factor, y: y_factor }
     }
 
     /// Creates a new vector from two points.

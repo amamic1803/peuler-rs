@@ -45,15 +45,12 @@ fn solve() -> String {
     // RECTANGLE_COUNT constant is used so that the code can be easily modified to solve for other values
     // therefore the expressions are a bit more complicated than they need to be
 
-    let max_val =
-        ((-1.0 + (1.0 + 4.0 * ((4 * RECTANGLE_COUNT) as f64) / 2.0).sqrt()) / 2.0).floor() as u64;
+    let max_val = ((-1.0 + (1.0 + 4.0 * ((4 * RECTANGLE_COUNT) as f64) / 2.0).sqrt()) / 2.0).floor() as u64;
 
     let mut closest_product = 0;
     let mut closest_diff = u64::MAX;
     for m in 1..=max_val {
-        let n_exact = (-1.0
-            + (1.0 + (4.0 * ((4 * RECTANGLE_COUNT) as f64)) / (m * (m + 1)) as f64).sqrt())
-            / 2.0;
+        let n_exact = (-1.0 + (1.0 + (4.0 * ((4 * RECTANGLE_COUNT) as f64)) / (m * (m + 1)) as f64).sqrt()) / 2.0;
         let n_low = n_exact.floor() as u64;
         let n_high = n_exact.ceil() as u64;
 

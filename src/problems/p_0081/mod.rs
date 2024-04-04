@@ -44,11 +44,6 @@ fn parse_input(input: &str) -> Vec<Vec<u32>> {
     input
         .trim()
         .lines()
-        .map(|line| {
-            line.trim()
-                .split(',')
-                .map(|num_str| num_str.parse::<u32>().unwrap())
-                .collect::<Vec<u32>>()
-        })
+        .map(|line| line.trim().split(',').map(|num_str| num_str.parse::<u32>().unwrap()).collect::<Vec<u32>>())
         .collect::<Vec<Vec<u32>>>()
 }

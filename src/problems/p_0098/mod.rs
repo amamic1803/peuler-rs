@@ -86,9 +86,8 @@ fn solve() -> String {
         let (mut storage1, mut storage2) = (Vec::new(), Vec::new());
 
         // iterator over squares with the same number of digits as the words
-        let squares_iter = (((10_u64.pow(word1.len() as u32 - 1) as f64).sqrt().ceil() as u64)
-            ..=((10_u64.pow(word1.len() as u32) as f64).sqrt().floor() as u64))
-            .map(|i| i * i);
+        let squares_iter =
+            (((10_u64.pow(word1.len() as u32 - 1) as f64).sqrt().ceil() as u64)..=((10_u64.pow(word1.len() as u32) as f64).sqrt().floor() as u64)).map(|i| i * i);
 
         // for each square number, find if it can represent each word
         // if it can, push it and the array to the storage vector of that word

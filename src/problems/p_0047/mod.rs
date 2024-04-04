@@ -26,10 +26,7 @@ fn solve() -> String {
     // which is equal to (CONSECUTIVE_COUNT * n) + (((CONSECUTIVE_COUNT - 1) * CONSECUTIVE_COUNT) / 2)
     // so we search until the sum of the array is not equal to the above expression
 
-    while consecutive.iter().sum::<u64>()
-        != (consecutive[0] * CONSECUTIVE_COUNT
-            + (((CONSECUTIVE_COUNT - 1) * CONSECUTIVE_COUNT) / 2))
-    {
+    while consecutive.iter().sum::<u64>() != (consecutive[0] * CONSECUTIVE_COUNT + (((CONSECUTIVE_COUNT - 1) * CONSECUTIVE_COUNT) / 2)) {
         // if current number has 4 distinct prime factors, add it to the end of the array and remove the first number
         // this is actually achieved by setting the first element to current number and rotating the array left by 1
         if prime_factors(curr_num).len() == CONSECUTIVE_COUNT as usize {

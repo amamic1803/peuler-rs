@@ -45,8 +45,7 @@ fn solve() -> String {
     // find minimum c
     // 2*10^24 - 2*10^12 + 1 is not the perfect square, therefore we can calculate the minimum c
     // by taking the integer square root of 2*10^24 - 2*10^12 + 1 and adding 1
-    let min_c = u64::try_from(isqrt_128(2 * 10u128.pow(24) - 2 * 10_u128.pow(12) + 1) + 1)
-        .expect("Overflow");
+    let min_c = u64::try_from(isqrt_128(2 * 10u128.pow(24) - 2 * 10_u128.pow(12) + 1) + 1).expect("Overflow");
 
     // set initial values for d and c (fundamental solution)
     let mut d = 1;

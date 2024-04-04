@@ -14,11 +14,7 @@ fn solve() -> String {
     let input = include_str!("0054_poker.txt");
     let parsed_input = parse_input(input);
 
-    parsed_input
-        .into_iter()
-        .filter(|&game| game_result(game))
-        .count()
-        .to_string()
+    parsed_input.into_iter().filter(|&game| game_result(game)).count().to_string()
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -202,11 +198,7 @@ fn hand(player: [(u8, u8); 5]) -> Hand {
     if let Hand::HighCard(_) = result {
         match pairs.len() {
             1 => {
-                let mut other_cards = player
-                    .into_iter()
-                    .map(|card| card.0)
-                    .filter(|&rank| rank != pairs[0])
-                    .collect::<Vec<u8>>();
+                let mut other_cards = player.into_iter().map(|card| card.0).filter(|&rank| rank != pairs[0]).collect::<Vec<u8>>();
                 other_cards.sort_by_key(|&rank| Reverse(rank));
                 result = Hand::OnePair((pairs[0], other_cards.try_into().unwrap()));
             }
@@ -237,8 +229,7 @@ fn hand(player: [(u8, u8); 5]) -> Hand {
         // straight
         let mut straight_cards = player.iter().map(|card| card.0).collect::<Vec<u8>>();
         straight_cards.sort();
-        let straight =
-            (straight_cards[0]..(straight_cards[0] + 5)).collect::<Vec<u8>>() == straight_cards;
+        let straight = (straight_cards[0]..(straight_cards[0] + 5)).collect::<Vec<u8>>() == straight_cards;
         if straight {
             let mut hand = player.into_iter().map(|card| card.0).collect::<Vec<u8>>();
             hand.sort_by_key(|&rank| Reverse(rank));
@@ -285,18 +276,8 @@ fn parse_input(input: &str) -> Vec<Game> {
         .map(|line| {
             let mut line_elements = line.split_whitespace();
 
-            let player1: [(u8, u8); 5] = line_elements
-                .by_ref()
-                .take(5)
-                .map(parse_card)
-                .collect::<Vec<(u8, u8)>>()
-                .try_into()
-                .unwrap();
-            let player2: [(u8, u8); 5] = line_elements
-                .map(parse_card)
-                .collect::<Vec<(u8, u8)>>()
-                .try_into()
-                .unwrap();
+            let player1: [(u8, u8); 5] = line_elements.by_ref().take(5).map(parse_card).collect::<Vec<(u8, u8)>>().try_into().unwrap();
+            let player2: [(u8, u8); 5] = line_elements.map(parse_card).collect::<Vec<(u8, u8)>>().try_into().unwrap();
 
             (player1, player2)
         })

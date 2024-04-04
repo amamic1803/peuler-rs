@@ -22,10 +22,7 @@ fn solve() -> String {
     for d in 1..MAX {
         let sqrt_continued_fraction = ContinuedFraction::from_sqrt(d as i64);
         for convergent in sqrt_continued_fraction.convergents() {
-            if convergent.denominator_ref() * convergent.denominator_ref() * Natural::from(d)
-                + Natural::ONE
-                == convergent.numerator_ref() * convergent.numerator_ref()
-            {
+            if convergent.denominator_ref() * convergent.denominator_ref() * Natural::from(d) + Natural::ONE == convergent.numerator_ref() * convergent.numerator_ref() {
                 if convergent.numerator_ref() > &max_x {
                     max_x = convergent.numerator_ref().clone();
                     max_d = d;

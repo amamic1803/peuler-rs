@@ -11,11 +11,7 @@ fn solve() -> String {
     let grid: Vec<Vec<u64>> = input
         .trim()
         .lines()
-        .map(|line| {
-            line.split_whitespace()
-                .map(|num| num.parse::<u64>().unwrap())
-                .collect()
-        })
+        .map(|line| line.split_whitespace().map(|num| num.parse::<u64>().unwrap()).collect())
         .collect();
     let mut max_product = 0;
 

@@ -12,12 +12,7 @@ fn solve() -> String {
     input
         .trim()
         .split(',')
-        .map(|word| {
-            word.trim_matches('"')
-                .chars()
-                .map(letter_value)
-                .sum::<u32>()
-        })
+        .map(|word| word.trim_matches('"').chars().map(letter_value).sum::<u32>())
         .filter(is_triangle_num)
         .count()
         .to_string()

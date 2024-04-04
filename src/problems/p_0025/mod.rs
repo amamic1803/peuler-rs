@@ -23,9 +23,7 @@ fn solve() -> String {
     // after some manipulation, we get n >= (999 + log(5) / 2) / log(a)
     // now the only thing left is to find the smallest integer n that satisfies this inequality
 
-    (((999.0_f64 + (5.0_f64.log10() / 2.0_f64)) / ((1.0_f64 + 5.0_f64.sqrt()) / 2.0_f64).log10())
-        .ceil() as u64)
-        .to_string()
+    (((999.0_f64 + (5.0_f64.log10() / 2.0_f64)) / ((1.0_f64 + 5.0_f64.sqrt()) / 2.0_f64).log10()).ceil() as u64).to_string()
 }
 
 // this is the slow, manual solution that actually calculates the fibonacci numbers

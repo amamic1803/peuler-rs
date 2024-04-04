@@ -27,11 +27,7 @@ fn solve() -> String {
     }
 
     // count the number of true values in the cache
-    cache
-        .iter()
-        .filter(|&&x| x == Some(true))
-        .count()
-        .to_string()
+    cache.iter().filter(|&&x| x == Some(true)).count().to_string()
 }
 
 fn process_number(num: u64, cache: &mut Vec<Option<bool>>) -> bool {

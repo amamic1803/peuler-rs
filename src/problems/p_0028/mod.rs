@@ -21,9 +21,7 @@ fn solve() -> String {
     // 1 + 4 * ((floor(1001 / 2) + 1) * (2 * (floor(1001 / 2) + 1) + 1) * (2 * (floor(1001 / 2) + 1) - 1) / 3 - 1) - 6 * ((floor(1001 / 2) + 1)^2 - 1) + 6 * floor(1001 / 2)
     // note that these formulas are valid only for odd numbers, but that is ok because spiral size is always odd
 
-    let result: u64 = 1 + 4 * (sum_n_odd_squares(SPIRAL_SIZE / 2 + 1) - 1)
-        - 6 * (sum_n_odd(SPIRAL_SIZE / 2 + 1) - 1)
-        + 6 * (SPIRAL_SIZE / 2);
+    let result: u64 = 1 + 4 * (sum_n_odd_squares(SPIRAL_SIZE / 2 + 1) - 1) - 6 * (sum_n_odd(SPIRAL_SIZE / 2 + 1) - 1) + 6 * (SPIRAL_SIZE / 2);
 
     result.to_string()
 }

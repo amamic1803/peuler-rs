@@ -46,10 +46,7 @@ fn parse_input(input: &str) -> Vec<(Point2D, Point2D, Point2D)> {
         .trim()
         .lines()
         .map(|line| {
-            let mut line_iter = line
-                .trim()
-                .split(',')
-                .map(|num_str| num_str.parse::<f64>().unwrap());
+            let mut line_iter = line.trim().split(',').map(|num_str| num_str.parse::<f64>().unwrap());
             (
                 Point2D::new(line_iter.next().unwrap(), line_iter.next().unwrap()),
                 Point2D::new(line_iter.next().unwrap(), line_iter.next().unwrap()),

@@ -9,10 +9,5 @@ pub fn get_problem() -> Problem {
 use crate::shared::math::collatz_seq;
 
 fn solve() -> String {
-    (1..1_000_000)
-        .map(|n| (n, collatz_seq(n).count()))
-        .max_by_key(|&(_, count)| count)
-        .unwrap()
-        .0
-        .to_string()
+    (1..1_000_000).map(|n| (n, collatz_seq(n).count())).max_by_key(|&(_, count)| count).unwrap().0.to_string()
 }

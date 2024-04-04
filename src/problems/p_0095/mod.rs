@@ -67,11 +67,7 @@ fn solve() -> String {
     // find the longest chain (maximum value in chain_lengths)
     let max_chain_length = *chain_lengths.iter().flatten().max().unwrap();
     // find the first element with that chain length and return it
-    for (num, length) in chain_lengths
-        .into_iter()
-        .enumerate()
-        .filter_map(|(i, length)| length.map(|length| (i, length)))
-    {
+    for (num, length) in chain_lengths.into_iter().enumerate().filter_map(|(i, length)| length.map(|length| (i, length))) {
         if length == max_chain_length {
             return num.to_string();
         }

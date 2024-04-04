@@ -64,12 +64,7 @@ fn solve() -> String {
     }
 
     // assert that there are exactly 2 sequences
-    assert_eq!(
-        found_sequences.len(),
-        2,
-        "Found {} sequences, expected 2",
-        found_sequences.len()
-    );
+    assert_eq!(found_sequences.len(), 2, "Found {} sequences, expected 2", found_sequences.len());
 
     // result string
     let mut result = String::new();

@@ -36,9 +36,7 @@ fn solve() -> String {
                 n += 1;
                 let next_digit_count = digit_count + digits(next_product).count();
 
-                if (next_digit_count > 9)
-                    || (next_product != slice_to_int(&perm[digit_count..next_digit_count]))
-                {
+                if (next_digit_count > 9) || (next_product != slice_to_int(&perm[digit_count..next_digit_count])) {
                     pandigital_multiple = false;
                     break;
                 }

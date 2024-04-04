@@ -11,11 +11,7 @@ use malachite::num::conversion::traits::Digits;
 use malachite::Natural;
 
 fn solve() -> String {
-    Natural::power_of_2(1000)
-        .to_digits_desc(&10_u64)
-        .iter()
-        .sum::<u64>()
-        .to_string()
+    Natural::power_of_2(1000).to_digits_desc(&10_u64).iter().sum::<u64>().to_string()
 }
 
 // this is slow, pen and paper style solution

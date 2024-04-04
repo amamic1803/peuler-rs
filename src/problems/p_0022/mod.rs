@@ -20,11 +20,7 @@ fn solve() -> String {
 }
 
 fn parse_input(input: &str) -> Vec<&str> {
-    let mut input: Vec<&str> = input
-        .trim()
-        .split(',')
-        .map(|s| s.trim_matches('"'))
-        .collect();
+    let mut input: Vec<&str> = input.trim().split(',').map(|s| s.trim_matches('"')).collect();
 
     input.sort();
 

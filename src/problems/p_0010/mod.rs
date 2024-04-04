@@ -9,8 +9,5 @@ pub fn get_problem() -> Problem {
 use crate::shared::math::sieve_of_eratosthenes;
 
 fn solve() -> String {
-    sieve_of_eratosthenes(1_999_999)
-        .iter()
-        .sum::<u64>()
-        .to_string()
+    sieve_of_eratosthenes(1_999_999).iter().sum::<u64>().to_string()
 }

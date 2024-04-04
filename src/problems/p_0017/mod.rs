@@ -13,10 +13,7 @@ use std::sync::Mutex;
 fn solve() -> String {
     let mut sum = 0;
     for n in 1..1001 {
-        sum += num_to_string(n)
-            .chars()
-            .filter(|c| ![' ', '-'].contains(c))
-            .count();
+        sum += num_to_string(n).chars().filter(|c| ![' ', '-'].contains(c)).count();
     }
     sum.to_string()
 }

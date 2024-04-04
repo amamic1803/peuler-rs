@@ -44,9 +44,7 @@ fn solve() -> String {
 
         // check current number with all previous numbers (in reverse order)
         for i in (0..curr_ind).rev() {
-            if sequence_set.contains(&(sequence[curr_ind] - sequence[i]))
-                && sequence_set.contains(&(sequence[curr_ind] + sequence[i]))
-            {
+            if sequence_set.contains(&(sequence[curr_ind] - sequence[i])) && sequence_set.contains(&(sequence[curr_ind] + sequence[i])) {
                 return (sequence[curr_ind] - sequence[i]).to_string();
             }
         }

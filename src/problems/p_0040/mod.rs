@@ -11,11 +11,7 @@ use crate::shared::math::digits_rev;
 const POSITIONS: [u64; 7] = [1, 10, 100, 1_000, 10_000, 100_000, 1_000_000];
 
 fn solve() -> String {
-    POSITIONS
-        .into_iter()
-        .map(|pos| get_digit(pos) as u64)
-        .product::<u64>()
-        .to_string()
+    POSITIONS.into_iter().map(|pos| get_digit(pos) as u64).product::<u64>().to_string()
 }
 
 /// This function calculates the digit at the given position in Champernowne's Constant.

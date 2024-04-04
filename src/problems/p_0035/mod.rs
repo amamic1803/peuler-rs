@@ -58,9 +58,5 @@ fn solve() -> String {
     }
 
     // count primes marked as circular
-    primes_map
-        .into_iter()
-        .filter(|(_, primality)| *primality)
-        .count()
-        .to_string()
+    primes_map.into_iter().filter(|(_, primality)| *primality).count().to_string()
 }

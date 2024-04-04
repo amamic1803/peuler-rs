@@ -60,11 +60,7 @@ impl Problems {
     /// The `String` with the problem's solution.
     /// Or a message if the problem is not available.
     pub fn run(&self, problem_id: usize) -> String {
-        match self
-            .problems
-            .iter()
-            .find(|problem| problem.id == problem_id)
-        {
+        match self.problems.iter().find(|problem| problem.id == problem_id) {
             Some(problem) => problem.run(),
             None => format!("Problem {:04} not available!\n", problem_id),
         }
@@ -79,12 +75,7 @@ impl Problems {
     /// # Returns
     /// The `String` with the header.
     fn print_header(&self) -> String {
-        let mut max_line_len = self
-            .problems
-            .iter()
-            .map(|problem| problem.name().chars().count())
-            .max()
-            .unwrap();
+        let mut max_line_len = self.problems.iter().map(|problem| problem.name().chars().count()).max().unwrap();
         let mut result = String::new();
         if max_line_len < 21 {
             max_line_len = 21;
@@ -131,11 +122,7 @@ impl Problem {
     /// # Returns
     /// A new `Problem`.
     pub fn new(id: usize, title: &'static str, solution: fn() -> String) -> Self {
-        Self {
-            id,
-            title,
-            solution,
-        }
+        Self { id, title, solution }
     }
 
     /// Returns the problem's name.
