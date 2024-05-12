@@ -6,266 +6,15 @@ pub fn get_problem() -> Problem {
     Problem::new(54, "Poker Hands", solve)
 }
 
-use once_cell::sync::Lazy;
-use std::cmp::{Ordering, Reverse};
+use std::cmp::Ordering;
 use std::collections::HashMap;
 
 fn solve() -> String {
     let input = include_str!("0054_poker.txt");
-    let parsed_input = parse_input(input);
-
-    parsed_input.into_iter().filter(|&game| game_result(game)).count().to_string()
+    input.lines().map(|line| Game::new(line).winner()).filter(|&winner| winner == 1).count().to_string()
 }
 
-#[derive(Copy, Clone, Debug)]
-enum Han {
-    HighCard([u8; 5]),
-    OnePair((u8, [u8; 3])),
-    TwoPairs((u8, u8, u8)),
-    ThreeOfAKind((u8, [u8; 2])),
-    Straight([u8; 5]),
-    Flush([u8; 5]),
-    FullHouse((u8, u8)),
-    FourOfAKind((u8, u8)),
-    StraightFlush([u8; 5]),
-    RoyalFlush,
-}
-
-fn hand_score(hand: Hand) -> u8 {
-    match hand {
-        Hand::HighCard(_) => 0,
-        Hand::OnePair(_) => 1,
-        Hand::TwoPairs(_) => 2,
-        Hand::ThreeOfAKind(_) => 3,
-        Hand::Straight(_) => 4,
-        Hand::Flush(_) => 5,
-        Hand::FullHouse(_) => 6,
-        Hand::FourOfAKind(_) => 7,
-        Hand::StraightFlush(_) => 8,
-        Hand::RoyalFlush => 9,
-    }
-}
-
-fn game_result(game: Game) -> bool {
-    //! Returns true if player 1 wins, false if player 2 wins.
-
-    let (player1, player2) = game;
-    let player1 = hand(player1);
-    let player1_score = hand_score(player1);
-    let player2 = hand(player2);
-    let player2_score = hand_score(player2);
-
-    match player1_score.cmp(&player2_score) {
-        Ordering::Greater => true,
-        Ordering::Less => false,
-        Ordering::Equal => match player1 {
-            Hand::HighCard(play1_val) => {
-                if let Hand::HighCard(play2_val) = player2 {
-                    play1_val[0] > play2_val[0]
-                } else {
-                    unreachable!("Player 2 must have a high card here.")
-                }
-            }
-            Hand::OnePair(play1_val) => {
-                if let Hand::OnePair(play2_val) = player2 {
-                    match play1_val.0.cmp(&play2_val.0) {
-                        Ordering::Greater => true,
-                        Ordering::Less => false,
-                        Ordering::Equal => play1_val.1 > play2_val.1,
-                    }
-                } else {
-                    unreachable!("Player 2 must have a pair here.")
-                }
-            }
-            Hand::TwoPairs(play1_val) => {
-                if let Hand::TwoPairs(play2_val) = player2 {
-                    match play1_val.0.cmp(&play2_val.0) {
-                        Ordering::Greater => true,
-                        Ordering::Less => false,
-                        Ordering::Equal => match play1_val.1.cmp(&play2_val.1) {
-                            Ordering::Greater => true,
-                            Ordering::Less => false,
-                            Ordering::Equal => play1_val.2 > play2_val.2,
-                        },
-                    }
-                } else {
-                    unreachable!("Player 2 must have two pairs here.")
-                }
-            }
-            Hand::ThreeOfAKind(play1_val) => {
-                if let Hand::ThreeOfAKind(play2_val) = player2 {
-                    match play1_val.0.cmp(&play2_val.0) {
-                        Ordering::Greater => true,
-                        Ordering::Less => false,
-                        Ordering::Equal => play1_val.1 > play2_val.1,
-                    }
-                } else {
-                    unreachable!("Player 2 must have a three of a kind here.")
-                }
-            }
-            Hand::Straight(play1_val) => {
-                if let Hand::Straight(play2_val) = player2 {
-                    play1_val[0] > play2_val[0]
-                } else {
-                    unreachable!("Player 2 must have a straight here.")
-                }
-            }
-            Hand::Flush(play1_val) => {
-                if let Hand::Flush(play2_val) = player2 {
-                    play1_val[0] > play2_val[0]
-                } else {
-                    unreachable!("Player 2 must have a flush here.")
-                }
-            }
-            Hand::FullHouse(play1_val) => {
-                if let Hand::FullHouse(play2_val) = player2 {
-                    match play1_val.0.cmp(&play2_val.0) {
-                        Ordering::Greater => true,
-                        Ordering::Less => false,
-                        Ordering::Equal => play1_val.1 > play2_val.1,
-                    }
-                } else {
-                    unreachable!("Player 2 must have a full house here.")
-                }
-            }
-            Hand::FourOfAKind(play1_val) => {
-                if let Hand::FourOfAKind(play2_val) = player2 {
-                    match play1_val.0.cmp(&play2_val.0) {
-                        Ordering::Greater => true,
-                        Ordering::Less => false,
-                        Ordering::Equal => play1_val.1 > play2_val.1,
-                    }
-                } else {
-                    unreachable!("Player 2 must have a four of a kind here.")
-                }
-            }
-            Hand::StraightFlush(play1_val) => {
-                if let Hand::StraightFlush(play2_val) = player2 {
-                    play1_val[0] > play2_val[0]
-                } else {
-                    unreachable!("Player 2 must have a straight flush here.")
-                }
-            }
-            Hand::RoyalFlush => panic!("There should not be ties in the input."),
-        },
-    }
-}
-
-fn hand(player: [(u8, u8); 5]) -> Hand {
-    // high card
-    let mut sorted_cards = player.iter().map(|card| card.0).collect::<Vec<u8>>();
-    sorted_cards.sort_by_key(|&rank| Reverse(rank));
-    let mut result: Hand = Hand::HighCard(sorted_cards.try_into().unwrap());
-
-    // three of a kind, four of a kind, pairs
-    let mut kind_counts: HashMap<u8, u8> = HashMap::new();
-    for card in player {
-        let count = kind_counts.entry(card.0).or_insert(0);
-        *count += 1;
-    }
-    let mut pairs: Vec<u8> = Vec::new();
-    for (rank, count) in kind_counts {
-        match count {
-            2 => {
-                pairs.push(rank);
-            }
-            3 => {
-                let mut other_cards: Vec<u8> = Vec::with_capacity(2);
-                for card in player {
-                    if card.0 != rank {
-                        other_cards.push(card.0);
-                    }
-                }
-
-                other_cards.sort_by_key(|&rank| Reverse(rank));
-
-                result = Hand::ThreeOfAKind((rank, other_cards.try_into().unwrap()));
-            }
-            4 => {
-                let mut other_card: u8 = 0;
-                for card in player {
-                    if card.0 != rank {
-                        other_card = card.0;
-                    }
-                }
-
-                result = Hand::FourOfAKind((rank, other_card));
-            }
-            _ => {}
-        }
-    }
-
-    if let Hand::HighCard(_) = result {
-        match pairs.len() {
-            1 => {
-                let mut other_cards = player.into_iter().map(|card| card.0).filter(|&rank| rank != pairs[0]).collect::<Vec<u8>>();
-                other_cards.sort_by_key(|&rank| Reverse(rank));
-                result = Hand::OnePair((pairs[0], other_cards.try_into().unwrap()));
-            }
-            2 => {
-                let mut left_card: Option<u8> = None;
-                for card in player {
-                    if card.0 != pairs[0] && card.0 != pairs[1] {
-                        left_card = Some(card.0);
-                        break;
-                    }
-                }
-                assert!(left_card.is_some());
-
-                result = Hand::TwoPairs((pairs[0], pairs[1], left_card.unwrap()));
-            }
-            _ => {}
-        }
-    } else if let Hand::ThreeOfAKind(value) = result {
-        for pair in &pairs {
-            if *pair != value.0 {
-                result = Hand::FullHouse((value.0, *pair));
-                break;
-            }
-        }
-    }
-
-    if let Hand::HighCard(_) = result {
-        // straight
-        let mut straight_cards = player.iter().map(|card| card.0).collect::<Vec<u8>>();
-        straight_cards.sort();
-        let straight = (straight_cards[0]..(straight_cards[0] + 5)).collect::<Vec<u8>>() == straight_cards;
-        if straight {
-            let mut hand = player.into_iter().map(|card| card.0).collect::<Vec<u8>>();
-            hand.sort_by_key(|&rank| Reverse(rank));
-            result = Hand::Straight(hand.try_into().unwrap());
-        }
-
-        // flush
-        let mut flush = true;
-        for card in player {
-            if card.1 != player[0].1 {
-                flush = false;
-                break;
-            }
-        }
-        if flush {
-            let mut hand = player.into_iter().map(|card| card.0).collect::<Vec<u8>>();
-            hand.sort_by_key(|&rank| Reverse(rank));
-            result = Hand::Flush(hand.try_into().unwrap());
-        }
-
-        // straight flush, royal flush
-        let straight_flush = flush && straight;
-        if straight_flush {
-            let mut hand = player.into_iter().map(|card| card.0).collect::<Vec<u8>>();
-            hand.sort_by_key(|&rank| Reverse(rank));
-            result = if hand[0] != 12 {
-                Hand::StraightFlush(hand.try_into().unwrap())
-            } else {
-                Hand::RoyalFlush
-            };
-        }
-    }
-
-    result
-}
-
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 enum Suit {
     Spades,
     Clubs,
@@ -284,6 +33,7 @@ impl Suit {
     }
 }
 
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 enum Rank {
     Two,
     Three,
@@ -318,8 +68,36 @@ impl Rank {
             _ => panic!("Invalid rank."),
         }
     }
+    fn value(&self) -> u8 {
+        match self {
+            Self::Two => 0,
+            Self::Three => 1,
+            Self::Four => 2,
+            Self::Five => 3,
+            Self::Six => 4,
+            Self::Seven => 5,
+            Self::Eight => 6,
+            Self::Nine => 7,
+            Self::Ten => 8,
+            Self::Jack => 9,
+            Self::Queen => 10,
+            Self::King => 11,
+            Self::Ace => 12,
+        }
+    }
+}
+impl PartialOrd for Rank {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl Ord for Rank {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.value().cmp(&other.value())
+    }
 }
 
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 struct Card {
     suit: Suit,
     rank: Rank,
@@ -333,16 +111,146 @@ impl Card {
 
         Self { suit, rank }
     }
+    fn value(&self) -> u8 {
+        self.rank.value()
+    }
+}
+impl PartialOrd for Card {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl Ord for Card {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.rank.cmp(&other.rank)
+    }
 }
 
+#[derive(Debug, PartialEq, Eq)]
 struct Hand {
     cards: [Card; 5],
 }
 impl Hand {
     fn new(hand: &str) -> Self {
         let cards = hand.split_whitespace().map(Card::new).collect::<Vec<Card>>().try_into().unwrap();
-
         Self { cards }
+    }
+    fn score(&self) -> u32 {
+        let mut score = 0;
+
+        let mut cards = self.cards;
+
+        // high card
+        cards.sort();
+        score = score.max(self.generate_hand_code(HandType::HighCard, cards));
+
+        // straight
+        let mut straight = true;
+        for (i, card) in cards.iter().enumerate().skip(1) {
+            if card.value() != cards[i - 1].value() + 1 {
+                straight = false;
+                break;
+            }
+        }
+        if straight {
+            score = score.max(self.generate_hand_code(HandType::Straight, cards));
+        }
+
+        // flush
+        let mut flush = false;
+        if cards.iter().all(|card| card.suit == cards[0].suit) {
+            score = score.max(self.generate_hand_code(HandType::Flush, cards));
+            flush = true;
+        }
+
+        // straight flush, royal flush (just a subset of straight flush, not checked directly)
+        if straight && flush {
+            score = score.max(self.generate_hand_code(HandType::StraightFlush, cards));
+        }
+
+        // count the number of cards of each rank
+        let mut rank_counts = HashMap::new();
+        for card in &cards {
+            *rank_counts.entry(card.rank).or_insert(0) += 1;
+        }
+
+        // four of a kind
+        if let Some((&rank, _)) = rank_counts.iter().find(|&(_, value)| *value == 4) {
+            // put these 4 cards to the back of the hand
+            let other_index = cards.iter().position(|card| card.rank != rank).unwrap();
+            cards.swap(0, other_index);
+            score = score.max(self.generate_hand_code(HandType::FourOfAKind, cards));
+        }
+
+        // three of a kind, full house
+        if let Some((&rank3, _)) = rank_counts.iter().find(|&(_, value)| *value == 3) {
+            // put these 3 cards to the back of the hand
+            let mut other_indices = cards.iter().enumerate().filter(|(_, card)| card.rank != rank3).map(|(i, _)| i);
+            let other_index_1 = other_indices.next().unwrap();
+            let other_index_2 = other_indices.next().unwrap();
+            cards.swap(0, other_index_1);
+            cards.swap(1, other_index_2);
+
+            score = score.max(self.generate_hand_code(HandType::ThreeOfAKind, cards));
+
+            // full house
+            if rank_counts.iter().any(|(_, value)| *value == 2) {
+                // these 2 cards are already at the front of the hand (because other 3 were put to the back)
+                score = score.max(self.generate_hand_code(HandType::FullHouse, cards));
+            }
+        }
+
+        // one pair, two pairs
+        if let Some((&rank2, _)) = rank_counts.iter().find(|&(_, value)| *value == 2) {
+            // put these 2 cards to the back of the hand
+            let mut other_indices = cards.iter().enumerate().filter(|(_, card)| card.rank != rank2).map(|(i, _)| i);
+            let other_index_1 = other_indices.next().unwrap();
+            let other_index_2 = other_indices.next().unwrap();
+            let other_index_3 = other_indices.next().unwrap();
+            cards.swap(0, other_index_1);
+            cards.swap(1, other_index_2);
+            cards.swap(2, other_index_3);
+
+            score = score.max(self.generate_hand_code(HandType::OnePair, cards));
+
+            // two pairs
+            if let Some((&rank2_2, _)) = rank_counts.iter().filter(|&(_, value)| *value == 2).nth(1) {
+                // put the only card left to the front of the hand
+                let other_index = cards.iter().position(|card| card.rank != rank2 && card.rank != rank2_2).unwrap();
+                cards.swap(0, other_index);
+                if cards[1] > cards[3] {
+                    cards.swap(1, 3);
+                    cards.swap(2, 4);
+                }
+                score = score.max(self.generate_hand_code(HandType::TwoPairs, cards));
+            }
+        }
+
+        score
+    }
+    fn generate_hand_code(&self, hand_type: HandType, cards: [Card; 5]) -> u32 {
+        let mut code = 0;
+
+        // add the biggest value representing the hand type
+        code += 13_u32.pow(5) * hand_type.value() as u32;
+
+        // cards are sorted in the ascending order of their weights
+        for (i, card) in cards.iter().enumerate() {
+            code += 13_u32.pow(i as u32) * card.value() as u32;
+        }
+
+        // return the generated code
+        code
+    }
+}
+impl PartialOrd for Hand {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl Ord for Hand {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.score().cmp(&other.score())
     }
 }
 
@@ -352,10 +260,43 @@ struct Game {
 }
 impl Game {
     fn new(game: &str) -> Self {
-        let (player1, player2) = game.split_at(game.len() / 2);
+        let (player1, player2) = game.trim().split_at(game.len() / 2);
         let player1 = Hand::new(player1.trim());
         let player2 = Hand::new(player2.trim());
-
         Self { player1, player2 }
+    }
+    fn winner(&mut self) -> u8 {
+        match self.player1.cmp(&self.player2) {
+            Ordering::Greater => 1,
+            Ordering::Less => 2,
+            Ordering::Equal => 0,
+        }
+    }
+}
+
+enum HandType {
+    HighCard,
+    OnePair,
+    TwoPairs,
+    ThreeOfAKind,
+    Straight,
+    Flush,
+    FullHouse,
+    FourOfAKind,
+    StraightFlush,
+}
+impl HandType {
+    fn value(&self) -> u8 {
+        match self {
+            Self::HighCard => 0,
+            Self::OnePair => 1,
+            Self::TwoPairs => 2,
+            Self::ThreeOfAKind => 3,
+            Self::Straight => 4,
+            Self::Flush => 5,
+            Self::FullHouse => 6,
+            Self::FourOfAKind => 7,
+            Self::StraightFlush => 8,
+        }
     }
 }
