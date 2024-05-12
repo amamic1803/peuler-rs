@@ -18,7 +18,7 @@ fn solve() -> String {
 }
 
 #[derive(Copy, Clone, Debug)]
-enum Hand {
+enum Han {
     HighCard([u8; 5]),
     OnePair((u8, [u8; 3])),
     TwoPairs((u8, u8, u8)),
@@ -266,60 +266,96 @@ fn hand(player: [(u8, u8); 5]) -> Hand {
     result
 }
 
-// (rank, suit)
-type Game = ([(u8, u8); 5], [(u8, u8); 5]);
-
-fn parse_input(input: &str) -> Vec<Game> {
-    input
-        .trim()
-        .lines()
-        .map(|line| {
-            let mut line_elements = line.split_whitespace();
-
-            let player1: [(u8, u8); 5] = line_elements.by_ref().take(5).map(parse_card).collect::<Vec<(u8, u8)>>().try_into().unwrap();
-            let player2: [(u8, u8); 5] = line_elements.map(parse_card).collect::<Vec<(u8, u8)>>().try_into().unwrap();
-
-            (player1, player2)
-        })
-        .collect()
+enum Suit {
+    Spades,
+    Clubs,
+    Hearts,
+    Diamonds,
+}
+impl Suit {
+    fn new(suit: char) -> Self {
+        match suit {
+            'S' => Self::Spades,
+            'C' => Self::Clubs,
+            'H' => Self::Hearts,
+            'D' => Self::Diamonds,
+            _ => panic!("Invalid suit."),
+        }
+    }
 }
 
-fn parse_card(card: &str) -> (u8, u8) {
-    let mut chars = card.chars();
-
-    let rank = *RANKS.get(&chars.next().unwrap()).unwrap();
-    let suit = *SUITS.get(&chars.next().unwrap()).unwrap();
-
-    (rank, suit)
+enum Rank {
+    Two,
+    Three,
+    Four,
+    Five,
+    Six,
+    Seven,
+    Eight,
+    Nine,
+    Ten,
+    Jack,
+    Queen,
+    King,
+    Ace,
+}
+impl Rank {
+    fn new(rank: char) -> Self {
+        match rank {
+            '2' => Self::Two,
+            '3' => Self::Three,
+            '4' => Self::Four,
+            '5' => Self::Five,
+            '6' => Self::Six,
+            '7' => Self::Seven,
+            '8' => Self::Eight,
+            '9' => Self::Nine,
+            'T' => Self::Ten,
+            'J' => Self::Jack,
+            'Q' => Self::Queen,
+            'K' => Self::King,
+            'A' => Self::Ace,
+            _ => panic!("Invalid rank."),
+        }
+    }
 }
 
-static SUITS: Lazy<HashMap<char, u8>> = Lazy::new(|| {
-    let mut new_hashmap = HashMap::new();
+struct Card {
+    suit: Suit,
+    rank: Rank,
+}
+impl Card {
+    fn new(card: &str) -> Self {
+        let mut chars = card.chars();
 
-    new_hashmap.insert('C', 0);
-    new_hashmap.insert('D', 1);
-    new_hashmap.insert('H', 2);
-    new_hashmap.insert('S', 3);
+        let rank = Rank::new(chars.next().unwrap());
+        let suit = Suit::new(chars.next().unwrap());
 
-    new_hashmap
-});
+        Self { suit, rank }
+    }
+}
 
-static RANKS: Lazy<HashMap<char, u8>> = Lazy::new(|| {
-    let mut new_hashmap = HashMap::new();
+struct Hand {
+    cards: [Card; 5],
+}
+impl Hand {
+    fn new(hand: &str) -> Self {
+        let cards = hand.split_whitespace().map(Card::new).collect::<Vec<Card>>().try_into().unwrap();
 
-    new_hashmap.insert('2', 0);
-    new_hashmap.insert('3', 1);
-    new_hashmap.insert('4', 2);
-    new_hashmap.insert('5', 3);
-    new_hashmap.insert('6', 4);
-    new_hashmap.insert('7', 5);
-    new_hashmap.insert('8', 6);
-    new_hashmap.insert('9', 7);
-    new_hashmap.insert('T', 8);
-    new_hashmap.insert('J', 9);
-    new_hashmap.insert('Q', 10);
-    new_hashmap.insert('K', 11);
-    new_hashmap.insert('A', 12);
+        Self { cards }
+    }
+}
 
-    new_hashmap
-});
+struct Game {
+    player1: Hand,
+    player2: Hand,
+}
+impl Game {
+    fn new(game: &str) -> Self {
+        let (player1, player2) = game.split_at(game.len() / 2);
+        let player1 = Hand::new(player1.trim());
+        let player2 = Hand::new(player2.trim());
+
+        Self { player1, player2 }
+    }
+}
