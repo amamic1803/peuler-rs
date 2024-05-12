@@ -230,14 +230,16 @@ impl Hand {
     }
     fn generate_hand_code(&self, hand_type: HandType, cards: [Card; 5]) -> u32 {
         let mut code = 0;
-
-        // add the biggest value representing the hand type
-        code += 13_u32.pow(5) * hand_type.value() as u32;
+        let mut factor = 1;
 
         // cards are sorted in the ascending order of their weights
-        for (i, card) in cards.iter().enumerate() {
-            code += 13_u32.pow(i as u32) * card.value() as u32;
+        for card in cards {
+            code += factor * card.value() as u32;
+            factor *= 13;
         }
+
+        // add the biggest value representing the hand type
+        code += factor * hand_type.value() as u32;
 
         // return the generated code
         code
