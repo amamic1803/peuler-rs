@@ -9,8 +9,8 @@ pub fn get_problem() -> Problem {
 use crate::shared::math::{sum_n, sum_n_squares};
 
 fn solve() -> String {
-    let sum_of_squares = sum_n_squares(100);
-    let square_of_sum = sum_n(100).pow(2);
+    let sum_of_squares = sum_n_squares(100u64);
+    let square_of_sum = sum_n(100u64).pow(2);
 
     sum_of_squares.abs_diff(square_of_sum).to_string()
 }

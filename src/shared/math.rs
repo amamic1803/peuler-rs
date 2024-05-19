@@ -1,8 +1,8 @@
 //! Mathematical functions.
 
 use malachite::num::basic::traits::{One, Zero};
-use malachite::Integer;
-use malachite::Rational;
+use malachite::{Integer, Rational};
+use num_traits::{ConstOne, ConstZero, NumCast, PrimInt, Unsigned};
 use once_cell::sync::Lazy;
 use std::collections::HashSet;
 use std::iter;
@@ -782,35 +782,74 @@ pub fn sieve_of_eratosthenes(n: u64) -> Vec<u64> {
 /// # Arguments
 /// * `n` - The number of natural numbers to sum.
 /// # Returns
-/// * `u64` - The sum of the first n natural numbers.
-pub fn sum_n(n: u64) -> u64 {
-    n * (n + 1) / 2
+/// * The sum of the first n natural numbers.
+/// # Example
+/// ```
+/// use project_euler::shared::math::sum_n;
+/// // 1 + 2 + 3 + 4 + 5 = 15
+/// assert_eq!(sum_n(5u8), 15);
+/// ```
+pub fn sum_n<T>(n: T) -> T
+where
+    T: PrimInt + Unsigned + ConstOne + NumCast,
+{
+    let two = T::from(2).unwrap();
+    n * (n + T::ONE) / two
 }
 
 /// Finds the sum of the first n even natural numbers.
 /// # Arguments
 /// * `n` - The number of even natural numbers to sum.
 /// # Returns
-/// * `u64` - The sum of the first n even natural numbers.
-pub fn sum_n_even(n: u64) -> u64 {
-    n * (n + 1)
+/// * The sum of the first n even natural numbers.
+/// # Example
+/// ```
+/// use project_euler::shared::math::sum_n_even;
+/// // 2 + 4 + 6 + 8 + 10 = 30
+/// assert_eq!(sum_n_even(5u8), 30);
+/// ```
+pub fn sum_n_even<T>(n: T) -> T
+where
+    T: PrimInt + Unsigned + ConstOne,
+{
+    n * (n + T::ONE)
 }
 
 /// Finds the sum of the squares of the first n even natural numbers.
 /// # Arguments
 /// * `n` - The number of even natural numbers to sum.
 /// # Returns
-/// * `u64` - The sum of the squares of the first n even natural numbers.
-pub fn sum_n_even_squares(n: u64) -> u64 {
-    2 * n * (n + 1) * (2 * n + 1) / 3
+/// * The sum of the squares of the first n even natural numbers.
+/// # Example
+/// ```
+/// use project_euler::shared::math::sum_n_even_squares;
+/// // 2^2 + 4^2 + 6^2 + 8^2 + 10^2 = 220
+/// assert_eq!(sum_n_even_squares(5u16), 220);
+/// ```
+pub fn sum_n_even_squares<T>(n: T) -> T
+where
+    T: PrimInt + Unsigned + ConstOne + NumCast,
+{
+    let two = T::from(2).unwrap();
+    let three = T::from(3).unwrap();
+    two * n * (n + T::ONE) * (two * n + T::ONE) / three
 }
 
 /// Finds the sum of the first n odd natural numbers.
 /// # Arguments
 /// * `n` - The number of odd natural numbers to sum.
 /// # Returns
-/// * `u64` - The sum of the first n odd natural numbers.
-pub fn sum_n_odd(n: u64) -> u64 {
+/// * The sum of the first n odd natural numbers.
+/// # Example
+/// ```
+/// use project_euler::shared::math::sum_n_odd;
+/// // 1 + 3 + 5 + 7 + 9 = 25
+/// assert_eq!(sum_n_odd(5u8), 25);
+/// ```
+pub fn sum_n_odd<T>(n: T) -> T
+where
+    T: PrimInt + Unsigned,
+{
     n * n
 }
 
@@ -818,18 +857,45 @@ pub fn sum_n_odd(n: u64) -> u64 {
 /// # Arguments
 /// * `n` - The number of odd natural numbers to sum.
 /// # Returns
-/// * `u64` - The sum of the squares of the first n odd natural numbers.
-pub fn sum_n_odd_squares(n: u64) -> u64 {
-    n * (2 * n + 1) * (2 * n - 1) / 3
+/// * The sum of the squares of the first n odd natural numbers.
+/// # Example
+/// ```
+/// use project_euler::shared::math::sum_n_odd_squares;
+/// // 1^2 + 3^2 + 5^2 + 7^2 + 9^2 = 165
+/// assert_eq!(sum_n_odd_squares(5u16), 165);
+/// ```
+pub fn sum_n_odd_squares<T>(n: T) -> T
+where
+    T: PrimInt + Unsigned + ConstZero + ConstOne + NumCast,
+{
+    let two = T::from(2).unwrap();
+    let three = T::from(3).unwrap();
+
+    if n == T::ZERO {
+        T::ZERO
+    } else {
+        n * (two * n + T::ONE) * (two * n - T::ONE) / three
+    }
 }
 
 /// Finds the sum of the squares of the first n natural numbers.
 /// # Arguments
 /// * `n` - The number of natural numbers to sum.
 /// # Returns
-/// * `u64` - The sum of the squares of the first n natural numbers.
-pub fn sum_n_squares(n: u64) -> u64 {
-    n * (n + 1) * (2 * n + 1) / 6
+/// * The sum of the squares of the first n natural numbers.
+/// # Example
+/// ```
+/// use project_euler::shared::math::sum_n_squares;
+/// // 1^2 + 2^2 + 3^2 + 4^2 + 5^2 = 55
+/// assert_eq!(sum_n_squares(5u16), 55);
+/// ```
+pub fn sum_n_squares<T>(n: T) -> T
+where
+    T: PrimInt + Unsigned + ConstOne + NumCast,
+{
+    let two = T::from(2).unwrap();
+    let six = T::from(6).unwrap();
+    n * (n + T::ONE) * (two * n + T::ONE) / six
 }
 
 /// Finds the sum of the divisors of a number.
