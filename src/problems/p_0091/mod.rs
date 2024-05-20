@@ -110,7 +110,7 @@ fn solve() -> String {
     let mut n4 = 0;
     for y in 1..=GRID_SIZE {
         for x in (y + 1)..=GRID_SIZE {
-            let gcd_val = gcd(x as u64, y as u64) as u32;
+            let gcd_val = gcd(x, y);
             let i = x / gcd_val;
             let j = y / gcd_val;
             n4 += min(y / i, (GRID_SIZE - x) / j); // moving right/down

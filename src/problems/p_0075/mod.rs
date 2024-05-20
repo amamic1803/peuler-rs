@@ -52,7 +52,7 @@ fn solve() -> String {
             } // if perimeter is too big, we can stop checking bigger n
 
             // if m and n are coprime and m + n is odd (primitive triple)
-            if gcd(m as u64, n as u64) == 1 && (m + n) % 2 == 1 {
+            if gcd(m, n) == 1 && (m + n) % 2 == 1 {
                 // mark all multiples of perimeter as having a triangle
                 let mut current_l = l;
                 while current_l <= L_MAX {

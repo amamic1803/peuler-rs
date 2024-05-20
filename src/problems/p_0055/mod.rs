@@ -6,7 +6,7 @@ pub fn get_problem() -> Problem {
     Problem::new(55, "Lychrel Numbers", solve)
 }
 
-use crate::shared::math::{is_palindrome_128, reverse_128};
+use crate::shared::math::{is_palindrome, reverse};
 
 const MAX_ITERATIONS: u8 = 50;
 const MAX_VALUE: u128 = 10_000;
@@ -63,13 +63,13 @@ fn analyse_lychrel(n: u128, depth: u8, iterations: &mut [Option<u8>]) -> u8 {
 
     // if none of these are the case, the number is evaluated
     } else {
-        let next = n + reverse_128(n); // next number (n + reverse(n))
+        let next = n + reverse(n); // next number (n + reverse(n))
 
         // in the next part before every return it is checked whether the number is smaller than MAX_VALUE
         // if it is, the result, is also stored in the vector (besides being returned)
 
         // if the next number is a palindrome, the depth is returned
-        if is_palindrome_128(next) {
+        if is_palindrome(next) {
             if n < MAX_VALUE {
                 iterations[n as usize] = Some(depth);
             }

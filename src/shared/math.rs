@@ -224,12 +224,25 @@ pub fn factorial(n: u64) -> u64 {
 /// * `num1` - The first number.
 /// * `num2` - The second number.
 /// # Returns
-/// * `u64` - The greatest common divisor.
-pub fn gcd(mut num1: u64, mut num2: u64) -> u64 {
+/// * The greatest common divisor.
+/// # Example
+/// ```
+/// use project_euler::shared::math::gcd;
+/// // gcd of 12 and 18 is 6
+/// assert_eq!(gcd(12u8, 18u8), 6);
+/// // gcd of 0 and 0 is 0
+/// assert_eq!(gcd(0u8, 0u8), 0);
+/// // gcd of 0 and 5 is 5
+/// assert_eq!(gcd(0u8, 5u8), 5);
+/// ```
+pub fn gcd<T>(mut num1: T, mut num2: T) -> T
+where
+    T: PrimInt + Unsigned + ConstZero,
+{
     if num1 < num2 {
         (num1, num2) = (num2, num1);
     }
-    while num2 != 0 {
+    while num2 != T::ZERO {
         (num1, num2) = (num2, num1 % num2);
     }
     num1
@@ -254,17 +267,19 @@ pub fn gcd_multiple(nums: &[u64]) -> u64 {
 /// * `num` - The number to check.
 /// # Returns
 /// * `bool` - Whether the number is a palindrome.
-pub fn is_palindrome(num: u64) -> bool {
+/// # Example
+/// ```
+/// use project_euler::shared::math::is_palindrome;
+/// // 12321 is a palindrome
+/// assert!(is_palindrome(12321u16));
+/// // 12345 is not a palindrome
+/// assert!(!is_palindrome(12345u16));
+/// ```
+pub fn is_palindrome<T>(num: T) -> bool
+where
+    T: PrimInt + Unsigned + ConstZero + NumCast,
+{
     num == reverse(num)
-}
-
-/// Checks if a u128 number is a palindrome.
-/// # Arguments
-/// * `num` - The number to check.
-/// # Returns
-/// * `bool` - Whether the number is a palindrome.
-pub fn is_palindrome_128(num: u128) -> bool {
-    num == reverse_128(num)
 }
 
 /// Checks if two numbers are permutations of each other.
@@ -440,7 +455,7 @@ pub fn num_of_proper_divisors_1_to_n(n: u64) -> Vec<u64> {
 /// # Returns
 /// * `u64` - The multiplicative order.
 /// # Panics
-/// Panics if a and n are not coprime.
+/// If a and n are not coprime.
 pub fn ord(a: u64, n: u64) -> u64 {
     assert_eq!(gcd(a, n), 1, "a and n must be coprime.");
 
@@ -705,26 +720,24 @@ pub fn prime_factors_iter(mut x: u64) -> impl Iterator<Item = u64> {
 /// # Arguments
 /// * `num` - The number to reverse.
 /// # Returns
-/// * `u64` - The reversed number.
-pub fn reverse(mut num: u64) -> u64 {
-    let mut new_num = 0;
-    while num > 0 {
-        new_num = new_num * 10 + num % 10;
-        num /= 10;
-    }
-    new_num
-}
-
-/// Reverses a u128 number.
-/// # Arguments
-/// * `num` - The number to reverse.
-/// # Returns
-/// * `u128` - The reversed number.
-pub fn reverse_128(mut num: u128) -> u128 {
-    let mut new_num = 0;
-    while num > 0 {
-        new_num = new_num * 10 + num % 10;
-        num /= 10;
+/// * The reversed number.
+/// # Example
+/// ```
+/// use project_euler::shared::math::reverse;
+/// // 123 -> 321
+/// assert_eq!(reverse(123u16), 321);
+/// // 0 -> 0
+/// assert_eq!(reverse(0u8), 0);
+/// ```
+pub fn reverse<T>(mut num: T) -> T
+where
+    T: PrimInt + Unsigned + ConstZero + NumCast,
+{
+    let ten = T::from(10).unwrap();
+    let mut new_num = T::ZERO;
+    while num > T::ZERO {
+        new_num = new_num * ten + num % ten;
+        num = num / ten;
     }
     new_num
 }
@@ -761,7 +774,7 @@ pub fn sieve_of_eratosthenes(n: u64) -> Vec<u64> {
 
                     while check_ind < sieve.len() {
                         sieve[check_ind] = false;
-                        // we want check_val to always be odd, prime_val is always odd so we can just add prime_val * 2
+                        // we want check_val to always be odd, prime_val is always odd, so we can just add prime_val * 2
                         // (because if we added 2 odd numbers we would get an even number)
                         check_val += prime_val << 1;
                         check_ind = val_to_ind(check_val);
