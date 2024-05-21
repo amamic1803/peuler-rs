@@ -253,9 +253,22 @@ where
 /// # Arguments
 /// * `nums` - The numbers.
 /// # Returns
-/// * `u64` - The greatest common divisor.
-pub fn gcd_multiple(nums: &[u64]) -> u64 {
-    assert!(nums.len() > 1, "There must be at least 2 numbers.");
+/// * The greatest common divisor.
+/// # Panics
+/// If there are less than 2 numbers.
+/// # Example
+/// ```
+/// use project_euler::shared::math::gcd_multiple;
+/// // gcd of 12, 18 and 24 is 6
+/// assert_eq!(gcd_multiple([12u8, 18u8, 24u8]), 6);
+/// ```
+pub fn gcd_multiple<T, R>(nums: R) -> T
+where
+    T: PrimInt + Unsigned + ConstZero,
+    R: AsRef<[T]>,
+{
+    let nums = nums.as_ref();
+    assert!(nums.len() >= 2, "There must be at least 2 numbers.");
     let mut result = gcd(nums[0], nums[1]);
     for n in nums.iter().skip(2) {
         result = gcd(result, *n);
@@ -345,8 +358,17 @@ pub fn iter_to_int<T: IntoIterator<Item = u8>>(digits: T) -> u64 {
 /// * `num1` - The first number.
 /// * `num2` - The second number.
 /// # Returns
-/// * `u64` - The least common multiple.
-pub fn lcm(num1: u64, num2: u64) -> u64 {
+/// * The least common multiple.
+/// # Example
+/// ```
+/// use project_euler::shared::math::lcm;
+/// // lcm of 12 and 18 is 36
+/// assert_eq!(lcm(12u8, 18u8), 36);
+/// ```
+pub fn lcm<T>(num1: T, num2: T) -> T
+where
+    T: PrimInt + Unsigned + ConstZero,
+{
     (num1 / gcd(num1, num2)) * num2
 }
 
@@ -354,8 +376,21 @@ pub fn lcm(num1: u64, num2: u64) -> u64 {
 /// # Arguments
 /// * `nums` - The numbers.
 /// # Returns
-/// * `u64` - The least common multiple.
-pub fn lcm_multiple(nums: &[u64]) -> u64 {
+/// * The least common multiple.
+/// # Panics
+/// If there are less than 2 numbers.
+/// # Example
+/// ```
+/// use project_euler::shared::math::lcm_multiple;
+/// // lcm of 12, 18 and 24 is 72
+/// assert_eq!(lcm_multiple([12u8, 18u8, 24u8]), 72);
+/// ```
+pub fn lcm_multiple<T, R>(nums: R) -> T
+where
+    T: PrimInt + Unsigned + ConstZero,
+    R: AsRef<[T]>,
+{
+    let nums = nums.as_ref();
     assert!(nums.len() > 1, "There must be at least 2 numbers.");
     let mut result = lcm(nums[0], nums[1]);
     for n in nums.iter().skip(2) {
