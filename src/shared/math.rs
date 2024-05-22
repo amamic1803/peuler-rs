@@ -4,6 +4,7 @@ use malachite::num::basic::traits::{One, Zero};
 use malachite::{Integer, Rational};
 use num_traits::{ConstOne, ConstZero, NumCast, PrimInt, Unsigned};
 use once_cell::sync::Lazy;
+use std::borrow::Borrow;
 use std::collections::HashSet;
 use std::iter;
 use std::mem;
@@ -214,9 +215,24 @@ pub fn digits_rev(n: u64) -> impl Iterator<Item = u8> {
 /// # Arguments
 /// * `n` - The number to find the factorial of.
 /// # Returns
-/// * `u64` - The factorial of the number.
-pub fn factorial(n: u64) -> u64 {
-    (1..(n + 1)).product()
+/// * The factorial of the number.
+/// # Example
+/// ```
+/// use project_euler::shared::math::factorial;
+/// // 5! = 120
+/// assert_eq!(factorial(5u8), 120);
+/// ```
+pub fn factorial<T>(n: T) -> T
+where
+    T: PrimInt + Unsigned + ConstOne,
+{
+    let mut fact = T::ONE;
+    let mut i = T::ONE;
+    while i < n {
+        i = i + T::ONE;
+        fact = fact * i;
+    }
+    fact
 }
 
 /// Finds the greatest common divisor of two numbers.
@@ -262,16 +278,18 @@ where
 /// // gcd of 12, 18 and 24 is 6
 /// assert_eq!(gcd_multiple([12u8, 18u8, 24u8]), 6);
 /// ```
-pub fn gcd_multiple<T, R>(nums: R) -> T
+pub fn gcd_multiple<T, U, I>(nums: I) -> T
 where
     T: PrimInt + Unsigned + ConstZero,
-    R: AsRef<[T]>,
+    U: Borrow<T>,
+    I: IntoIterator<Item = U>,
 {
-    let nums = nums.as_ref();
-    assert!(nums.len() >= 2, "There must be at least 2 numbers.");
-    let mut result = gcd(nums[0], nums[1]);
-    for n in nums.iter().skip(2) {
-        result = gcd(result, *n);
+    let mut nums = nums.into_iter();
+    let n1 = *nums.next().expect("There must be at least 2 numbers.").borrow();
+    let n2 = *nums.next().expect("There must be at least 2 numbers.").borrow();
+    let mut result = gcd(n1, n2);
+    for n in nums {
+        result = gcd(result, *n.borrow());
     }
     result
 }
@@ -385,16 +403,18 @@ where
 /// // lcm of 12, 18 and 24 is 72
 /// assert_eq!(lcm_multiple([12u8, 18u8, 24u8]), 72);
 /// ```
-pub fn lcm_multiple<T, R>(nums: R) -> T
+pub fn lcm_multiple<T, U, I>(nums: I) -> T
 where
     T: PrimInt + Unsigned + ConstZero,
-    R: AsRef<[T]>,
+    U: Borrow<T>,
+    I: IntoIterator<Item = U>,
 {
-    let nums = nums.as_ref();
-    assert!(nums.len() > 1, "There must be at least 2 numbers.");
-    let mut result = lcm(nums[0], nums[1]);
-    for n in nums.iter().skip(2) {
-        result = lcm(result, *n);
+    let mut nums = nums.into_iter();
+    let n1 = *nums.next().expect("There must be at least 2 numbers.").borrow();
+    let n2 = *nums.next().expect("There must be at least 2 numbers.").borrow();
+    let mut result = lcm(n1, n2);
+    for n in nums {
+        result = lcm(result, *n.borrow());
     }
     result
 }
