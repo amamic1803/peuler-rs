@@ -182,34 +182,83 @@ impl ContinuedFraction {
 }
 
 /// Returns the iterator over the digits of a number.
-/// Iterates from the least significant digit to the most significant digit.
-pub fn digits(n: u64) -> impl Iterator<Item = u8> {
-    let mut current = n;
-    iter::from_fn(move || {
-        if current == 0 {
-            return None;
-        }
-        let result = current % 10;
-        current /= 10;
-        Some(result as u8)
-    })
+/// The iterator iterates from the most significant digit to the least significant digit,
+/// but can be reversed easily with `.rev()`.
+/// # Arguments
+/// * `n` - The number to get the digits of.
+/// * `radix` - The radix of the number.
+/// # Returns
+/// * The iterator over the digits of the number.
+/// # Example
+/// ```
+/// use project_euler::shared::math::digits;
+///
+/// assert_eq!(digits(123, 10).collect::<Vec<u8>>(), vec![1, 2, 3]);
+/// assert_eq!(digits(123, 10).rev().collect::<Vec<u8>>(), vec![3, 2, 1]);
+/// assert_eq!(digits(0, 10).len(), 0);
+/// assert_eq!(digits(123, 10).rev().len(), 3);
+/// ```
+pub fn digits(n: u64, radix: u64) -> DigitsIter {
+    DigitsIter::new(n, radix)
 }
+pub struct DigitsIter {
+    num: u64,
+    radix: u64,
+    front_weight: u64,
+    length: usize,
+}
+impl DigitsIter {
+    fn new(num: u64, radix: u64) -> Self {
+        let length;
+        let front_weight;
+        if num == 0 {
+            length = 0;
+            front_weight = 0;
+        } else {
+            length = num.ilog(radix) + 1;
+            front_weight = radix.pow(length - 1);
+        }
+        Self {
+            num,
+            radix,
+            front_weight,
+            length: length as usize,
+        }
+    }
+}
+impl Iterator for DigitsIter {
+    type Item = u8;
 
-/// Returns the iterator over the digits of a number in reverse order.
-/// Iterates from the most significant digit to the least significant digit.
-pub fn digits_rev(n: u64) -> impl Iterator<Item = u8> {
-    let mut digits_count = n.checked_ilog10().unwrap_or(0) + 1;
-    let mut current = reverse(n);
-    iter::from_fn(move || {
-        if current == 0 && digits_count == 0 {
-            return None;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.num == 0 && self.front_weight == 0 {
+            None
+        } else {
+            let next_digit = self.num / self.front_weight;
+            self.num %= self.front_weight;
+            self.front_weight /= self.radix;
+            self.length -= 1;
+            Some(next_digit as Self::Item)
         }
-        let result = current % 10;
-        current /= 10;
-        digits_count -= 1;
-        Some(result as u8)
-    })
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.length, Some(self.length))
+    }
 }
+impl DoubleEndedIterator for DigitsIter {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        if self.num == 0 {
+            None
+        } else {
+            let next_digit = self.num % self.radix;
+            self.num /= self.radix;
+            self.front_weight /= self.radix;
+            self.length -= 1;
+            Some(next_digit as Self::Item)
+        }
+    }
+}
+impl ExactSizeIterator for DigitsIter {}
 
 /// Calculates the factorial of a number.
 /// # Arguments
@@ -319,10 +368,10 @@ pub fn is_permutation(n: u64, m: u64) -> bool {
     let mut n_digits = [0_u8; 10];
     let mut m_digits = [0_u8; 10];
 
-    for digit in digits(n) {
+    for digit in digits(n, 10) {
         n_digits[digit as usize] += 1;
     }
-    for digit in digits(m) {
+    for digit in digits(m, 10) {
         m_digits[digit as usize] += 1;
     }
 
@@ -357,16 +406,27 @@ pub fn is_prime(n: u64) -> (bool, u64) {
     }
 }
 
-/// Creates an integer from an iterator over digits.
+/// Creates an integer from digits.
+/// Digits can be any type that implements [IntoIterator].
 /// # Arguments
-/// * `digits` - The iterator over digits.
+/// * `digits` - The type that implements [IntoIterator] and contains digits.
 /// # Returns
 /// * `u64` - The integer.
-pub fn iter_to_int<T: IntoIterator<Item = u8>>(digits: T) -> u64 {
+/// # Example
+/// ```
+/// use project_euler::shared::math::digits_to_int;
+/// // 123 -> 123
+/// assert_eq!(digits_to_int([1u8, 2u8, 3u8], 10), 123);
+/// ```
+pub fn digits_to_int<T, U>(digits: T, radix: u64) -> u64
+where
+    T: IntoIterator<Item = U>,
+    U: Borrow<u8>,
+{
     let mut result = 0;
     for digit in digits {
-        result *= 10;
-        result += digit as u64;
+        result *= radix;
+        result += *digit.borrow() as u64;
     }
     result
 }
@@ -1030,20 +1090,6 @@ pub fn sum_of_proper_divisors_1_to_n(n: u64) -> Vec<u64> {
         }
     }
     divisors
-}
-
-/// Converts a slice of digits to an integer.
-/// # Arguments
-/// * `n` - The slice of digits to convert. Type must be u8.
-/// # Returns
-/// * `u64` - The integer.
-pub fn slice_to_int(n: &[u8]) -> u64 {
-    let mut sum: u64 = 0;
-    for digit in n {
-        sum *= 10;
-        sum += *digit as u64;
-    }
-    sum
 }
 
 /// A vector in N-dimensional space.

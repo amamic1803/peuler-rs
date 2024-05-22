@@ -6,7 +6,7 @@ pub fn get_problem() -> Problem {
     Problem::new(98, "Anagramic Squares", solve)
 }
 
-use crate::shared::math::{digits_rev, is_permutation};
+use crate::shared::math::{digits, is_permutation};
 use itertools::Itertools;
 
 fn solve() -> String {
@@ -132,7 +132,7 @@ fn word_matches_num(word: &str, num: u64) -> (bool, [char; 10]) {
     // match characters of the word to digits of the number
     // if a digit is already matched to a character, and the current character is different,
     // but should be matched to the same digit, return false
-    for (n, c) in digits_rev(num).zip(word.chars()) {
+    for (n, c) in digits(num, 10).zip(word.chars()) {
         if num_char_dict[n as usize] == ' ' {
             num_char_dict[n as usize] = c;
         } else if num_char_dict[n as usize] != c {

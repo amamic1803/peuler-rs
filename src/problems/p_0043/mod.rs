@@ -6,7 +6,7 @@ pub fn get_problem() -> Problem {
     Problem::new(43, "Sub-string Divisibility", solve)
 }
 
-use crate::shared::math::slice_to_int;
+use crate::shared::math::digits_to_int;
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
 
@@ -68,7 +68,7 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
                     working.push(*i);
-                    if slice_to_int(&working[2..5]) % 3 == 0 {
+                    if digits_to_int(&working[2..5], 10) % 3 == 0 {
                         recursive_search(working, sum, depth + 1);
                     }
                     working.pop();
@@ -79,7 +79,7 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
                     working.push(*i);
-                    if slice_to_int(&working[4..7]) % 7 == 0 {
+                    if digits_to_int(&working[4..7], 10) % 7 == 0 {
                         recursive_search(working, sum, depth + 1);
                     }
                     working.pop();
@@ -90,7 +90,7 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
                     working.push(*i);
-                    if slice_to_int(&working[5..8]) % 11 == 0 {
+                    if digits_to_int(&working[5..8], 10) % 11 == 0 {
                         recursive_search(working, sum, depth + 1);
                     }
                     working.pop();
@@ -101,7 +101,7 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
                     working.push(*i);
-                    if slice_to_int(&working[6..9]) % 13 == 0 {
+                    if digits_to_int(&working[6..9], 10) % 13 == 0 {
                         recursive_search(working, sum, depth + 1);
                     }
                     working.pop();
@@ -112,14 +112,14 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
                     working.push(*i);
-                    if slice_to_int(&working[7..10]) % 17 == 0 {
+                    if digits_to_int(&working[7..10], 10) % 17 == 0 {
                         recursive_search(working, sum, depth + 1);
                     }
                     working.pop();
                 }
             }
         }
-        11 => *sum += slice_to_int(working),
+        11 => *sum += digits_to_int(working, 10),
         _ => unreachable!("Invalid depth"),
     }
 }

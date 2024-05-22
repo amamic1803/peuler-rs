@@ -24,7 +24,7 @@ fn solve() -> String {
         for num in start..=end {
             // store and sort digits of num in digits1
             digits1.clear();
-            for digit in digits(num) {
+            for digit in digits(num, 10) {
                 digits1.push(digit);
             }
             digits1.sort();
@@ -33,7 +33,7 @@ fn solve() -> String {
             for multiple in 2..=6 {
                 // store and sort digits of multiple in digits2
                 digits2.clear();
-                for digit in digits(num * multiple) {
+                for digit in digits(num * multiple, 10) {
                     digits2.push(digit);
                 }
                 digits2.sort();

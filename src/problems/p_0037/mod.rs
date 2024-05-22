@@ -6,7 +6,7 @@ pub fn get_problem() -> Problem {
     Problem::new(37, "Truncatable Primes", solve)
 }
 
-use crate::shared::math::{digits, is_prime, slice_to_int};
+use crate::shared::math::{digits, digits_to_int, is_prime};
 use itertools::Itertools;
 
 const TRUNC_PRIMES: u8 = 11;
@@ -30,7 +30,7 @@ fn solve() -> String {
     // vector to store truncatable primes
     let mut trunc_primes = Vec::with_capacity(TRUNC_PRIMES as usize);
 
-    // start with 2 digit numbers and go up
+    // start with 2-digit numbers and go up
     'outer: for n_len in 2_usize.. {
         // generate a vector of iterators for each digit
         // first element will be iterator over FIRST_DIGIT
@@ -45,7 +45,7 @@ fn solve() -> String {
 
         // iterate over cartesian product of these iterators over digits (they make numbers)
         for i in iterables.into_iter().multi_cartesian_product() {
-            let num = slice_to_int(&i); // convert vector of digits to number
+            let num = digits_to_int(i, 10); // convert vector of digits to number
 
             // check if number is truncatable prime
             if is_trunc_prime(num) {
@@ -66,7 +66,7 @@ fn is_trunc_prime(x: u64) -> bool {
     if !is_prime(x).0 {
         return false;
     }
-    for i in 1..digits(x).count() {
+    for i in 1..digits(x, 10).len() {
         if !is_prime(x % 10_u64.pow(i as u32)).0 || !is_prime(x / 10_u64.pow(i as u32)).0 {
             return false;
         }

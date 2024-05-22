@@ -51,7 +51,7 @@ fn solve() -> String {
 
         // for each cube, we get its digits, sort them, and add 1 to the count of that collection of digits
         for cube in &cubes {
-            let mut cube_digits = digits(*cube).collect::<Vec<_>>();
+            let mut cube_digits = digits(*cube, 10).collect::<Vec<_>>();
             cube_digits.sort();
             cube_counts.entry(cube_digits).and_modify(|e| *e += 1).or_insert(1);
         }
@@ -68,7 +68,7 @@ fn solve() -> String {
         // now we loop over cubes, calculate their digits, sort them, and check if they are in the set of good collections of digits
         // the first cube that is in the set is the solution (because we are processing cubes in ascending order)
         for cube in &cubes {
-            let mut cube_digits = digits(*cube).collect::<Vec<_>>();
+            let mut cube_digits = digits(*cube, 10).collect::<Vec<_>>();
             cube_digits.sort();
 
             if good_dig_seq.contains(&cube_digits) {

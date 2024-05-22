@@ -6,7 +6,7 @@ pub fn get_problem() -> Problem {
     Problem::new(40, "Champernowne's Constant", solve)
 }
 
-use crate::shared::math::digits_rev;
+use crate::shared::math::digits;
 
 const POSITIONS: [u64; 7] = [1, 10, 100, 1_000, 10_000, 100_000, 1_000_000];
 
@@ -53,7 +53,7 @@ fn get_digit(pos: u64) -> u8 {
     // if the digits_to_move is zero, that means that we are at the digit we need to return, so that is index 0
     // we are also sure that the index won't be longer than the number of digits in the number
     // because that was checked before
-    digits_rev(number).nth(digits_to_move as usize).unwrap()
+    digits(number, 10).nth(digits_to_move as usize).unwrap()
 }
 
 // this is a little slower, but more straightforward solution that just stores all the digits in a vector

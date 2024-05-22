@@ -6,7 +6,7 @@ pub fn get_problem() -> Problem {
     Problem::new(49, "Prime Permutations", solve)
 }
 
-use crate::shared::math::{digits, sieve_of_eratosthenes, slice_to_int};
+use crate::shared::math::{digits, digits_to_int, sieve_of_eratosthenes};
 use itertools::Itertools;
 use std::collections::BTreeSet;
 
@@ -36,8 +36,8 @@ fn solve() -> String {
         prime_perms.push(base_num);
 
         // generate permutations
-        for perm in digits(base_num).permutations(4) {
-            let perm_num = slice_to_int(&perm);
+        for perm in digits(base_num, 10).permutations(4) {
+            let perm_num = digits_to_int(perm, 10);
 
             // try to remove the number from the set
             // if it was in the set, true is returned and the number is added to the vector

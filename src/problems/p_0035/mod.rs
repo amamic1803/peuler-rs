@@ -17,10 +17,10 @@ fn solve() -> String {
     // we do that because when we rotate a number with one of those digits
     // when that digit gets to the end of the number, the number will be divisible by 2 or 5
     // and therefore not prime
-    primes.retain(|&n| digits(n).all(|digit| !matches!(digit, 0 | 2 | 4 | 5 | 6 | 8)));
+    primes.retain(|&n| digits(n, 10).all(|digit| !matches!(digit, 0 | 2 | 4 | 5 | 6 | 8)));
 
     // since we removed all primes with digits 0, 2, 4, 5, 6, 8 we also removed number 2 and 5
-    // but these are circular primes so we add them back (because their rotations are themselves)
+    // but these are circular primes, so we add them back (because their rotations are themselves)
     primes.insert(0, 2);
     primes.insert(2, 5);
 
@@ -31,9 +31,9 @@ fn solve() -> String {
     }
 
     // for each prime, check if it's circular, and mark it, and all its rotations as circular
-    let mut rotations: Vec<u64> = Vec::new();
+    let mut rotations = Vec::new();
     for mut n in primes {
-        let num_len = digits(n).count();
+        let num_len = digits(n, 10).len();
         let mut circular_prime = true;
 
         rotations.clear();

@@ -6,7 +6,7 @@ pub fn get_problem() -> Problem {
     Problem::new(41, "Pandigital Prime", solve)
 }
 
-use crate::shared::math::{is_prime, slice_to_int};
+use crate::shared::math::{digits_to_int, is_prime};
 use itertools::Itertools;
 
 fn solve() -> String {
@@ -26,7 +26,7 @@ fn solve() -> String {
 
     for len in [4, 7] {
         for num in (1..=len).permutations(len as usize) {
-            let num = slice_to_int(&num);
+            let num = digits_to_int(num, 10);
             if is_prime(num).0 && num > largest_prime {
                 largest_prime = num;
             }

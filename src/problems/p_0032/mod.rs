@@ -6,7 +6,7 @@ pub fn get_problem() -> Problem {
     Problem::new(32, "Pandigital Products", solve)
 }
 
-use crate::shared::math::slice_to_int;
+use crate::shared::math::digits_to_int;
 use itertools::Itertools;
 use std::collections::HashSet;
 
@@ -26,9 +26,9 @@ fn solve() -> String {
 
     for perm in (1..=9).permutations(9) {
         for first_digit_len in 1..=2 {
-            let fact1 = slice_to_int(&perm[0..first_digit_len]);
-            let fact2 = slice_to_int(&perm[first_digit_len..5]);
-            let prod = slice_to_int(&perm[5..9]);
+            let fact1 = digits_to_int(&perm[0..first_digit_len], 10);
+            let fact2 = digits_to_int(&perm[first_digit_len..5], 10);
+            let prod = digits_to_int(&perm[5..9], 10);
             if fact1 * fact2 == prod && !found_products.contains(&prod) {
                 sum += prod;
                 found_products.insert(prod);
