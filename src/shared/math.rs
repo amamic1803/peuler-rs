@@ -40,40 +40,6 @@ pub fn apcf(n: u64) -> f64 {
     }
 }
 
-/// Calculate the integer square root.
-/// Slower than casting to f64 and using .sqrt().floor().
-/// To be used with big numbers which would lose precision if cast to f64.
-/// Uses Newton's method.
-pub fn isqrt(n: u64) -> u64 {
-    if n <= 1 {
-        n
-    } else {
-        let mut x0 = 2_u64.pow((n.ilog2() >> 1) + 1);
-        let mut x1 = (x0 + n / x0) >> 1;
-        while x1 < x0 {
-            x0 = x1;
-            x1 = (x0 + n / x0) >> 1;
-        }
-        x0
-    }
-}
-
-/// Calculate the integer square root of an u128 number.
-/// Same as isqrt, but for u128.
-pub fn isqrt_128(n: u128) -> u128 {
-    if n <= 1 {
-        n
-    } else {
-        let mut x0 = 2_u128.pow((n.ilog2() >> 1) + 1);
-        let mut x1 = (x0 + n / x0) >> 1;
-        while x1 < x0 {
-            x0 = x1;
-            x1 = (x0 + n / x0) >> 1;
-        }
-        x0
-    }
-}
-
 /// Returns the iterator of the Collatz sequence starting at a number.
 pub fn collatz_seq(num: u64) -> impl Iterator<Item = u64> {
     let mut current = num;
@@ -403,6 +369,40 @@ pub fn is_prime(n: u64) -> (bool, u64) {
         }
 
         (true, 1)
+    }
+}
+
+/// Calculate the integer square root.
+/// Slower than casting to f64 and using .sqrt().floor().
+/// To be used with big numbers which would lose precision if cast to f64.
+/// Uses Newton's method.
+pub fn isqrt(n: u64) -> u64 {
+    if n <= 1 {
+        n
+    } else {
+        let mut x0 = 2_u64.pow((n.ilog2() >> 1) + 1);
+        let mut x1 = (x0 + n / x0) >> 1;
+        while x1 < x0 {
+            x0 = x1;
+            x1 = (x0 + n / x0) >> 1;
+        }
+        x0
+    }
+}
+
+/// Calculate the integer square root of an u128 number.
+/// Same as isqrt, but for u128.
+pub fn isqrt_128(n: u128) -> u128 {
+    if n <= 1 {
+        n
+    } else {
+        let mut x0 = 2_u128.pow((n.ilog2() >> 1) + 1);
+        let mut x1 = (x0 + n / x0) >> 1;
+        while x1 < x0 {
+            x0 = x1;
+            x1 = (x0 + n / x0) >> 1;
+        }
+        x0
     }
 }
 
