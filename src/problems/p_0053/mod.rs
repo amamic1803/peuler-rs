@@ -8,7 +8,7 @@ pub fn get_problem() -> Problem {
 
 use malachite::num::basic::traits::One;
 use malachite::Natural;
-use once_cell::sync::Lazy;
+use std::sync::LazyLock;
 
 const LOW_N: usize = 23;
 const N: usize = 100;
@@ -35,7 +35,7 @@ fn solve() -> String {
     result.to_string()
 }
 
-static FACT_CACHE: Lazy<[Natural; N + 1]> = Lazy::new(|| {
+static FACT_CACHE: LazyLock<[Natural; N + 1]> = LazyLock::new(|| {
     let mut cache = [Natural::ONE; N + 1];
     let mut current_num = Natural::ONE;
 

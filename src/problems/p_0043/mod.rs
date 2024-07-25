@@ -7,12 +7,12 @@ pub fn get_problem() -> Problem {
 }
 
 use crate::shared::math::digits_to_int;
-use once_cell::sync::Lazy;
 use std::collections::HashMap;
+use std::sync::LazyLock;
 
 /// The digits that can be used in each position.
-static DIGITS: Lazy<HashMap<u8, Vec<u8>>> = Lazy::new(|| {
-    let mut digits = HashMap::new();
+static DIGITS: LazyLock<HashMap<u8, Vec<u8>>> = LazyLock::new(|| {
+    let mut digits = HashMap::with_capacity(10);
     digits.insert(1, vec![1, 2, 3, 4, 5, 6, 7, 8, 9]);
     digits.insert(2, vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     digits.insert(3, vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);

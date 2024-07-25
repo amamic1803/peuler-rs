@@ -1,13 +1,13 @@
 //! **Problem 34** - *Digit Factorials*
+
+use crate::shared::math::newtons_method;
 use crate::shared::structures::Problem;
+use std::sync::LazyLock;
 
 /// Get `Problem` struct.
 pub fn get_problem() -> Problem {
     Problem::new(34, "Digit Factorials", solve)
 }
-
-use crate::shared::math::newtons_method;
-use once_cell::sync::Lazy;
 
 fn solve() -> String {
     // first we want to find some upper bound for the problem
@@ -49,7 +49,7 @@ fn solve() -> String {
 }
 
 // pre-calculated factorials
-static FACTORIALS: Lazy<[u64; 10]> = Lazy::new(|| {
+static FACTORIALS: LazyLock<[u64; 10]> = LazyLock::new(|| {
     let mut array = [1; 10];
 
     for i in 2..10 {

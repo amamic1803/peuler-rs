@@ -12,8 +12,7 @@ lto = true
 opt-level = 3
 
 [dependencies]
-clap = { version = "4.5.4", features = ["cargo"] }
+clap = { version = "4.5.11", features = ["cargo"] }
 itertools = "0.13.0"
-malachite = "0.4.9"
+malachite = "0.4.14"
 num-traits = "0.2.19"
-once_cell = "1.19.0"

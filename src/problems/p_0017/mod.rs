@@ -6,9 +6,8 @@ pub fn get_problem() -> Problem {
     Problem::new(17, "Number Letter Counts", solve)
 }
 
-use once_cell::sync::Lazy;
 use std::collections::HashMap;
-use std::sync::Mutex;
+use std::sync::LazyLock;
 
 fn solve() -> String {
     let mut sum = 0;
@@ -29,7 +28,7 @@ fn num_to_string(mut n: u64) -> String {
     } else {
         let hundreds: u64 = n / 100;
         if hundreds != 0 {
-            name.push_str(DIGIT_SINGLE.lock().unwrap().get(&hundreds).unwrap());
+            name.push_str(DIGIT_SINGLE.get(&hundreds).unwrap());
             name.push_str(" hundred")
         }
         n %= 100;
@@ -39,16 +38,16 @@ fn num_to_string(mut n: u64) -> String {
                 name.push_str(" and ");
             }
             if (9 < n) & (n < 20) {
-                name.push_str(DIGIT_TEEN.lock().unwrap().get(&n).unwrap());
+                name.push_str(DIGIT_TEEN.get(&n).unwrap());
             } else if n < 10 {
-                name.push_str(DIGIT_SINGLE.lock().unwrap().get(&n).unwrap());
+                name.push_str(DIGIT_SINGLE.get(&n).unwrap());
             } else {
                 let tens: u64 = n / 10;
                 let ones: u64 = n % 10;
-                name.push_str(DIGIT_DOUBLE.lock().unwrap().get(&tens).unwrap());
+                name.push_str(DIGIT_DOUBLE.get(&tens).unwrap());
                 if ones != 0 {
                     name.push('-');
-                    name.push_str(DIGIT_SINGLE.lock().unwrap().get(&ones).unwrap());
+                    name.push_str(DIGIT_SINGLE.get(&ones).unwrap());
                 }
             }
         }
@@ -57,7 +56,7 @@ fn num_to_string(mut n: u64) -> String {
     name
 }
 
-static DIGIT_SINGLE: Lazy<Mutex<HashMap<u64, &str>>> = Lazy::new(|| {
+static DIGIT_SINGLE: LazyLock<HashMap<u64, &str>> = LazyLock::new(|| {
     let mut hash_map = HashMap::new();
 
     hash_map.insert(1, "one");
@@ -70,10 +69,10 @@ static DIGIT_SINGLE: Lazy<Mutex<HashMap<u64, &str>>> = Lazy::new(|| {
     hash_map.insert(8, "eight");
     hash_map.insert(9, "nine");
 
-    Mutex::new(hash_map)
+    hash_map
 });
 
-static DIGIT_DOUBLE: Lazy<Mutex<HashMap<u64, &str>>> = Lazy::new(|| {
+static DIGIT_DOUBLE: LazyLock<HashMap<u64, &str>> = LazyLock::new(|| {
     let mut hash_map = HashMap::new();
 
     hash_map.insert(2, "twenty");
@@ -85,10 +84,10 @@ static DIGIT_DOUBLE: Lazy<Mutex<HashMap<u64, &str>>> = Lazy::new(|| {
     hash_map.insert(8, "eighty");
     hash_map.insert(9, "ninety");
 
-    Mutex::new(hash_map)
+    hash_map
 });
 
-static DIGIT_TEEN: Lazy<Mutex<HashMap<u64, &str>>> = Lazy::new(|| {
+static DIGIT_TEEN: LazyLock<HashMap<u64, &str>> = LazyLock::new(|| {
     let mut hash_map = HashMap::new();
 
     hash_map.insert(10, "ten");
@@ -102,5 +101,5 @@ static DIGIT_TEEN: Lazy<Mutex<HashMap<u64, &str>>> = Lazy::new(|| {
     hash_map.insert(18, "eighteen");
     hash_map.insert(19, "nineteen");
 
-    Mutex::new(hash_map)
+    hash_map
 });

@@ -3,13 +3,12 @@
 use malachite::num::basic::traits::{One, Zero};
 use malachite::{Integer, Rational};
 use num_traits::{ConstOne, ConstZero, NumCast, PrimInt, Unsigned};
-use once_cell::sync::Lazy;
 use std::borrow::Borrow;
 use std::collections::HashSet;
 use std::iter;
 use std::mem;
 use std::ops::{Add, Mul, Sub};
-use std::sync::Mutex;
+use std::sync::{LazyLock, Mutex};
 
 /// Inverse of the prime-counting function.
 /// Estimates the number for which the prime-counting function is approximately n.
@@ -612,7 +611,7 @@ pub fn partition_p(n: u64) -> u64 {
     // we can just calculate all values and store them in a vector
 
     // memoization
-    static CACHE_VEC: Lazy<Mutex<Vec<u64>>> = Lazy::new(|| Mutex::new(vec![1_u64, 1_u64]));
+    static CACHE_VEC: LazyLock<Mutex<Vec<u64>>> = LazyLock::new(|| Mutex::new(vec![1_u64, 1_u64]));
     let mut cache = CACHE_VEC.lock().unwrap();
 
     // if n is already in the cache vector, then return the value
