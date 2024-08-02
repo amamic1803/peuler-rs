@@ -6,5 +6,3 @@ Since its creation in 2001 by Colin Hughes, Project Euler has gained notability 
 It includes 800 problems as of 30 May 2022, with a new one added approximately every week.
 Problems are of varying difficulty, but each is solvable in less than a minute of CPU time using an efficient algorithm on a modestly powered computer.
 As of 27 April 2021, Project Euler has more than 1,000,000 users who have solved at least one problem, in over 100 different programming languages.
-
-Source: _Wikipedia_
