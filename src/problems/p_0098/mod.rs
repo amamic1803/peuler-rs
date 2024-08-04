@@ -109,7 +109,7 @@ fn solve() -> String {
         // if we find such a pair, we update the maximum square number found
         for (sqr1, arr1) in storage1 {
             for (sqr2, arr2) in &storage2 {
-                if is_permutation(sqr1, *sqr2) && arr1 == *arr2 {
+                if is_permutation(sqr1, *sqr2, 10) && arr1 == *arr2 {
                     maximum = maximum.max(sqr1).max(*sqr2);
                 }
             }

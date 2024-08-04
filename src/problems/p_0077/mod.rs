@@ -9,7 +9,7 @@ pub fn get_problem() -> Problem {
 use crate::shared::math::partition_prime;
 
 fn solve() -> String {
-    for i in 0.. {
+    for i in 0u32.. {
         if partition_prime(i) > 5000 {
             return i.to_string();
         }

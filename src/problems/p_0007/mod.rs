@@ -9,5 +9,5 @@ pub fn get_problem() -> Problem {
 use crate::shared::math::{apcf, sieve_of_eratosthenes};
 
 fn solve() -> String {
-    sieve_of_eratosthenes(apcf(10001).round() as u64)[10_000].to_string()
+    sieve_of_eratosthenes(apcf(10001u64).round() as u64)[10_000].to_string()
 }

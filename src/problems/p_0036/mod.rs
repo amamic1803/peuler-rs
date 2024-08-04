@@ -23,7 +23,7 @@ fn solve() -> String {
     let mut x = 1;
     let mut generated_palindrome = binary_palindrome(x, true);
     while generated_palindrome < LIMIT {
-        if is_palindrome(generated_palindrome) {
+        if is_palindrome(generated_palindrome, 10) {
             sum += generated_palindrome;
         }
         x += 1;
@@ -34,7 +34,7 @@ fn solve() -> String {
     x = 1;
     generated_palindrome = binary_palindrome(x, false);
     while generated_palindrome < LIMIT {
-        if is_palindrome(generated_palindrome) {
+        if is_palindrome(generated_palindrome, 10) {
             sum += generated_palindrome;
         }
         x += 1;

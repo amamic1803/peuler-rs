@@ -1,14 +1,15 @@
 //! Mathematical functions.
 
-use malachite::num::basic::traits::{One, Zero};
-use malachite::{Integer, Rational};
-use num_traits::{ConstOne, ConstZero, NumCast, PrimInt, Unsigned};
 use std::borrow::Borrow;
 use std::collections::HashSet;
 use std::iter;
 use std::mem;
 use std::ops::{Add, Mul, Sub};
-use std::sync::{LazyLock, Mutex};
+
+use itertools::{izip, Itertools};
+use malachite::num::basic::traits::{One, Zero};
+use malachite::{Integer, Rational};
+use num_traits::{ConstOne, ConstZero, NumCast, PrimInt, ToPrimitive, Unsigned};
 
 /// Inverse of the prime-counting function.
 /// Estimates the number for which the prime-counting function is approximately n.
@@ -19,30 +20,46 @@ use std::sync::{LazyLock, Mutex};
 /// * `n` - The number to estimate the inverse of the prime-counting function for.
 /// # Returns
 /// * `f64` - The estimated inverse of the prime-counting function for n.
-pub fn apcf(n: u64) -> f64 {
+/// # Example
+/// ```
+/// use project_euler::shared::math::apcf;
+/// assert_eq!(apcf(2), 3.0);
+/// ```
+pub fn apcf<T>(n: T) -> f64
+where
+    T: ToPrimitive,
+{
+    let n = n.to_f64().expect("Cannot convert to f64.");
     match n {
-        0 => 0.0,
-        1 => 2.0,
-        2 => 3.0,
-        3 => 5.0,
+        0.0 => 0.0,
+        1.0 => 2.0,
+        2.0 => 3.0,
+        3.0 => 5.0,
         _ => {
-            let a = n as f64;
-            let newtons = |x: f64| (a * x * (x.ln() - 1.0)) / (x - a);
-            let mut prev_x = f64::NEG_INFINITY;
-            let mut x = a + 1.0;
-            while (x - prev_x).abs() > 1e-10 {
-                prev_x = x;
-                x = newtons(x);
-            }
-            x
+            let x0 = n + 1.0;
+            let precision = 1e-10;
+            let function = |x: f64| n * x.ln() - x;
+            let derivative = |x: f64| n / x - 1.0;
+            newtons_method(x0, precision, function, derivative)
         }
     }
 }
 
 /// Returns the iterator of the Collatz sequence starting at a number.
+/// The iterator starts at the number itself and ends at 1.
+/// # Arguments
+/// * `num` - The number to start the Collatz sequence at.
+/// # Returns
+/// * The iterator over the Collatz sequence.
+/// # Example
+/// ```
+/// use project_euler::shared::math::collatz_seq;
+/// // Collatz sequence starting at 13: 13, 40, 20, 10, 5, 16, 8, 4, 2, 1
+/// assert_eq!(collatz_seq(13).collect::<Vec<u64>>(), vec![13, 40, 20, 10, 5, 16, 8, 4, 2, 1]);
+/// ```
 pub fn collatz_seq(num: u64) -> impl Iterator<Item = u64> {
     let mut current = num;
-    iter::from_fn(move || {
+    iter::once(current).chain(iter::from_fn(move || {
         if current == 1 {
             return None;
         }
@@ -52,10 +69,18 @@ pub fn collatz_seq(num: u64) -> impl Iterator<Item = u64> {
             current = 3 * current + 1;
         }
         Some(current)
-    })
+    }))
 }
 
 /// Represents a continued fraction.
+/// # Example
+/// ```
+/// use project_euler::shared::math::ContinuedFraction;
+/// // Continued fraction of sqrt(2): [1; 2, 2, 2, ...]
+/// let cf = ContinuedFraction::from_sqrt(2);
+/// assert_eq!(cf.non_periodic(), vec![1i64].as_slice());
+/// assert_eq!(cf.periodic(), Some(vec![2i64].as_slice()));
+/// ```
 pub struct ContinuedFraction {
     non_periodic: Vec<i64>,
     periodic: Option<Vec<i64>>,
@@ -163,67 +188,142 @@ impl ContinuedFraction {
 /// assert_eq!(digits(0, 10).len(), 0);
 /// assert_eq!(digits(123, 10).rev().len(), 3);
 /// ```
-pub fn digits(n: u64, radix: u64) -> DigitsIter {
+pub fn digits(n: u64, radix: u8) -> impl DoubleEndedIterator<Item = u8> + ExactSizeIterator {
+    struct DigitsIter {
+        num: u64,
+        radix: u64,
+        front_weight: u64,
+        length: usize,
+    }
+    impl DigitsIter {
+        fn new(num: u64, radix: u8) -> Self {
+            let radix = radix as u64;
+            let length;
+            let front_weight;
+            if num == 0 {
+                length = 0;
+                front_weight = 0;
+            } else {
+                length = num.ilog(radix) + 1;
+                front_weight = radix.pow(length - 1);
+            }
+            Self {
+                num,
+                radix,
+                front_weight,
+                length: length as usize,
+            }
+        }
+    }
+    impl Iterator for DigitsIter {
+        type Item = u8;
+
+        fn next(&mut self) -> Option<Self::Item> {
+            if self.num == 0 && self.front_weight == 0 {
+                None
+            } else {
+                let next_digit = self.num / self.front_weight;
+                self.num %= self.front_weight;
+                self.front_weight /= self.radix;
+                self.length -= 1;
+                Some(next_digit as Self::Item)
+            }
+        }
+
+        fn size_hint(&self) -> (usize, Option<usize>) {
+            (self.length, Some(self.length))
+        }
+    }
+    impl DoubleEndedIterator for DigitsIter {
+        fn next_back(&mut self) -> Option<Self::Item> {
+            if self.num == 0 {
+                None
+            } else {
+                let next_digit = self.num % self.radix;
+                self.num /= self.radix;
+                self.front_weight /= self.radix;
+                self.length -= 1;
+                Some(next_digit as Self::Item)
+            }
+        }
+    }
+    impl ExactSizeIterator for DigitsIter {}
+
     DigitsIter::new(n, radix)
 }
-pub struct DigitsIter {
-    num: u64,
-    radix: u64,
-    front_weight: u64,
-    length: usize,
-}
-impl DigitsIter {
-    fn new(num: u64, radix: u64) -> Self {
-        let length;
-        let front_weight;
-        if num == 0 {
-            length = 0;
-            front_weight = 0;
-        } else {
-            length = num.ilog(radix) + 1;
-            front_weight = radix.pow(length - 1);
-        }
-        Self {
-            num,
-            radix,
-            front_weight,
-            length: length as usize,
-        }
-    }
-}
-impl Iterator for DigitsIter {
-    type Item = u8;
 
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.num == 0 && self.front_weight == 0 {
-            None
-        } else {
-            let next_digit = self.num / self.front_weight;
-            self.num %= self.front_weight;
-            self.front_weight /= self.radix;
-            self.length -= 1;
-            Some(next_digit as Self::Item)
-        }
+/// Creates an integer from digits.
+/// Digits can be any type that implements [IntoIterator].
+/// # Arguments
+/// * `digits` - The type that implements [IntoIterator] and contains digits.
+/// * `radix` - The radix of the number.
+/// # Returns
+/// * `u64` - The integer.
+/// # Example
+/// ```
+/// use project_euler::shared::math::digits_to_int;
+/// // 123 -> 123
+/// assert_eq!(digits_to_int([1u8, 2u8, 3u8], 10), 123);
+/// ```
+pub fn digits_to_int<T, U>(digits: T, radix: u8) -> u64
+where
+    T: IntoIterator<Item = U>,
+    U: Borrow<u8>,
+{
+    let mut result = 0;
+    let radix = radix as u64;
+    for digit in digits {
+        result = result * radix + *digit.borrow() as u64;
     }
+    result
+}
 
-    fn size_hint(&self) -> (usize, Option<usize>) {
-        (self.length, Some(self.length))
-    }
-}
-impl DoubleEndedIterator for DigitsIter {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        if self.num == 0 {
-            None
-        } else {
-            let next_digit = self.num % self.radix;
-            self.num /= self.radix;
-            self.front_weight /= self.radix;
-            self.length -= 1;
-            Some(next_digit as Self::Item)
+/// Finds the distinct prime factors of a number and their powers.
+/// The prime factors are returned in ascending order.
+/// # Arguments
+/// * `x` - The number to find the distinct prime factors of.
+/// # Returns
+/// * Iterator over the distinct prime factors and their powers. (prime_factor, power)
+/// # Example
+/// ```
+/// use project_euler::shared::math::distinct_prime_factors;
+/// // distinct prime factors of 12: (2, 2), (3, 1)
+/// assert_eq!(distinct_prime_factors(12).collect::<Vec<_>>(), vec![(2, 2), (3, 1)]);
+/// // distinct prime factors of 2048: (2, 11)
+/// assert_eq!(distinct_prime_factors(2048).collect::<Vec<_>>(), vec![(2, 11)]);
+/// // distinct prime factors of 134043: (3, 1), (7, 1), (13, 1), (491, 1)
+/// assert_eq!(distinct_prime_factors(134043).collect::<Vec<_>>(), vec![(3, 1), (7, 1), (13, 1), (491, 1)]);
+/// ```
+pub fn distinct_prime_factors(x: u64) -> impl Iterator<Item = (u64, u64)> {
+    let mut prime_factors = prime_factors(x);
+    let mut factor = 0;
+    let mut power = 0;
+    iter::from_fn(move || loop {
+        match prime_factors.next() {
+            Some(next_factor) => {
+                if next_factor == factor {
+                    power += 1;
+                } else {
+                    let ret = (factor, power);
+                    factor = next_factor;
+                    power = 1;
+                    if ret.1 != 0 {
+                        return Some(ret);
+                    }
+                }
+            }
+            None => {
+                return if power != 0 {
+                    let ret = (factor, power);
+                    power = 0;
+                    Some(ret)
+                } else {
+                    None
+                }
+            }
         }
-    }
+    })
 }
-impl ExactSizeIterator for DigitsIter {}
 
 /// Calculates the factorial of a number.
 /// # Arguments
@@ -247,6 +347,28 @@ where
         fact = fact * i;
     }
     fact
+}
+
+/// Calculates the factorials of numbers from 1 to n.
+/// # Arguments
+/// * `n` - The number to find the factorials of.
+/// # Returns
+/// * `Vec<u64>` - The factorials of numbers from 0 to n. Index represents the number.
+/// # Example
+/// ```
+/// use project_euler::shared::math::factorial_1_to_n;
+/// assert_eq!(factorial_1_to_n(5u8), vec![1, 1, 2, 6, 24, 120]);
+/// ```
+pub fn factorial_1_to_n<T>(n: T) -> Vec<u64>
+where
+    T: PrimInt + Unsigned + ConstOne,
+{
+    let n = n.to_usize().expect("Number too large.");
+    let mut factorials = vec![1; n + 1];
+    for i in 2..=n {
+        factorials[i] = factorials[i - 1] * (i as u64);
+    }
+    factorials
 }
 
 /// Finds the greatest common divisor of two numbers.
@@ -311,36 +433,54 @@ where
 /// Checks if a number is a palindrome.
 /// # Arguments
 /// * `num` - The number to check.
+/// * `radix` - The radix of the number.
 /// # Returns
 /// * `bool` - Whether the number is a palindrome.
 /// # Example
 /// ```
 /// use project_euler::shared::math::is_palindrome;
 /// // 12321 is a palindrome
-/// assert!(is_palindrome(12321u16));
+/// assert!(is_palindrome(12321u16, 10));
 /// // 12345 is not a palindrome
-/// assert!(!is_palindrome(12345u16));
+/// assert!(!is_palindrome(12345u16, 10));
+/// // binary 11011 is a palindrome
+/// assert!(is_palindrome(0b11011u8, 2));
 /// ```
-pub fn is_palindrome<T>(num: T) -> bool
+pub fn is_palindrome<T>(num: T, radix: u8) -> bool
 where
     T: PrimInt + Unsigned + ConstZero + NumCast,
 {
-    num == reverse(num)
+    num == reverse(num, radix)
 }
 
 /// Checks if two numbers are permutations of each other.
-pub fn is_permutation(n: u64, m: u64) -> bool {
-    let mut n_digits = [0_u8; 10];
-    let mut m_digits = [0_u8; 10];
+/// # Arguments
+/// * `n` - The first number.
+/// * `m` - The second number.
+/// * `radix` - The radix of the numbers.
+/// # Returns
+/// * `bool` - Whether the numbers are permutations of each other.
+/// # Example
+/// ```
+/// use project_euler::shared::math::is_permutation;
+/// // 123 and 321 are permutations
+/// assert!(is_permutation(123, 321, 10));
+/// // 123 and 3210 are not permutations
+/// assert!(!is_permutation(123, 3210, 10));
+/// // binary 1101 and 1011 are permutations
+/// assert!(is_permutation(0b1101, 0b1011, 2));
+/// ```
+pub fn is_permutation(n: u64, m: u64, radix: u8) -> bool {
+    let mut seen_digits = [0_i8; 256];
 
-    for digit in digits(n, 10) {
-        n_digits[digit as usize] += 1;
+    for digit in digits(n, radix) {
+        seen_digits[digit as usize] += 1;
     }
-    for digit in digits(m, 10) {
-        m_digits[digit as usize] += 1;
+    for digit in digits(m, radix) {
+        seen_digits[digit as usize] -= 1;
     }
 
-    n_digits == m_digits
+    seen_digits.iter().all(|&count| count == 0)
 }
 
 /// Checks if a number is prime.
@@ -349,6 +489,16 @@ pub fn is_permutation(n: u64, m: u64) -> bool {
 /// # Returns
 /// * `bool` - Whether the number is prime.
 /// * `u64` - The smallest divisor if the number is not prime, otherwise 1.
+/// # Panics
+/// If the number is less than 2.
+/// # Example
+/// ```
+/// use project_euler::shared::math::is_prime;
+/// // 7 is prime
+/// assert_eq!(is_prime(7), (true, 1));
+/// // 12 is not prime, smallest divisor is 2
+/// assert_eq!(is_prime(12), (false, 2));
+/// ```
 pub fn is_prime(n: u64) -> (bool, u64) {
     assert!(n >= 2, "Number must be greater than or equal to 2.");
 
@@ -375,6 +525,16 @@ pub fn is_prime(n: u64) -> (bool, u64) {
 /// Slower than casting to f64 and using .sqrt().floor().
 /// To be used with big numbers which would lose precision if cast to f64.
 /// Uses Newton's method.
+/// # Arguments
+/// * `n` - The number to find the integer square root of.
+/// # Returns
+/// * `u64` - The integer square root.
+/// # Example
+/// ```
+/// use project_euler::shared::math::isqrt;
+/// // isqrt of 12 is 3
+/// assert_eq!(isqrt(12), 3);
+/// ```
 pub fn isqrt(n: u64) -> u64 {
     if n <= 1 {
         n
@@ -391,6 +551,16 @@ pub fn isqrt(n: u64) -> u64 {
 
 /// Calculate the integer square root of an u128 number.
 /// Same as isqrt, but for u128.
+/// # Arguments
+/// * `n` - The number to find the integer square root of.
+/// # Returns
+/// * `u128` - The integer square root.
+/// # Example
+/// ```
+/// use project_euler::shared::math::isqrt_128;
+/// // isqrt of 12 is 3
+/// assert_eq!(isqrt_128(12), 3);
+/// ```
 pub fn isqrt_128(n: u128) -> u128 {
     if n <= 1 {
         n
@@ -403,31 +573,6 @@ pub fn isqrt_128(n: u128) -> u128 {
         }
         x0
     }
-}
-
-/// Creates an integer from digits.
-/// Digits can be any type that implements [IntoIterator].
-/// # Arguments
-/// * `digits` - The type that implements [IntoIterator] and contains digits.
-/// # Returns
-/// * `u64` - The integer.
-/// # Example
-/// ```
-/// use project_euler::shared::math::digits_to_int;
-/// // 123 -> 123
-/// assert_eq!(digits_to_int([1u8, 2u8, 3u8], 10), 123);
-/// ```
-pub fn digits_to_int<T, U>(digits: T, radix: u64) -> u64
-where
-    T: IntoIterator<Item = U>,
-    U: Borrow<u8>,
-{
-    let mut result = 0;
-    for digit in digits {
-        result *= radix;
-        result += *digit.borrow() as u64;
-    }
-    result
 }
 
 /// Finds the least common multiple of two numbers.
@@ -487,6 +632,18 @@ where
 /// * `derivative` - The derivative of the function.
 /// # Returns
 /// * `f64` - The zero of the function.
+/// # Panics
+/// If the derivative is 0 at some of the evaluated points.
+/// # Example
+/// ```
+/// use project_euler::shared::math::newtons_method;
+/// // zero of x^2 - 2 = 0 is sqrt(2)
+/// let x0 = 1.0;
+/// let precision = 1e-10;
+/// let function = |x| x * x - 2.0;
+/// let derivative = |x| 2.0 * x;
+/// assert!((newtons_method(x0, precision, function, derivative) - 2.0_f64.sqrt()).abs() < precision);
+/// ```
 pub fn newtons_method<F, D>(x0: f64, precision: f64, function: F, derivative: D) -> f64
 where
     F: Fn(f64) -> f64,
@@ -508,7 +665,16 @@ where
 /// * `n` - The number to find the number of divisors of.
 /// # Returns
 /// * `u64` - The number of divisors of the number.
+/// # Example
+/// ```
+/// use project_euler::shared::math::num_of_divisors;
+/// // divisors of 12: 1, 2, 3, 4, 6, 12
+/// assert_eq!(num_of_divisors(12), 6);
+/// ```
 pub fn num_of_divisors(n: u64) -> u64 {
+    if n == 0 {
+        return 0;
+    }
     // let n be a natural number
     // we can factorise n
     // n = p1^a1 * p2^a2 * p3^a3 * ... * pn^an
@@ -516,20 +682,29 @@ pub fn num_of_divisors(n: u64) -> u64 {
     // a function d(n) returns the number of divisors of n
     // obviously, d(n) = (a1 + 1) * (a2 + 1) * (a3 + 1) * ... * (an + 1)
 
-    prime_factors(n).into_iter().map(|(_, a)| a + 1).product()
+    distinct_prime_factors(n).map(|(_, a)| a + 1).product()
 }
 
 /// Finds the number of divisors of numbers from 1 to n.
 /// # Arguments
 /// * `n` - The number to find the number of divisors of.
 /// # Returns
-/// * `Vec<u64>` - The number of divisors of numbers from 1 to n. Index 0 is unused (set to 0), other indices represent the number.
-pub fn num_of_divisors_1_to_n(n: u64) -> Vec<u64> {
-    let mut divisors = vec![1; (n + 1) as usize];
+/// * `Vec<u64>` - The number of divisors of numbers from 0 to n. Index represents the number.
+/// # Example
+/// ```
+/// use project_euler::shared::math::num_of_divisors_1_to_n;
+/// assert_eq!(num_of_divisors_1_to_n(10u8), vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]);
+/// ```
+pub fn num_of_divisors_1_to_n<T>(n: T) -> Vec<u64>
+where
+    T: PrimInt + Unsigned + ToPrimitive,
+{
+    let n = n.to_usize().expect("Number too large.");
+    let mut divisors = vec![1; n + 1];
     divisors[0] = 0;
     for i in 2..=n {
-        for j in (i..=n).step_by(i as usize) {
-            divisors[j as usize] += 1;
+        for j in (i..=n).step_by(i) {
+            divisors[j] += 1;
         }
     }
     divisors
@@ -541,8 +716,14 @@ pub fn num_of_divisors_1_to_n(n: u64) -> Vec<u64> {
 /// * `n` - The number to find the number of proper divisors of.
 /// # Returns
 /// * `u64` - The number of proper divisors of the number.
+/// # Example
+/// ```
+/// use project_euler::shared::math::num_of_proper_divisors;
+/// // proper divisors of 12: 1, 2, 3, 4, 6
+/// assert_eq!(num_of_proper_divisors(12), 5);
+/// ```
 pub fn num_of_proper_divisors(n: u64) -> u64 {
-    num_of_divisors(n) - 1
+    num_of_divisors(n).saturating_sub(1)
 }
 
 /// Finds the number of proper divisors of numbers from 1 to n.
@@ -550,19 +731,28 @@ pub fn num_of_proper_divisors(n: u64) -> u64 {
 /// # Arguments
 /// * `n` - The number to find the number of proper divisors of.
 /// # Returns
-/// * `Vec<u64>` - The number of proper divisors of numbers from 1 to n. Index 0 is unused (set to 0), other indices represent the number.
-pub fn num_of_proper_divisors_1_to_n(n: u64) -> Vec<u64> {
-    let mut divisors = vec![0; (n + 1) as usize];
+/// * `Vec<u64>` - The number of proper divisors of numbers from 0 to n. Index represents the number.
+/// # Example
+/// ```
+/// use project_euler::shared::math::num_of_proper_divisors_1_to_n;
+/// assert_eq!(num_of_proper_divisors_1_to_n(10u8), vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]);
+/// ```
+pub fn num_of_proper_divisors_1_to_n<T>(n: T) -> Vec<u64>
+where
+    T: PrimInt + Unsigned + ToPrimitive,
+{
+    let n = n.to_usize().expect("Number too large.");
+    let mut divisors = vec![0; n + 1];
     for i in 2..=n {
-        for j in (i..=n).step_by(i as usize) {
-            divisors[j as usize] += 1;
+        for j in (i..=n).step_by(i) {
+            divisors[j] += 1;
         }
     }
     divisors
 }
 
 /// Calculates multiplicative order.
-/// Finds the smallest positive integer k such that a^k ≡ 1 (mod n).
+/// (smallest positive integer k such that a^k ≡ 1 (mod n)).
 /// a and n must be coprime.
 /// # Arguments
 /// * `a` - The base.
@@ -571,9 +761,13 @@ pub fn num_of_proper_divisors_1_to_n(n: u64) -> Vec<u64> {
 /// * `u64` - The multiplicative order.
 /// # Panics
 /// If a and n are not coprime.
+/// # Example
+/// ```
+/// use project_euler::shared::math::ord;
+/// // ord(3, 7) = 6
+/// assert_eq!(ord(3, 7), 6);
+/// ```
 pub fn ord(a: u64, n: u64) -> u64 {
-    assert_eq!(gcd(a, n), 1, "a and n must be coprime.");
-
     // a^k ≡ 1 (mod n)
     // a^k (mod n) = ((a^(k-1) (mod n)) * a) (mod n)
     // example: 8^2 mod 7 = ((8 mod 7) * 8) mod 7
@@ -588,49 +782,71 @@ pub fn ord(a: u64, n: u64) -> u64 {
     }
 
     // since a and n are coprime, multiplicative order must exist
-    unreachable!("Multiplicative order not found.");
+    panic!("Multiplicative order not found (a and n must be coprime).");
 }
 
-/// Calculates the partition function.
-/// Finds the number of ways a number can be written as a sum of positive integers.
+/// Calculates the partition function
+/// (number of ways a number can be written as a sum of positive integers).
 /// Uses the recurrence relation p(n) = Σ(k=1, n)(-1)^(k+1) * (p(n - k(3k - 1) / 2) + p(n - k(3k + 1) / 2)).
-/// Uses memoization to speed up the calculation.
 /// # Arguments
 /// * `n` - The number to find the number of partitions of.
 /// # Returns
 /// * `u64` - The number of partitions of the number.
 /// # Example
-/// Partitions of 5: {5}, {4, 1}, {3, 2}, {3, 1, 1}, {2, 2, 1}, {2, 1, 1, 1}, {1, 1, 1, 1, 1}
-///
-/// partition_p(5) = 7
-pub fn partition_p(n: u64) -> u64 {
+/// ```
+/// use project_euler::shared::math::partition_p;
+/// // Partitions of 5: {5}, {4, 1}, {3, 2}, {3, 1, 1}, {2, 2, 1}, {2, 1, 1, 1}, {1, 1, 1, 1, 1} == 7
+/// assert_eq!(partition_p(5u8), 7);
+/// ```
+pub fn partition_p<T>(n: T) -> u64
+where
+    T: PrimInt + Unsigned + ToPrimitive,
+{
+    // since calculating p(n) also requires calculating p of every number less than n,
+    // so we just calculate all values and get the value of p(n) from the vector (last value)
+    partition_p_1_to_n(n).pop().unwrap()
+}
+
+/// Calculates the partition function for numbers from 1 to n
+/// (number of ways a number can be written as a sum of positive integers).
+/// Uses the recurrence relation p(n) = Σ(k=1, n)(-1)^(k+1) * (p(n - k(3k - 1) / 2) + p(n - k(3k + 1) / 2)).
+/// # Arguments
+/// * `n` - The number to find the number of partitions of.
+/// # Returns
+/// * `Vec<u64>` - The number of partitions of numbers from 0 to n. Index represents the number.
+/// # Example
+/// ```
+/// use project_euler::shared::math::partition_p_1_to_n;
+/// assert_eq!(partition_p_1_to_n(10u8), vec![1, 1, 2, 3, 5, 7, 11, 15, 22, 30, 42]);
+/// ```
+pub fn partition_p_1_to_n<T>(n: T) -> Vec<u64>
+where
+    T: PrimInt + Unsigned + ToPrimitive,
+{
     // get n as usize
-    let n = usize::try_from(n).expect("Number too large.");
+    let n = n.to_usize().expect("Number too large.");
 
-    // since calculating p(n) also requires calculating p of every number less than n
-    // we can just calculate all values and store them in a vector
-
-    // memoization
-    static CACHE_VEC: LazyLock<Mutex<Vec<u64>>> = LazyLock::new(|| Mutex::new(vec![1_u64, 1_u64]));
-    let mut cache = CACHE_VEC.lock().unwrap();
-
-    // if n is already in the cache vector, then return the value
-    if let Some(&value) = cache.get(n) {
-        return value;
+    // if n is 0, return 1
+    if n == 0 {
+        return vec![1];
     }
 
-    while cache.len() <= n {
+    let mut partitions = Vec::with_capacity(n + 1);
+    partitions.push(1);
+    partitions.push(1);
+
+    while partitions.len() <= n {
         // calculate next value and add it to vector
 
-        let curr_n = cache.len();
+        let curr_n = partitions.len();
         let mut next_val = 0;
         for k in 1..=curr_n {
             let left_value = match curr_n.checked_sub((k * (3 * k - 1)) >> 1) {
-                Some(ind) => cache[ind],
+                Some(ind) => partitions[ind],
                 None => break, // larger of the indices is below zero, so any larger k will only be 0, we can break
             };
             let right_value = match curr_n.checked_sub((k * (3 * k + 1)) >> 1) {
-                Some(ind) => cache[ind],
+                Some(ind) => partitions[ind],
                 None => 0,
             };
             let value = left_value + right_value;
@@ -642,26 +858,51 @@ pub fn partition_p(n: u64) -> u64 {
             }
         }
 
-        // push the newly calculated value to the cache vector
-        cache.push(next_val);
+        // push the newly calculated value to the vector
+        partitions.push(next_val);
     }
 
-    // return the value
-    cache[n]
+    // return the partitions vector
+    partitions
 }
 
-/// Calculates the number of prime partitions.
-/// Finds the number of ways a number can be written as a sum of primes.
+/// Calculates the number of prime partitions
+/// (a number of ways a number can be written as a sum of primes).
 /// # Arguments
 /// * `n` - The number to find the number of prime partitions of.
 /// # Returns
 /// * `u64` - The number of prime partitions of the number.
 /// # Example
-/// Prime partitions of 7: {7}, {5, 2}, {3, 2, 2}
-///
-/// partition_prime(7) = 3
-pub fn partition_prime(n: u64) -> u64 {
-    let n = usize::try_from(n).expect("Number too large.");
+/// ```
+/// use project_euler::shared::math::partition_prime;
+/// // Prime partitions of 7: {7}, {5, 2}, {3, 2, 2}
+/// assert_eq!(partition_prime(7u8), 3);
+/// ```
+pub fn partition_prime<T>(n: T) -> u64
+where
+    T: PrimInt + Unsigned + ToPrimitive,
+{
+    // since calculating p(n) also requires calculating p of every number less than n,
+    // so we just calculate all values and get the value of p(n) from the vector (last value)
+    partition_prime_1_to_n(n).pop().unwrap()
+}
+
+/// Calculates the number of prime partitions for numbers from 1 to n.
+/// Prime partitions is a number of ways a number can be written as a sum of primes.
+/// # Arguments
+/// * `n` - The number to find the number of prime partitions of.
+/// # Returns
+/// * `Vec<u64>` - The number of prime partitions of numbers from 0 to n. Index represents the number.
+/// # Example
+/// ```
+/// use project_euler::shared::math::partition_prime_1_to_n;
+/// assert_eq!(partition_prime_1_to_n(10u8), vec![1, 0, 1, 1, 1, 2, 2, 3, 3, 4, 5]);
+/// ```
+pub fn partition_prime_1_to_n<T>(n: T) -> Vec<u64>
+where
+    T: PrimInt + Unsigned + ToPrimitive,
+{
+    let n = n.to_usize().expect("Number too large.");
     let primes = sieve_of_eratosthenes(n as u64);
 
     let mut dp = vec![0; n + 1];
@@ -675,7 +916,7 @@ pub fn partition_prime(n: u64) -> u64 {
         }
     }
 
-    dp[n]
+    dp
 }
 
 /// Simple prime-counting function.
@@ -686,14 +927,24 @@ pub fn partition_prime(n: u64) -> u64 {
 /// * `x` - The number to estimate the number of primes less than or equal to.
 /// # Returns
 /// * `f64` - The estimated number of primes less than or equal to x.
-pub fn pcf(x: u64) -> f64 {
+/// # Example
+/// ```
+/// use project_euler::shared::math::pcf;
+/// // number of primes less than or equal to 100: 25
+/// assert!(pcf(100u8) < 25.0);
+/// ```
+pub fn pcf<T>(x: T) -> f64
+where
+    T: PrimInt + Unsigned + ToPrimitive,
+{
+    let x = x.to_f64().expect("Number too large.");
     match x {
-        0..=1 => 0.0,
-        2 => 1.0,
-        3..=4 => 2.0,
-        5..=6 => 3.0,
-        7..=10 => 4.0,
-        _ => x as f64 / (x as f64).ln(),
+        0.0..=1.0 => 0.0,
+        2.0 => 1.0,
+        3.0..=4.0 => 2.0,
+        5.0..=6.0 => 3.0,
+        7.0..=10.0 => 4.0,
+        _ => x / x.ln(),
     }
 }
 
@@ -705,27 +956,55 @@ pub fn pcf(x: u64) -> f64 {
 /// * `x` - The number to find the number of primes less than or equal to.
 /// # Returns
 /// * `u64` - The exact number of primes less than or equal to x.
+/// # Example
+/// ```
+/// use project_euler::shared::math::pcf_exact;
+/// // number of primes less than or equal to 100: 25
+/// assert_eq!(pcf_exact(100), 25);
+/// ```
 pub fn pcf_exact(x: u64) -> u64 {
     sieve_of_eratosthenes(x).len() as u64
 }
 
 /// Calculate the Euler's totient function.
+/// Finds the number of positive integers less than n that are coprime to n.
+/// # Arguments
+/// * `n` - The number to find the Euler's totient function of.
+/// # Returns
+/// * `u64` - The Euler's totient function of the number.
+/// # Example
+/// ```
+/// use project_euler::shared::math::phi;
+/// // phi(0) = 0, phi(1) = 1, phi(2) = 1, phi(3) = 2, phi(4) = 2, phi(5) = 4
+/// assert_eq!(phi(0), 0);
+/// assert_eq!(phi(1), 1);
+/// assert_eq!(phi(2), 1);
+/// assert_eq!(phi(3), 2);
+/// assert_eq!(phi(4), 2);
+/// assert_eq!(phi(5), 4);
+/// ```
 pub fn phi(n: u64) -> u64 {
     let mut result = n;
-    let mut curr_fact = 0;
-    for fact in prime_factors_iter(n) {
-        if curr_fact != fact {
-            curr_fact = fact;
-            result -= result / fact;
-        }
-    }
+    distinct_prime_factors(n).map(|(factor, _)| factor).for_each(|factor| {
+        result -= result / factor;
+    });
     result
 }
 
 /// Calculate the Euler's totient function for numbers from 1 to n.
-/// Returns a vector of the results, index 0 is unused (set to 0), other indices represent the number.
+/// Returns a vector of the results, indices represent the number.
+/// # Arguments
+/// * `n` - The number to find the Euler's totient function of.
+/// # Returns
+/// * `Vec<u64>` - The Euler's totient function of numbers from 0 to n. Index represents the number.
+/// # Example
+/// ```
+/// use project_euler::shared::math::phi_1_to_n;
+/// // phi(0) = 0, phi(1) = 1, phi(2) = 1, phi(3) = 2, phi(4) = 2, phi(5) = 4
+/// assert_eq!(phi_1_to_n(5), vec![0, 1, 1, 2, 2, 4]);
+/// ```
 pub fn phi_1_to_n(n: u64) -> Vec<u64> {
-    let mut phi_values: Vec<u64> = (0..=n).collect();
+    let mut phi_values = (0..=n).collect_vec();
 
     for i in 2..=n {
         if phi_values[i as usize] == i {
@@ -760,64 +1039,44 @@ impl<const N: usize> Point<N> {
     }
 }
 
-/// Finds the prime factors of a number.
-/// If the number is 0 or 1, then an empty vector is returned.
+/// Returns the prime factors as an iterator.
+/// If the factor appears multiple times, it will appear multiple times in the iterator.
+/// Factors are returned in the ascending order.
 /// # Arguments
 /// * `x` - The number to find the prime factors of.
 /// # Returns
-/// * `Vec<(u64, u64)>` - The prime factors of the number. In the form (prime_factor, power).
-pub fn prime_factors(mut x: u64) -> Vec<(u64, u64)> {
+/// * Iterator over the prime factors.
+/// # Example
+/// ```
+/// use project_euler::shared::math::prime_factors;
+/// // prime factors of 12: 2, 2, 3
+/// assert_eq!(prime_factors(12).collect::<Vec<_>>(), vec![2, 2, 3]);
+/// ```
+pub fn prime_factors(mut x: u64) -> impl Iterator<Item = u64> {
     // calculate primes that are less than or equal to the square root of x
-    // these are the only possible prime factors
-    let prime_table = sieve_of_eratosthenes((x as f64).sqrt().floor() as u64);
-    let mut factors = Vec::new();
+    let mut prime_table = sieve_of_eratosthenes((x as f64).sqrt().floor() as u64).into_iter();
 
-    // for every prime factor divide x by that prime factor until it is no longer divisible by that prime factor
-    // if x becomes 1 then we have found all prime factors and don't need to check further
-    for prime_fact in prime_table {
-        let mut fact_info = (prime_fact, 0);
-
-        while x % prime_fact == 0 {
-            fact_info.1 += 1;
-            x /= prime_fact;
-        }
-
-        if fact_info.1 > 0 {
-            factors.push(fact_info);
-        }
-
-        if x == 1 {
-            break;
-        }
-    }
-
-    // if x is not 1 here, then there are two options
-    // 1. x is prime -> we add it to the list of prime factors
-    // 2. x is zero -> we do nothing
-    if x != 1 && x != 0 {
-        factors.push((x, 1));
-    }
-
-    factors
-}
-
-/// Returns the prime factors as an iterator.
-/// If the prime factor appears multiple times, then it will appear multiple times in the iterator.
-/// Factors are returned in ascending order.
-/// Makes no memory allocations, therefore, it is better for small numbers.
-/// For big numbers, prime_factors should be faster because it uses prime sieve.
-pub fn prime_factors_iter(mut x: u64) -> impl Iterator<Item = u64> {
-    let mut factor = 2;
+    // check those primes
+    let mut factor = prime_table.next().unwrap_or(2);
     iter::from_fn(move || {
-        while factor <= x {
+        while x != 0 {
             if x % factor == 0 {
                 x /= factor;
                 return Some(factor);
             }
-            match factor {
-                2 => factor += 1,
-                _ => factor += 2,
-            };
+            match prime_table.next() {
+                Some(next_factor) => {
+                    factor = next_factor;
+                }
+                // if there are no more primes x is either 1 or a prime number (last factor)
+                None => {
+                    if x != 1 {
+                        factor = x;
+                    } else {
+                        return None;
+                    }
+                }
+            }
         }
         None
     })
@@ -826,25 +1085,28 @@ pub fn prime_factors_iter(mut x: u64) -> impl Iterator<Item = u64> {
 /// Reverses a number.
 /// # Arguments
 /// * `num` - The number to reverse.
+/// * `radix` - The radix of the number.
 /// # Returns
 /// * The reversed number.
 /// # Example
 /// ```
 /// use project_euler::shared::math::reverse;
 /// // 123 -> 321
-/// assert_eq!(reverse(123u16), 321);
+/// assert_eq!(reverse(123u16, 10), 321);
 /// // 0 -> 0
-/// assert_eq!(reverse(0u8), 0);
+/// assert_eq!(reverse(0u8, 10), 0);
+/// // binary 1101 -> 1011
+/// assert_eq!(reverse(0b1101u8, 2), 0b1011);
 /// ```
-pub fn reverse<T>(mut num: T) -> T
+pub fn reverse<T>(mut num: T, radix: u8) -> T
 where
     T: PrimInt + Unsigned + ConstZero + NumCast,
 {
-    let ten = T::from(10).unwrap();
+    let radix = T::from(radix).unwrap();
     let mut new_num = T::ZERO;
     while num > T::ZERO {
-        new_num = new_num * ten + num % ten;
-        num = num / ten;
+        new_num = new_num * radix + num % radix;
+        num = num / radix;
     }
     new_num
 }
@@ -855,6 +1117,12 @@ where
 /// * `n` - The number to find all primes less than or equal to.
 /// # Returns
 /// * `Vec<u64>` - All primes less than or equal to n.
+/// # Example
+/// ```
+/// use project_euler::shared::math::sieve_of_eratosthenes;
+/// // primes less than or equal to 10: 2, 3, 5, 7
+/// assert_eq!(sieve_of_eratosthenes(10), vec![2, 3, 5, 7]);
+/// ```
 pub fn sieve_of_eratosthenes(n: u64) -> Vec<u64> {
     match n {
         0..=1 => Vec::with_capacity(0),
@@ -913,8 +1181,7 @@ pub fn sum_n<T>(n: T) -> T
 where
     T: PrimInt + Unsigned + ConstOne + NumCast,
 {
-    let two = T::from(2).unwrap();
-    n * (n + T::ONE) / two
+    n * (n + T::ONE) / T::from(2).unwrap()
 }
 
 /// Finds the sum of the first n even natural numbers.
@@ -951,8 +1218,7 @@ where
     T: PrimInt + Unsigned + ConstOne + NumCast,
 {
     let two = T::from(2).unwrap();
-    let three = T::from(3).unwrap();
-    two * n * (n + T::ONE) * (two * n + T::ONE) / three
+    two * n * (n + T::ONE) * (two * n + T::ONE) / T::from(3).unwrap()
 }
 
 /// Finds the sum of the first n odd natural numbers.
@@ -989,12 +1255,10 @@ where
     T: PrimInt + Unsigned + ConstZero + ConstOne + NumCast,
 {
     let two = T::from(2).unwrap();
-    let three = T::from(3).unwrap();
-
     if n == T::ZERO {
         T::ZERO
     } else {
-        n * (two * n + T::ONE) * (two * n - T::ONE) / three
+        n * (two * n + T::ONE) * (two * n - T::ONE) / T::from(3).unwrap()
     }
 }
 
@@ -1013,9 +1277,7 @@ pub fn sum_n_squares<T>(n: T) -> T
 where
     T: PrimInt + Unsigned + ConstOne + NumCast,
 {
-    let two = T::from(2).unwrap();
-    let six = T::from(6).unwrap();
-    n * (n + T::ONE) * (two * n + T::ONE) / six
+    n * (n + T::ONE) * (T::from(2).unwrap() * n + T::ONE) / T::from(6).unwrap()
 }
 
 /// Finds the sum of the divisors of a number.
@@ -1023,6 +1285,12 @@ where
 /// * `n` - The number to find the sum of the divisors of.
 /// # Returns
 /// * `u64` - The sum of the divisors of the number.
+/// # Example
+/// ```
+/// use project_euler::shared::math::sum_of_divisors;
+/// // sum of divisors of 10 is 18
+/// assert_eq!(sum_of_divisors(10), 18);
+/// ```
 pub fn sum_of_divisors(n: u64) -> u64 {
     // let σ(n) be the sum of the divisors of n
     // let p be a prime number
@@ -1045,7 +1313,7 @@ pub fn sum_of_divisors(n: u64) -> u64 {
         // for each we calculate the sum of the divisors of that prime factor
         // and multiply them together
 
-        prime_factors(n).into_iter().map(|(p, a)| (p.pow(a as u32 + 1) - 1) / (p - 1)).product()
+        distinct_prime_factors(n).map(|(p, a)| (p.pow(a as u32 + 1) - 1) / (p - 1)).product()
     }
 }
 
@@ -1053,7 +1321,17 @@ pub fn sum_of_divisors(n: u64) -> u64 {
 /// # Arguments
 /// * `n` - The number to find the sum of the divisors of.
 /// # Returns
-/// * `Vec<u64>` - The sum of the divisors of numbers from 1 to n. Index 0 is unused (set to 0), other indices represent the number.
+/// * `Vec<u64>` - The sum of the divisors of numbers from 0 to n. Index represents the number.
+/// # Example
+/// ```
+/// use project_euler::shared::math::sum_of_divisors_1_to_n;
+/// // sum of divisors of 1 is 1
+/// assert_eq!(sum_of_divisors_1_to_n(1), vec![0, 1]);
+/// // sum of divisors of 2 is 3
+/// assert_eq!(sum_of_divisors_1_to_n(2), vec![0, 1, 3]);
+/// // sum of divisors of 10 is 18
+/// assert_eq!(sum_of_divisors_1_to_n(10), vec![0, 1, 3, 4, 7, 6, 12, 8, 15, 13, 18]);
+/// ```
 pub fn sum_of_divisors_1_to_n(n: u64) -> Vec<u64> {
     let mut divisors = vec![0; (n + 1) as usize];
     for i in 1..=n {
@@ -1070,6 +1348,12 @@ pub fn sum_of_divisors_1_to_n(n: u64) -> Vec<u64> {
 /// * `n` - The number to find the sum of the proper divisors of.
 /// # Returns
 /// * `u64` - The sum of the proper divisors of the number.
+/// # Example
+/// ```
+/// use project_euler::shared::math::sum_of_proper_divisors;
+/// // sum of proper divisors of 10 is 8
+/// assert_eq!(sum_of_proper_divisors(10), 8);
+/// ```
 pub fn sum_of_proper_divisors(n: u64) -> u64 {
     // sum of proper divisors is equal to the sum of all divisors minus the number itself
     sum_of_divisors(n) - n
@@ -1080,7 +1364,17 @@ pub fn sum_of_proper_divisors(n: u64) -> u64 {
 /// # Arguments
 /// * `n` - The number to find the sum of the proper divisors of.
 /// # Returns
-/// * `Vec<u64>` - The sum of the proper divisors of numbers from 1 to n. Index 0 is unused (set to 0), other indices represent the number.
+/// * `Vec<u64>` - The sum of the proper divisors of numbers from 0 to n. Index represents the number.
+/// # Example
+/// ```
+/// use project_euler::shared::math::sum_of_proper_divisors_1_to_n;
+/// // sum of proper divisors of 1 is 0
+/// assert_eq!(sum_of_proper_divisors_1_to_n(1), vec![0, 0]);
+/// // sum of proper divisors of 2 is 1
+/// assert_eq!(sum_of_proper_divisors_1_to_n(2), vec![0, 0, 1]);
+/// // sum of proper divisors of 10 is 8
+/// assert_eq!(sum_of_proper_divisors_1_to_n(10), vec![0, 0, 1, 1, 3, 1, 6, 1, 7, 4, 8]);
+/// ```
 pub fn sum_of_proper_divisors_1_to_n(n: u64) -> Vec<u64> {
     let mut divisors = vec![0; (n + 1) as usize];
     for i in 1..=n {
@@ -1123,8 +1417,8 @@ impl<const N: usize> Vector<N> {
     }
     /// Creates a new vector from 2 points.
     /// # Arguments
-    /// * `point1` - The first point.
-    /// * `point2` - The second point.
+    /// * `point1` - The starting point.
+    /// * `point2` - The ending point.
     /// # Returns
     /// * `Vector` - The vector from point1 to point2.
     /// # Example
@@ -1137,9 +1431,7 @@ impl<const N: usize> Vector<N> {
     /// ```
     pub fn from_points(point1: Point<N>, point2: Point<N>) -> Self {
         let mut coords = [0.0; N];
-        for (i, coord) in coords.iter_mut().enumerate() {
-            *coord = point2.coords[i] - point1.coords[i];
-        }
+        izip!(coords.iter_mut(), point1.coords.iter(), point2.coords.iter()).for_each(|(coord, x, y)| *coord = y - x);
         Self { coords }
     }
     /// Calculates the angle between two vectors.
@@ -1194,7 +1486,7 @@ impl<const N: usize> Vector<N> {
     /// assert_eq!(vector1.dot_product(&vector2), 32.0);
     /// ```
     pub fn dot_product(&self, other: &Self) -> f64 {
-        self.coords.iter().zip(other.coords.iter()).map(|(&x, &y)| x * y).sum()
+        self.coords.iter().zip(other.coords.iter()).map(|(x, y)| x * y).sum()
     }
     /// Calculates the magnitude of the vector.
     /// # Returns
@@ -1206,7 +1498,7 @@ impl<const N: usize> Vector<N> {
     /// assert_eq!(vector.magnitude(), 3.7416573867739413);
     /// ```
     pub fn magnitude(&self) -> f64 {
-        self.coords.iter().map(|&x| x.powi(2)).sum::<f64>().sqrt()
+        self.coords.iter().map(|x| x.powi(2)).sum::<f64>().sqrt()
     }
     /// Calculates the normalized vector.
     /// # Returns
@@ -1220,33 +1512,27 @@ impl<const N: usize> Vector<N> {
     /// assert_eq!(vector.normalize().coords, [0.2672612419124244, 0.5345224838248488, 0.8017837257372732]);
     /// ```
     pub fn normalize(&self) -> Self {
-        let mag = self.magnitude();
+        let magnitude = self.magnitude();
         let mut coords = [0.0; N];
-        for (i, coord) in coords.iter_mut().enumerate() {
-            *coord = self.coords[i] / mag;
-        }
+        coords.iter_mut().zip(self.coords.iter()).for_each(|(coord, x)| *coord = x / magnitude);
         Self { coords }
     }
 }
-impl<const N: usize> Add for Vector<N> {
+impl<const N: usize> Add<Self> for Vector<N> {
     type Output = Self;
 
     fn add(self, other: Self) -> Self {
         let mut coords = [0.0; N];
-        for (i, coord) in coords.iter_mut().enumerate() {
-            *coord = self.coords[i] + other.coords[i];
-        }
+        izip!(coords.iter_mut(), self.coords.iter(), other.coords.iter()).for_each(|(coord, x, y)| *coord = x + y);
         Self { coords }
     }
 }
-impl<const N: usize> Sub for Vector<N> {
+impl<const N: usize> Sub<Self> for Vector<N> {
     type Output = Self;
 
     fn sub(self, other: Self) -> Self {
         let mut coords = [0.0; N];
-        for (i, coord) in coords.iter_mut().enumerate() {
-            *coord = self.coords[i] - other.coords[i];
-        }
+        izip!(coords.iter_mut(), self.coords.iter(), other.coords.iter()).for_each(|(coord, x, y)| *coord = x - y);
         Self { coords }
     }
 }
@@ -1255,9 +1541,7 @@ impl<const N: usize> Mul<f64> for Vector<N> {
 
     fn mul(self, rhs: f64) -> Self::Output {
         let mut coords = self.coords;
-        for coord in coords.iter_mut() {
-            *coord *= rhs;
-        }
+        coords.iter_mut().for_each(|coord| *coord *= rhs);
         Self { coords }
     }
 }
@@ -1265,10 +1549,6 @@ impl<const N: usize> Mul<Vector<N>> for f64 {
     type Output = Vector<N>;
 
     fn mul(self, rhs: Vector<N>) -> Self::Output {
-        let mut coords = rhs.coords;
-        for coord in coords.iter_mut() {
-            *coord *= self;
-        }
-        Vector::<N> { coords }
+        rhs * self
     }
 }

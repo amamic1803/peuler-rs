@@ -6,7 +6,7 @@ pub fn get_problem() -> Problem {
     Problem::new(47, "Distinct Primes Factors", solve)
 }
 
-use crate::shared::math::prime_factors;
+use crate::shared::math::distinct_prime_factors;
 
 // number of consecutive numbers to find
 const CONSECUTIVE_COUNT: u64 = 4;
@@ -29,7 +29,7 @@ fn solve() -> String {
     while consecutive.iter().sum::<u64>() != (consecutive[0] * CONSECUTIVE_COUNT + (((CONSECUTIVE_COUNT - 1) * CONSECUTIVE_COUNT) / 2)) {
         // if current number has 4 distinct prime factors, add it to the end of the array and remove the first number
         // this is actually achieved by setting the first element to current number and rotating the array left by 1
-        if prime_factors(curr_num).len() == CONSECUTIVE_COUNT as usize {
+        if distinct_prime_factors(curr_num).count() == CONSECUTIVE_COUNT as usize {
             consecutive[0] = curr_num;
             consecutive.rotate_left(1);
         }

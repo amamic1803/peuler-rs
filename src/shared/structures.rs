@@ -62,7 +62,7 @@ impl Problems {
     pub fn run(&self, problem_id: usize) -> String {
         match self.problems.iter().find(|problem| problem.id == problem_id) {
             Some(problem) => problem.run(),
-            None => format!("Problem {:04} not available!\n", problem_id),
+            None => format!("Problem {:04} not available!", problem_id),
         }
     }
 

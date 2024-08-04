@@ -63,13 +63,13 @@ fn analyse_lychrel(n: u128, depth: u8, iterations: &mut [Option<u8>]) -> u8 {
 
     // if none of these are the case, the number is evaluated
     } else {
-        let next = n + reverse(n); // next number (n + reverse(n))
+        let next = n + reverse(n, 10); // next number (n + reverse(n))
 
         // in the next part before every return it is checked whether the number is smaller than MAX_VALUE
         // if it is, the result, is also stored in the vector (besides being returned)
 
         // if the next number is a palindrome, the depth is returned
-        if is_palindrome(next) {
+        if is_palindrome(next, 10) {
             if n < MAX_VALUE {
                 iterations[n as usize] = Some(depth);
             }

@@ -16,7 +16,7 @@ fn solve() -> String {
     let mut min_ratio = f64::INFINITY;
     let mut min_index = 0;
     for n in 2..=MAX_N {
-        if is_permutation(n, phi_values[n as usize]) {
+        if is_permutation(n, phi_values[n as usize], 10) {
             let ratio = n as f64 / phi_values[n as usize] as f64;
             if ratio < min_ratio {
                 min_ratio = ratio;

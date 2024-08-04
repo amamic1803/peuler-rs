@@ -6,13 +6,16 @@ pub fn get_problem() -> Problem {
     Problem::new(74, "Digit Factorial Chains", solve)
 }
 
-use crate::shared::math::{digits, factorial};
+use crate::shared::math::{digits, factorial_1_to_n};
 
 const MAX: usize = 1_000_000; // limit of the problem
 
 fn solve() -> String {
     // vector to store lengths of chains
     let mut chains = vec![0_u8; MAX];
+
+    // precalculate factorials for digits
+    let digit_factorials = factorial_1_to_n(9u8);
 
     // add known chains
     chains[169] = 3;
@@ -49,7 +52,7 @@ fn solve() -> String {
                     }
                 } else {
                     // chain length for the last item is unknown, calculate next item
-                    let next_item = digits(stack.last().unwrap().0, 10).map(|d| factorial(d as u64)).sum::<u64>();
+                    let next_item = digits(stack.last().unwrap().0, 10).map(|d| digit_factorials[d as usize]).sum::<u64>();
 
                     // if the next item is the same as the last item, then the chain length of the last item is 1
                     // if the next item is < MAX and its chain length is known, then the chain length of the last item is 1 + the chain length of the next item

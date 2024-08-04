@@ -14,7 +14,7 @@ fn solve() -> String {
     for fact1 in 100..1000 {
         for fact2 in fact1..1000 {
             let product = fact1 * fact2;
-            if is_palindrome(product) && (product > largest_palindrome) {
+            if is_palindrome(product, 10) && (product > largest_palindrome) {
                 largest_palindrome = product;
             }
         }
