@@ -57,7 +57,7 @@ fn num_to_string(mut n: u64) -> String {
 }
 
 static DIGIT_SINGLE: LazyLock<HashMap<u64, &str>> = LazyLock::new(|| {
-    let mut hash_map = HashMap::new();
+    let mut hash_map = HashMap::with_capacity(9);
 
     hash_map.insert(1, "one");
     hash_map.insert(2, "two");
@@ -73,7 +73,7 @@ static DIGIT_SINGLE: LazyLock<HashMap<u64, &str>> = LazyLock::new(|| {
 });
 
 static DIGIT_DOUBLE: LazyLock<HashMap<u64, &str>> = LazyLock::new(|| {
-    let mut hash_map = HashMap::new();
+    let mut hash_map = HashMap::with_capacity(8);
 
     hash_map.insert(2, "twenty");
     hash_map.insert(3, "thirty");
@@ -88,7 +88,7 @@ static DIGIT_DOUBLE: LazyLock<HashMap<u64, &str>> = LazyLock::new(|| {
 });
 
 static DIGIT_TEEN: LazyLock<HashMap<u64, &str>> = LazyLock::new(|| {
-    let mut hash_map = HashMap::new();
+    let mut hash_map = HashMap::with_capacity(10);
 
     hash_map.insert(10, "ten");
     hash_map.insert(11, "eleven");
