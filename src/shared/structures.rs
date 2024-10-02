@@ -1,5 +1,8 @@
 //! A module containing the structures used in the project.
 
+use std::sync::mpsc;
+use tinypool::ThreadPool;
+
 /// A structure containing the problems.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Problems {
@@ -43,11 +46,35 @@ impl Problems {
     pub fn solutions(&self) -> String {
         let mut result = self.print_header();
 
-        for problem in &self.problems {
-            result.push_str(&problem.name());
-            result.push('\n');
-            result.push_str(&problem.run());
-            result.push('\n');
+        match ThreadPool::new(None) {
+            Ok(mut pool) => {
+                let (tx, rx) = mpsc::channel();
+                for problem in self.problems.iter() {
+                    let tx = tx.clone();
+                    let problem = *problem;
+                    pool.add_to_queue(move || {
+                        let solution = problem.run();
+                        tx.send((problem, solution)).unwrap();
+                    });
+                }
+                pool.join();
+                let mut solutions = Vec::from_iter(rx.try_iter());
+                solutions.sort();
+                for (problem, solution) in solutions {
+                    result.push_str(&problem.name());
+                    result.push('\n');
+                    result.push_str(&solution);
+                    result.push('\n');
+                }
+            }
+            Err(_) => {
+                for problem in &self.problems {
+                    result.push_str(&problem.name());
+                    result.push('\n');
+                    result.push_str(&problem.run());
+                    result.push('\n');
+                }
+            }
         }
 
         result.trim().to_string()
@@ -112,7 +139,6 @@ pub struct Problem {
     /// The problem's solution function.
     pub solution: fn() -> String,
 }
-
 impl Problem {
     /// Creates a new `Problem`.
     /// # Arguments
@@ -125,7 +151,17 @@ impl Problem {
         Self { id, title, solution }
     }
 
-    /// Returns the problem's name.
+    /// Returns the problem's id.
+    pub fn id(&self) -> usize {
+        self.id
+    }
+
+    /// Returns the problem's title.
+    pub fn title(&self) -> &'static str {
+        self.title
+    }
+
+    /// Returns the problem's name (id + title, nicely formatted).
     /// # Returns
     /// The `String` with the problem's id + title.
     pub fn name(&self) -> String {
@@ -137,5 +173,15 @@ impl Problem {
     /// The `String` with the problem's solution.
     pub fn run(&self) -> String {
         (self.solution)()
+    }
+}
+impl Ord for Problem {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.id.cmp(&other.id)
+    }
+}
+impl PartialOrd for Problem {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
     }
 }
