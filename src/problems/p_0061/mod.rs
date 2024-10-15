@@ -1,7 +1,6 @@
 //! **Problem 61** - *Cyclical Figurate Numbers*
 
 use crate::shared::structures::Problem;
-use itertools::Itertools;
 use std::collections::HashMap;
 
 /// Get `Problem` struct.
@@ -78,66 +77,52 @@ fn solve() -> String {
     let heptagonal_map = generate_map(&heptagonal);
     let octagonal_map = generate_map(&octagonal);
 
-    // generates all permutations, but some could be skipped (that have the same start)!!!
-    let perms = [&square_map, &pentagonal_map, &hexagonal_map, &heptagonal_map, &octagonal_map]
-        .into_iter()
-        .permutations(5)
-        .collect_vec();
+    // we will try to find the chain by recursively trying to find the next number in the chain
+
+    let maps = [&square_map, &pentagonal_map, &hexagonal_map, &heptagonal_map, &octagonal_map];
+    let mut visited_maps = [false; 5];
     let mut stack = Vec::with_capacity(6);
-    let mut iter_stack = Vec::with_capacity(5);
 
-    'outer: for n in triangle {
+    // try to do that for each triangle number
+    for n in triangle {
         stack.push(n);
-
-        for perm in perms.iter() {
-            match perm[0].get(&(stack[0] % 100)) {
-                Some(vec) => {
-                    iter_stack.push(vec.iter());
-                    stack.push(*iter_stack[0].next().unwrap());
-                }
-                None => continue,
-            }
-            while !iter_stack.is_empty() {
-                if iter_stack.len() == 5 && stack.len() == 6 {
-                    if stack.last().unwrap() % 100 == stack[0] / 100 {
-                        break 'outer;
-                    } else {
-                        stack.pop();
-                        if let Some(val) = iter_stack.last_mut().unwrap().next() {
-                            stack.push(*val);
-                        }
-                    }
-                } else if stack.len() == iter_stack.len() {
-                    iter_stack.pop();
-                    if let Some(last_item) = iter_stack.last_mut() {
-                        stack.pop();
-                        if let Some(val) = last_item.next() {
-                            stack.push(*val);
-                        }
-                    }
-                } else {
-                    match perm[iter_stack.len()].get(&(stack.last().unwrap() % 100)) {
-                        Some(vec) => {
-                            iter_stack.push(vec.iter());
-                            stack.push(*iter_stack.last_mut().unwrap().next().unwrap());
-                        }
-                        None => {
-                            stack.pop();
-                            if let Some(val) = iter_stack.last_mut().unwrap().next() {
-                                stack.push(*val);
-                            }
-                        }
-                    }
-                }
-            }
+        // if rec returns true, we found the chain
+        if rec(&mut stack, &maps, &mut visited_maps) {
+            break;
         }
-
         stack.pop();
     }
 
-    // TODO: Write better recursive solution, this tries all permutations unnecessarily
-
+    // sum the numbers in the chain and return the result
     stack.into_iter().map(|n| n as u32).sum::<u32>().to_string()
+}
+
+// recursive function that tries to find the next number in the chain
+fn rec(stack: &mut Vec<u16>, maps: &[&HashMap<u16, Vec<u16>>], visited_maps: &mut [bool]) -> bool {
+    // if we have 6 numbers in the chain, check if the last number is cyclical with the first
+    // if it is returns true, otherwise returns false
+    if stack.len() == 6 {
+        return stack.last().unwrap() % 100 == stack[0] / 100;
+    }
+
+    for i in 0..5 {
+        if !visited_maps[i] {
+            if let Some(next_values) = maps[i].get(&(stack.last().unwrap() % 100)) {
+                visited_maps[i] = true;
+                for next_value in next_values {
+                    stack.push(*next_value);
+                    // if rec returns true, we found the chain, we need to quit the search (by returning true)
+                    if rec(stack, maps, visited_maps) {
+                        return true;
+                    }
+                    stack.pop();
+                }
+                visited_maps[i] = false;
+            }
+        }
+    }
+
+    false
 }
 
 /// Given a list of numbers, generate a map where the key is the first two digits of the number,
@@ -178,3 +163,66 @@ where
 
     numbers
 }
+
+// OLD SOLUTION
+// non-recursive solution, but not the most efficient
+// use itertools::Itertools;
+// fn solution_old() {
+//     // generates all permutations, but some could be skipped (that have the same start)!!!
+//     let perms = [&square_map, &pentagonal_map, &hexagonal_map, &heptagonal_map, &octagonal_map]
+//         .into_iter()
+//         .permutations(5)
+//         .collect_vec();
+//     let mut stack = Vec::with_capacity(6);
+//     let mut iter_stack = Vec::with_capacity(5);
+//
+//     'outer: for n in triangle {
+//         stack.push(n);
+//
+//         for perm in perms.iter() {
+//             match perm[0].get(&(stack[0] % 100)) {
+//                 Some(vec) => {
+//                     iter_stack.push(vec.iter());
+//                     stack.push(*iter_stack[0].next().unwrap());
+//                 }
+//                 None => continue,
+//             }
+//             while !iter_stack.is_empty() {
+//                 if iter_stack.len() == 5 && stack.len() == 6 {
+//                     if stack.last().unwrap() % 100 == stack[0] / 100 {
+//                         break 'outer;
+//                     } else {
+//                         stack.pop();
+//                         if let Some(val) = iter_stack.last_mut().unwrap().next() {
+//                             stack.push(*val);
+//                         }
+//                     }
+//                 } else if stack.len() == iter_stack.len() {
+//                     iter_stack.pop();
+//                     if let Some(last_item) = iter_stack.last_mut() {
+//                         stack.pop();
+//                         if let Some(val) = last_item.next() {
+//                             stack.push(*val);
+//                         }
+//                     }
+//                 } else {
+//                     match perm[iter_stack.len()].get(&(stack.last().unwrap() % 100)) {
+//                         Some(vec) => {
+//                             iter_stack.push(vec.iter());
+//                             stack.push(*iter_stack.last_mut().unwrap().next().unwrap());
+//                         }
+//                         None => {
+//                             stack.pop();
+//                             if let Some(val) = iter_stack.last_mut().unwrap().next() {
+//                                 stack.push(*val);
+//                             }
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//
+//         stack.pop();
+//     }
+//     stack.into_iter().map(|n| n as u32).sum::<u32>().to_string()
+// }
