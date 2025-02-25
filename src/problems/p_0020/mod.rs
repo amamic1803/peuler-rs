@@ -6,15 +6,15 @@ pub fn get_problem() -> Problem {
     Problem::new(20, "Factorial Digit Sum", solve)
 }
 
-use malachite::num::arithmetic::traits::Factorial;
-use malachite::num::conversion::traits::Digits;
 use malachite::Natural;
+use malachite::base::num::arithmetic::traits::Factorial;
+use malachite::base::num::conversion::traits::Digits;
 
 fn solve() -> String {
     Natural::factorial(100).to_digits_desc(&10_u64).iter().sum::<u64>().to_string()
 }
 
-// this is slow, pen and paper style solution
+// this is a slow, pen and paper style solution
 
 // fn solve_manual() -> String {
 //     let mut working_num: Vec<u64> = vec![1];

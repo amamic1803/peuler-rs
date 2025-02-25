@@ -7,8 +7,8 @@ pub fn get_problem() -> Problem {
 }
 
 use crate::shared::math::ContinuedFraction;
-use malachite::num::basic::traits::{One, Zero};
 use malachite::Natural;
+use malachite::base::num::basic::traits::{One, Zero};
 
 const MAX: u16 = 1000;
 

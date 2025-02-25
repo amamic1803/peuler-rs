@@ -6,9 +6,9 @@ pub fn get_problem() -> Problem {
     Problem::new(56, "Powerful Digit Sum", solve)
 }
 
-use malachite::num::arithmetic::traits::Pow;
-use malachite::num::conversion::traits::Digits;
 use malachite::Natural;
+use malachite::base::num::arithmetic::traits::Pow;
+use malachite::base::num::conversion::traits::Digits;
 
 fn solve() -> String {
     let mut max_sum: u32 = 0;

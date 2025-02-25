@@ -2,7 +2,7 @@
 name = "project_euler"
 description = "Project Euler solutions in Rust"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [profile.release]
 lto = true
@@ -11,8 +11,8 @@ lto = true
 opt-level = 3
 
 [dependencies]
-clap = { version = "4.5.19", features = ["cargo"] }
-itertools = "0.13.0"
-malachite = "0.4.16"
+clap = { version = "4.5.31", features = ["cargo"] }
+itertools = "0.14.0"
+malachite = "0.5.0"
 num-traits = "0.2.19"
 tinypool = "0.2.0"

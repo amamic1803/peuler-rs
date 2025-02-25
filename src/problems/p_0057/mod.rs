@@ -6,9 +6,10 @@ pub fn get_problem() -> Problem {
     Problem::new(57, "Square Root Convergents", solve)
 }
 
-use malachite::num::arithmetic::traits::FloorLogBase;
-use malachite::num::basic::traits::{One, Two};
-use malachite::{Natural, Rational};
+use malachite::Natural;
+use malachite::base::num::arithmetic::traits::FloorLogBase;
+use malachite::base::num::basic::traits::{One, Two};
+use malachite::rational::Rational;
 
 fn solve() -> String {
     let ten_rational = Natural::from(10_u8);

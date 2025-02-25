@@ -6,9 +6,10 @@ use std::iter;
 use std::mem;
 use std::ops::{Add, Mul, Sub};
 
-use itertools::{izip, Itertools};
-use malachite::num::basic::traits::{One, Zero};
-use malachite::{Integer, Rational};
+use itertools::{Itertools, izip};
+use malachite::Integer;
+use malachite::base::num::basic::traits::{One, Zero};
+use malachite::rational::Rational;
 use num_traits::{ConstOne, ConstZero, NumCast, PrimInt, ToPrimitive, Unsigned};
 
 /// Inverse of the prime-counting function.
@@ -148,7 +149,7 @@ impl ContinuedFraction {
     /// Iterator over the convergents of the continued fraction.
     /// If the continued fraction is finite, then the iterator is also finite.
     /// If the continued fraction is infinite, then the iterator is infinite.
-    pub fn convergents(&self) -> impl Iterator<Item = Rational> + '_ {
+    pub fn convergents(&self) -> impl Iterator<Item = Rational> {
         let mut prev_num = Integer::ZERO;
         let mut prev_den = Integer::ONE;
         let mut num = Integer::ONE;
@@ -298,27 +299,29 @@ pub fn distinct_prime_factors(x: u64) -> impl Iterator<Item = (u64, u64)> {
     let mut prime_factors = prime_factors(x);
     let mut factor = 0;
     let mut power = 0;
-    iter::from_fn(move || loop {
-        match prime_factors.next() {
-            Some(next_factor) => {
-                if next_factor == factor {
-                    power += 1;
-                } else {
-                    let ret = (factor, power);
-                    factor = next_factor;
-                    power = 1;
-                    if ret.1 != 0 {
-                        return Some(ret);
+    iter::from_fn(move || {
+        loop {
+            match prime_factors.next() {
+                Some(next_factor) => {
+                    if next_factor == factor {
+                        power += 1;
+                    } else {
+                        let ret = (factor, power);
+                        factor = next_factor;
+                        power = 1;
+                        if ret.1 != 0 {
+                            return Some(ret);
+                        }
                     }
                 }
-            }
-            None => {
-                return if power != 0 {
-                    let ret = (factor, power);
-                    power = 0;
-                    Some(ret)
-                } else {
-                    None
+                None => {
+                    return if power != 0 {
+                        let ret = (factor, power);
+                        power = 0;
+                        Some(ret)
+                    } else {
+                        None
+                    };
                 }
             }
         }

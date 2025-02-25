@@ -6,8 +6,8 @@ pub fn get_problem() -> Problem {
     Problem::new(53, "Combinatoric Selections", solve)
 }
 
-use malachite::num::basic::traits::One;
 use malachite::Natural;
+use malachite::base::num::basic::traits::One;
 use std::sync::LazyLock;
 
 const LOW_N: usize = 23;

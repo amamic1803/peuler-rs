@@ -7,8 +7,8 @@ pub fn get_problem() -> Problem {
 }
 
 use crate::shared::math::ContinuedFraction;
-use malachite::num::conversion::traits::Digits;
 use malachite::Natural;
+use malachite::base::num::conversion::traits::Digits;
 
 fn solve() -> String {
     // generate the values for the continued fraction (2, 1, 2, 1, 1, 4, 1, 1, 6, 1, 1, 8, ...)
