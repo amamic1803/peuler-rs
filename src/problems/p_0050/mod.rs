@@ -22,7 +22,7 @@ fn solve() -> String {
     let mut sum: u64 = 0; // sum of consecutive primes
     let mut i: usize = 0; // first index of window
     let mut j: usize = 0; // first index after window
-                          // create initial window (intentionally bigger than biggest_prime -> it is definitely not a consecutive prime sum)
+    // create initial window (intentionally bigger than biggest_prime -> it is definitely not a consecutive prime sum)
     while sum <= biggest_prime {
         sum += primes[j];
         j += 1;

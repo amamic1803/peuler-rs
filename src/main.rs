@@ -1,4 +1,4 @@
-use clap::{command, value_parser, Arg, ArgAction};
+use clap::{Arg, ArgAction, command, value_parser};
 
 use project_euler::get_problems;
 
