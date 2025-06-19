@@ -1,0 +1,19 @@
+# Build directories
+build/
+target/
+cmake-build-*/
+
+# Cargo
+Cargo.lock
+
+#IDE
+.idea/
+.vscode/
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+.venv/
+venv/
