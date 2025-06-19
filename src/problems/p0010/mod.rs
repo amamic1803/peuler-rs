@@ -1,16 +1,20 @@
-//! **Problem 10** - *Summation of Primes*
-use crate::shared::structures::Problem;
+use crate::Problem;
+use crate::math::sieve_of_eratosthenes;
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(10, "Summation of Primes", solve)
-}
+problem!(Problem0010, 10, "Summation of Primes");
+impl Problem for Problem0010 {
+    fn id(&self) -> usize {
+        self.id
+    }
 
-use crate::shared::math::sieve_of_eratosthenes;
+    fn title(&self) -> &str {
+        self.title
+    }
 
-fn solve() -> String {
-    sieve_of_eratosthenes(1_999_999)
-        .iter()
-        .sum::<u64>()
-        .to_string()
+    fn run(&self) -> String {
+        sieve_of_eratosthenes(1_999_999)
+            .into_iter()
+            .sum::<u64>()
+            .to_string()
+    }
 }

@@ -1,21 +1,26 @@
-//! **Problem 16** - *Power Digit Sum*
-use crate::shared::structures::Problem;
-
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(16, "Power Digit Sum", solve)
-}
-
+use crate::Problem;
 use malachite::Natural;
 use malachite::base::num::arithmetic::traits::PowerOf2;
 use malachite::base::num::conversion::traits::Digits;
 
-fn solve() -> String {
-    Natural::power_of_2(1000)
-        .to_digits_desc(&10_u64)
-        .iter()
-        .sum::<u64>()
-        .to_string()
+problem!(Problem0016, 16, "Power Digit Sum");
+
+impl Problem for Problem0016 {
+    fn id(&self) -> usize {
+        self.id
+    }
+
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        Natural::power_of_2(1000)
+            .to_digits_desc(&10_u64)
+            .iter()
+            .sum::<u64>()
+            .to_string()
+    }
 }
 
 // this is a slow, pen and paper style solution

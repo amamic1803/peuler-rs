@@ -1,13 +1,17 @@
-//! **Problem 7** - *10001st Prime*
-use crate::shared::structures::Problem;
+use crate::Problem;
+use crate::math::{apcf, sieve_of_eratosthenes};
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(7, "10001st Prime", solve)
-}
+problem!(Problem0007, 7, "10001st Prime");
+impl Problem for Problem0007 {
+    fn id(&self) -> usize {
+        self.id
+    }
 
-use crate::shared::math::{apcf, sieve_of_eratosthenes};
+    fn title(&self) -> &str {
+        self.title
+    }
 
-fn solve() -> String {
-    sieve_of_eratosthenes(apcf(10001u64).round() as u64)[10_000].to_string()
+    fn run(&self) -> String {
+        sieve_of_eratosthenes(apcf(10001u64).round() as u64)[10_000].to_string()
+    }
 }

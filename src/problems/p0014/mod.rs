@@ -1,18 +1,22 @@
-//! **Problem 14** - *Longest Collatz Sequence*
-use crate::shared::structures::Problem;
+use crate::Problem;
+use crate::math::collatz_seq;
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(14, "Longest Collatz Sequence", solve)
-}
+problem!(Problem0014, 14, "Longest Collatz Sequence");
+impl Problem for Problem0014 {
+    fn id(&self) -> usize {
+        self.id
+    }
 
-use crate::shared::math::collatz_seq;
+    fn title(&self) -> &str {
+        self.title
+    }
 
-fn solve() -> String {
-    (1..1_000_000)
-        .map(|n| (n, collatz_seq(n).count()))
-        .max_by_key(|&(_, count)| count)
-        .unwrap()
-        .0
-        .to_string()
+    fn run(&self) -> String {
+        (1..1_000_000)
+            .map(|n| (n, collatz_seq(n).count()))
+            .max_by_key(|&(_, count)| count)
+            .unwrap()
+            .0
+            .to_string()
+    }
 }

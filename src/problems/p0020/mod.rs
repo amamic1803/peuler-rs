@@ -1,21 +1,26 @@
-//! **Problem 20** - *Factorial Digit Sum*
-use crate::shared::structures::Problem;
-
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(20, "Factorial Digit Sum", solve)
-}
-
+use crate::Problem;
 use malachite::Natural;
 use malachite::base::num::arithmetic::traits::Factorial;
 use malachite::base::num::conversion::traits::Digits;
 
-fn solve() -> String {
-    Natural::factorial(100)
-        .to_digits_desc(&10_u64)
-        .iter()
-        .sum::<u64>()
-        .to_string()
+problem!(Problem0020, 20, "Factorial Digit Sum");
+
+impl Problem for Problem0020 {
+    fn id(&self) -> usize {
+        self.id
+    }
+
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        Natural::factorial(100)
+            .to_digits_desc(&10_u64)
+            .iter()
+            .sum::<u64>()
+            .to_string()
+    }
 }
 
 // this is a slow, pen and paper style solution

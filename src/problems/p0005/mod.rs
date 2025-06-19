@@ -1,13 +1,17 @@
-//! **Problem 5** - *Smallest Multiple*
-use crate::shared::structures::Problem;
+use crate::Problem;
+use crate::math::lcm_multiple;
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(5, "Smallest Multiple", solve)
-}
+problem!(Problem0005, 5, "Smallest Multiple");
+impl Problem for Problem0005 {
+    fn id(&self) -> usize {
+        self.id
+    }
 
-use crate::shared::math::lcm_multiple;
+    fn title(&self) -> &str {
+        self.title
+    }
 
-fn solve() -> String {
-    lcm_multiple(1u32..=20).to_string()
+    fn run(&self) -> String {
+        lcm_multiple(1u32..=20).to_string()
+    }
 }
