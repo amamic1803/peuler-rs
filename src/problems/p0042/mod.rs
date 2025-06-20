@@ -1,26 +1,32 @@
-//! **Problem 42** - *Coded Triangle Numbers*
-use crate::shared::structures::Problem;
+use crate::Problem;
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(42, "Coded Triangle Numbers", solve)
-}
+problem!(Problem0042, 42, "Coded Triangle Numbers");
 
-fn solve() -> String {
-    let input = include_str!("0042_words.txt");
+impl Problem for Problem0042 {
+    fn id(&self) -> usize {
+        self.id
+    }
 
-    input
-        .trim()
-        .split(',')
-        .map(|word| {
-            word.trim_matches('"')
-                .chars()
-                .map(letter_value)
-                .sum::<u32>()
-        })
-        .filter(is_triangle_num)
-        .count()
-        .to_string()
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        let input = include_str!("0042_words.txt");
+
+        input
+            .trim()
+            .split(',')
+            .map(|word| {
+                word.trim_matches('"')
+                    .chars()
+                    .map(letter_value)
+                    .sum::<u32>()
+            })
+            .filter(is_triangle_num)
+            .count()
+            .to_string()
+    }
 }
 
 fn letter_value(letter: char) -> u32 {

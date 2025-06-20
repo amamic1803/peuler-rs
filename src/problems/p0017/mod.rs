@@ -1,23 +1,28 @@
-//! **Problem 17** - *Number Letter Counts*
-use crate::shared::structures::Problem;
-
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(17, "Number Letter Counts", solve)
-}
-
+use crate::Problem;
 use std::collections::HashMap;
 use std::sync::LazyLock;
 
-fn solve() -> String {
-    let mut sum = 0;
-    for n in 1..1001 {
-        sum += num_to_string(n)
-            .chars()
-            .filter(|c| ![' ', '-'].contains(c))
-            .count();
+problem!(Problem0017, 17, "Number Letter Counts");
+
+impl Problem for Problem0017 {
+    fn id(&self) -> usize {
+        self.id
     }
-    sum.to_string()
+
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        let mut sum = 0;
+        for n in 1..1001 {
+            sum += num_to_string(n)
+                .chars()
+                .filter(|c| ![' ', '-'].contains(c))
+                .count();
+        }
+        sum.to_string()
+    }
 }
 
 fn num_to_string(mut n: u64) -> String {

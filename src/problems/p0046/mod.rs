@@ -1,22 +1,27 @@
-//! **Problem 46** - *Goldbach's Other Conjecture*
-use crate::shared::structures::Problem;
+use crate::Problem;
+use crate::math::primes::is_prime;
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(46, "Goldbach's Other Conjecture", solve)
-}
+problem!(Problem0046, 46, "Goldbach's Other Conjecture");
 
-use crate::shared::math::is_prime;
-
-fn solve() -> String {
-    let mut primes = vec![2];
-    let mut current = next_odd_composite(1, &mut primes);
-
-    while satisfies_conjecture(current, &primes) {
-        current = next_odd_composite(current, &mut primes);
+impl Problem for Problem0046 {
+    fn id(&self) -> usize {
+        self.id
     }
 
-    current.to_string()
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        let mut primes = vec![2];
+        let mut current = next_odd_composite(1, &mut primes);
+
+        while satisfies_conjecture(current, &primes) {
+            current = next_odd_composite(current, &mut primes);
+        }
+
+        current.to_string()
+    }
 }
 
 /// Get the next odd composite number.

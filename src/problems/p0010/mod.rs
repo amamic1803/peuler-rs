@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::sieve_of_eratosthenes;
+use crate::math::primes::sieve_of_eratosthenes;
 
 problem!(Problem0010, 10, "Summation of Primes");
 impl Problem for Problem0010 {

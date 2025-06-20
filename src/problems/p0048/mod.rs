@@ -1,23 +1,29 @@
-//! **Problem 48** - *Self Powers*
-use crate::shared::structures::Problem;
+use crate::Problem;
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(48, "Self Powers", solve)
-}
+problem!(Problem0048, 48, "Self Powers");
 
-fn solve() -> String {
-    // full manual calculation method commented out below, this is better
-    // by using mod at every step we discard unnecessary digits
-
-    let mut result: u64 = 0;
-
-    for n in 1..1001 {
-        result += power_mod(n, n);
-        result %= MODULO;
+impl Problem for Problem0048 {
+    fn id(&self) -> usize {
+        self.id
     }
 
-    result.to_string()
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        // full manual calculation method commented out below, this is better
+        // by using mod at every step we discard unnecessary digits
+
+        let mut result: u64 = 0;
+
+        for n in 1..1001 {
+            result += power_mod(n, n);
+            result %= MODULO;
+        }
+
+        result.to_string()
+    }
 }
 
 const MODULO: u64 = 10_000_000_000;

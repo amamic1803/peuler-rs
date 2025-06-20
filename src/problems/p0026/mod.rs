@@ -1,36 +1,41 @@
-//! **Problem 26** - *Reciprocal Cycles*
-use crate::shared::structures::Problem;
+use crate::Problem;
+use crate::math::{gcd, ord};
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(26, "Reciprocal Cycles", solve)
-}
+problem!(Problem0026, 26, "Reciprocal Cycles");
 
-use crate::shared::math::{gcd, ord};
-
-const MAX_D: u64 = 1000;
-
-fn solve() -> String {
-    // the number of repeating digits in the decimal representation of 1/n
-    // is equal to the multiplicative order of 10 modulo n
-    // that is the smallest integer k such that 10^k = 1 (mod n)
-    // for multiplicative order to exist, n must be coprime to 10
-    // that is n must not have 2 or 5 as a factor
-
-    let mut longest_d = 0;
-    let mut longest_cycle = 0;
-
-    for d in 2..MAX_D {
-        if gcd(10, d) == 1 {
-            let cycle_len = ord(10, d);
-            if cycle_len > longest_cycle {
-                longest_cycle = cycle_len;
-                longest_d = d;
-            }
-        }
+impl Problem for Problem0026 {
+    fn id(&self) -> usize {
+        self.id
     }
 
-    longest_d.to_string()
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        const MAX_D: u64 = 1000;
+
+        // the number of repeating digits in the decimal representation of 1/n
+        // is equal to the multiplicative order of 10 modulo n
+        // that is the smallest integer k such that 10^k = 1 (mod n)
+        // for multiplicative order to exist, n must be coprime to 10
+        // that is n must not have 2 or 5 as a factor
+
+        let mut longest_d = 0;
+        let mut longest_cycle = 0;
+
+        for d in 2..MAX_D {
+            if gcd(10, d) == 1 {
+                let cycle_len = ord(10, d);
+                if cycle_len > longest_cycle {
+                    longest_cycle = cycle_len;
+                    longest_d = d;
+                }
+            }
+        }
+
+        longest_d.to_string()
+    }
 }
 
 // old solution, uses long division

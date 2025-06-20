@@ -1,22 +1,27 @@
-//! **Problem 40** - *Champernowne's Constant*
-use crate::shared::structures::Problem;
+use crate::Problem;
+use crate::math::digits;
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(40, "Champernowne's Constant", solve)
+problem!(Problem0040, 40, "Champernowne's Constant");
+
+impl Problem for Problem0040 {
+    fn id(&self) -> usize {
+        self.id
+    }
+
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        POSITIONS
+            .into_iter()
+            .map(|pos| get_digit(pos) as u64)
+            .product::<u64>()
+            .to_string()
+    }
 }
-
-use crate::shared::math::digits;
 
 const POSITIONS: [u64; 7] = [1, 10, 100, 1_000, 10_000, 100_000, 1_000_000];
-
-fn solve() -> String {
-    POSITIONS
-        .into_iter()
-        .map(|pos| get_digit(pos) as u64)
-        .product::<u64>()
-        .to_string()
-}
 
 /// This function calculates the digit at the given position in Champernowne's Constant.
 /// # Arguments

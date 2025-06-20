@@ -1,46 +1,52 @@
-//! **Problem 45** - *Triangular, Pentagonal, and Hexagonal*
-use crate::shared::structures::Problem;
+use crate::Problem;
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(45, "Triangular, Pentagonal, and Hexagonal", solve)
-}
+problem!(Problem0045, 45, "Triangular, Pentagonal, and Hexagonal");
 
-fn solve() -> String {
-    // we can think of T(n), P(n) and H(n) as sequences of natural numbers
-
-    // every triangular number is also hexagonal
-    // proof:
-    // T(n) = n(n+1)/2
-    // H(m) = m(2m-1)
-    // T(n) = H(m)
-    // n(n+1)/2 = m(2m-1)
-    // n(n+1) = 2m(2m-1)
-    // n(n+1) =(2m-1)2m
-    // from there we can read that
-    // n = 2m-1
-    // therefore for every hexagonal number at index m there is equal triangular number at index n=2m-1
-    // so we can say that H(m) = T(2m-1)
-
-    // now we know that if a number is hexagonal then
-    // it is also triangular so we don't have to check if it is triangular
-
-    // let n be a natural number bigger than 1
-    // it can be proven (by induction) that P(n) < H(n) for all n > 1
-    // that means that we can generate hexagonal numbers and check if they are pentagonal
-    // which is more efficient than generating pentagonal numbers and checking if they are hexagonal
-
-    // problem says that we are searching for number bigger than H(143) so we can start from 144
-    let mut n = 144;
-    let mut hex_num = n * (2 * n - 1);
-
-    // each iteration we increase n by 1 and calculate next hexagonal number
-    while !is_pentagonal(hex_num) {
-        n += 1;
-        hex_num = n * ((n << 1) - 1); // n * (2n - 1)
+impl Problem for Problem0045 {
+    fn id(&self) -> usize {
+        self.id
     }
 
-    hex_num.to_string()
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        // we can think of T(n), P(n) and H(n) as sequences of natural numbers
+
+        // every triangular number is also hexagonal
+        // proof:
+        // T(n) = n(n+1)/2
+        // H(m) = m(2m-1)
+        // T(n) = H(m)
+        // n(n+1)/2 = m(2m-1)
+        // n(n+1) = 2m(2m-1)
+        // n(n+1) =(2m-1)2m
+        // from there we can read that
+        // n = 2m-1
+        // therefore for every hexagonal number at index m there is equal triangular number at index n=2m-1
+        // so we can say that H(m) = T(2m-1)
+
+        // now we know that if a number is hexagonal then
+        // it is also triangular so we don't have to check if it is triangular
+
+        // let n be a natural number bigger than 1
+        // it can be proven (by induction) that P(n) < H(n) for all n > 1
+        // that means that we can generate hexagonal numbers and check if they are pentagonal
+        // which is more efficient than generating pentagonal numbers and checking if they are hexagonal
+
+        // problem says that we are searching for number bigger than H(143) so we can start from 144
+        let mut n = 144;
+        let mut hex_num = n * (2 * n - 1);
+
+        // each iteration we increase n by 1 and calculate next hexagonal number
+        while !is_pentagonal(hex_num) {
+            n += 1;
+            hex_num = n * ((n << 1) - 1); // n * (2n - 1)
+        }
+
+        hex_num.to_string()
+    }
 }
 
 fn is_pentagonal(num: u64) -> bool {

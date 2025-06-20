@@ -1,31 +1,38 @@
-//! **Problem 25** - *1000-digit Fibonacci Number*
-use crate::shared::structures::Problem;
+use crate::Problem;
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(25, "1000-digit Fibonacci Number", solve)
-}
+problem!(Problem0025, 25, "1000-digit Fibonacci Number");
 
-fn solve() -> String {
-    // let a = 1 + sqrt(5) / 2
-    // let b = 1 - sqrt(5) / 2
-    // we can use binet's formula to calculate the nth fibonacci number
-    // f(n) = (a^n - b^n) / sqrt(5)
+impl Problem for Problem0025 {
+    fn id(&self) -> usize {
+        self.id
+    }
 
-    // we know that wanted number needs to have at least 1000 digits
-    // we first find the smallest number with 1000 digits, that is 10^999
-    // now we want to find the first n for which f(n) >= 10^999
+    fn title(&self) -> &str {
+        self.title
+    }
 
-    // since b is smaller than 1, b^n will be very small for large n so we can ignore it
-    // now binet's formula becomes f(n) = a^n / sqrt(5)
+    fn run(&self) -> String {
+        // let a = 1 + sqrt(5) / 2
+        // let b = 1 - sqrt(5) / 2
+        // we can use binet's formula to calculate the nth fibonacci number
+        // f(n) = (a^n - b^n) / sqrt(5)
 
-    // plugging that in the inequality we get a^n / sqrt(5) >= 10^999
-    // after some manipulation, we get n >= (999 + log(5) / 2) / log(a)
-    // now the only thing left is to find the smallest integer n that satisfies this inequality
+        // we know that wanted number needs to have at least 1000 digits
+        // we first find the smallest number with 1000 digits, that is 10^999
+        // now we want to find the first n for which f(n) >= 10^999
 
-    (((999.0_f64 + (5.0_f64.log10() / 2.0_f64)) / ((1.0_f64 + 5.0_f64.sqrt()) / 2.0_f64).log10())
+        // since b is smaller than 1, b^n will be very small for large n so we can ignore it
+        // now binet's formula becomes f(n) = a^n / sqrt(5)
+
+        // plugging that in the inequality we get a^n / sqrt(5) >= 10^999
+        // after some manipulation, we get n >= (999 + log(5) / 2) / log(a)
+        // now the only thing left is to find the smallest integer n that satisfies this inequality
+
+        (((999.0_f64 + (5.0_f64.log10() / 2.0_f64))
+            / ((1.0_f64 + 5.0_f64.sqrt()) / 2.0_f64).log10())
         .ceil() as u64)
-        .to_string()
+            .to_string()
+    }
 }
 
 // this is the slow, manual solution that actually calculates the fibonacci numbers

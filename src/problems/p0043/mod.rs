@@ -1,14 +1,28 @@
-//! **Problem 43** - *Sub-string Divisibility*
-use crate::shared::structures::Problem;
-
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(43, "Sub-string Divisibility", solve)
-}
-
-use crate::shared::math::digits_to_int;
+use crate::Problem;
+use crate::math::digits_to_int;
 use std::collections::HashMap;
 use std::sync::LazyLock;
+
+problem!(Problem0043, 43, "Sub-string Divisibility");
+
+impl Problem for Problem0043 {
+    fn id(&self) -> usize {
+        self.id
+    }
+
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        let mut sum = 0;
+        let mut working = Vec::new();
+
+        recursive_search(&mut working, &mut sum, 1);
+
+        sum.to_string()
+    }
+}
 
 /// The digits that can be used in each position.
 static DIGITS: LazyLock<HashMap<u8, Vec<u8>>> = LazyLock::new(|| {
@@ -25,15 +39,6 @@ static DIGITS: LazyLock<HashMap<u8, Vec<u8>>> = LazyLock::new(|| {
     digits.insert(10, vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     digits
 });
-
-fn solve() -> String {
-    let mut sum = 0;
-    let mut working = Vec::new();
-
-    recursive_search(&mut working, &mut sum, 1);
-
-    sum.to_string()
-}
 
 /// Recursively search for all pandigital numbers with the given properties.
 fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {

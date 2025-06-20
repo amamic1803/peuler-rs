@@ -1,19 +1,24 @@
-//! **Problem 31** - *Coin Sums*
-use crate::shared::structures::Problem;
-
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(31, "Coin Sums", solve)
-}
-
+use crate::Problem;
 use std::collections::HashMap;
 
-fn solve() -> String {
-    let coins: [u64; 8] = [200, 100, 50, 20, 10, 5, 2, 1]; // available coins
-    let mut cache: HashMap<(u64, usize), u64> = HashMap::new(); // used to memoize results
-    let wanted_value: u64 = 200; // 2£ = 200p
+problem!(Problem0031, 31, "Coin Sums");
 
-    num_of_combinations(wanted_value, 0, &coins, &mut cache).to_string()
+impl Problem for Problem0031 {
+    fn id(&self) -> usize {
+        self.id
+    }
+
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        let coins: [u64; 8] = [200, 100, 50, 20, 10, 5, 2, 1]; // available coins
+        let mut cache: HashMap<(u64, usize), u64> = HashMap::new(); // used to memoize results
+        let wanted_value: u64 = 200; // 2£ = 200p
+
+        num_of_combinations(wanted_value, 0, &coins, &mut cache).to_string()
+    }
 }
 
 fn num_of_combinations(

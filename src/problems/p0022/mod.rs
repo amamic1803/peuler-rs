@@ -1,22 +1,28 @@
-//! **Problem 22** - *Names Scores*
-use crate::shared::structures::Problem;
+use crate::Problem;
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(22, "Names Scores", solve)
-}
+problem!(Problem0022, 22, "Names Scores");
 
-fn solve() -> String {
-    let input = include_str!("0022_names.txt");
-    let names = parse_input(input);
-
-    let mut result = 0;
-
-    for (i, name) in names.into_iter().enumerate() {
-        result += (i + 1) as u32 * name_value(name);
+impl Problem for Problem0022 {
+    fn id(&self) -> usize {
+        self.id
     }
 
-    result.to_string()
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        let input = include_str!("0022_names.txt");
+        let names = parse_input(input);
+
+        let mut result = 0;
+
+        for (i, name) in names.into_iter().enumerate() {
+            result += (i + 1) as u32 * name_value(name);
+        }
+
+        result.to_string()
+    }
 }
 
 fn parse_input(input: &str) -> Vec<&str> {
