@@ -1,47 +1,52 @@
-//! **Problem 55** - *Lychrel Numbers*
-use crate::shared::structures::Problem;
+use crate::Problem;
+use crate::math::{is_palindrome, reverse};
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(55, "Lychrel Numbers", solve)
+problem!(Problem0055, 55, "Lychrel Numbers");
+
+impl Problem for Problem0055 {
+    fn id(&self) -> usize {
+        self.id
+    }
+
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        // index zero is not used
+        // every other index is the number of iterations to become a palindrome for that number
+        // if the number is not a palindrome after MAX_ITERATIONS, it is a Lychrel number
+        // a vector of Option<u8> is used
+        // None value means that the number has not been evaluated yet
+        // Some(u8) value means that the number has been evaluated and the value is the number of iterations
+        // since the limit of iterations is 50, the value can be stored in a u8
+        // we will use the value of u8::MAX to represent a Lychrel number
+
+        let mut iterations: Vec<Option<u8>> = vec![None; MAX_VALUE as usize];
+        iterations[0] = Some(0); // set index zero to 0 so that it is not a Lychrel number
+
+        // iterate through all numbers and find the number of iterations to become a palindrome
+        // if the number is already analysed, skip it
+        for n in 1..MAX_VALUE {
+            if iterations[n as usize].is_none() {
+                analyse_lychrel(n, 1, &mut iterations);
+            }
+        }
+
+        // count number of u8::MAX values (Lychrel numbers)
+        iterations
+            .into_iter()
+            .filter(|&x| match x {
+                None => false,
+                Some(val) => val == u8::MAX,
+            })
+            .count()
+            .to_string()
+    }
 }
-
-use crate::shared::math::{is_palindrome, reverse};
 
 const MAX_ITERATIONS: u8 = 50;
 const MAX_VALUE: u128 = 10_000;
-
-fn solve() -> String {
-    // index zero is not used
-    // every other index is the number of iterations to become a palindrome for that number
-    // if the number is not a palindrome after MAX_ITERATIONS, it is a Lychrel number
-    // a vector of Option<u8> is used
-    // None value means that the number has not been evaluated yet
-    // Some(u8) value means that the number has been evaluated and the value is the number of iterations
-    // since the limit of iterations is 50, the value can be stored in a u8
-    // we will use the value of u8::MAX to represent a Lychrel number
-
-    let mut iterations: Vec<Option<u8>> = vec![None; MAX_VALUE as usize];
-    iterations[0] = Some(0); // set index zero to 0 so that it is not a Lychrel number
-
-    // iterate through all numbers and find the number of iterations to become a palindrome
-    // if the number is already analysed, skip it
-    for n in 1..MAX_VALUE {
-        if iterations[n as usize].is_none() {
-            analyse_lychrel(n, 1, &mut iterations);
-        }
-    }
-
-    // count number of u8::MAX values (Lychrel numbers)
-    iterations
-        .into_iter()
-        .filter(|&x| match x {
-            None => false,
-            Some(val) => val == u8::MAX,
-        })
-        .count()
-        .to_string()
-}
 
 /// Analyse a number to find the number of iterations to become a palindrome
 /// It is a recursive function with one of the arguments being a mutable reference to a vector

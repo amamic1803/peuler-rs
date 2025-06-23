@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::collatz_seq;
+use crate::math::sequence::CollatzSeq;
 
 problem!(Problem0014, 14, "Longest Collatz Sequence");
 impl Problem for Problem0014 {
@@ -12,11 +12,9 @@ impl Problem for Problem0014 {
     }
 
     fn run(&self) -> String {
-        (1..1_000_000)
-            .map(|n| (n, collatz_seq(n).count()))
-            .max_by_key(|&(_, count)| count)
+        (1u64..1_000_000)
+            .max_by_key(|&n| CollatzSeq::new(n).count())
             .unwrap()
-            .0
             .to_string()
     }
 }

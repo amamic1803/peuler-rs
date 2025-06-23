@@ -1,6 +1,6 @@
 use crate::Problem;
 use crate::math::digits_to_int;
-use crate::math::primes::is_prime;
+use crate::math::prime::is_prime;
 use itertools::Itertools;
 
 problem!(Problem0041, 41, "Pandigital Prime");

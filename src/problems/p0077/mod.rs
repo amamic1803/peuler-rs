@@ -1,18 +1,23 @@
-//! **Problem 77** - *Prime Summations*
-use crate::shared::structures::Problem;
+use crate::Problem;
+use crate::math::partition_prime;
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(77, "Prime Summations", solve)
-}
+problem!(Problem0077, 77, "Prime Summations");
 
-use crate::shared::math::partition_prime;
-
-fn solve() -> String {
-    for i in 0u32.. {
-        if partition_prime(i) > 5000 {
-            return i.to_string();
-        }
+impl Problem for Problem0077 {
+    fn id(&self) -> usize {
+        self.id
     }
-    unreachable!()
+
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        for i in 0u32.. {
+            if partition_prime(i) > 5000 {
+                return i.to_string();
+            }
+        }
+        unreachable!()
+    }
 }

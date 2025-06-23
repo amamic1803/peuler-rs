@@ -15,7 +15,7 @@ use std::iter;
 /// * `f64` - The estimated inverse of the prime-counting function for n.
 /// # Example
 /// ```
-/// use peuler::math::primes::apcf;
+/// use peuler::math::prime::apcf;
 /// assert_eq!(apcf(2), 3.0);
 /// ```
 pub fn apcf<T>(n: T) -> f64
@@ -46,7 +46,7 @@ where
 /// * Iterator over the distinct prime factors and their powers. (prime_factor, power)
 /// # Example
 /// ```
-/// use peuler::math::primes::distinct_prime_factors;
+/// use peuler::math::prime::distinct_prime_factors;
 /// // distinct prime factors of 12: (2, 2), (3, 1)
 /// assert_eq!(distinct_prime_factors(12).collect::<Vec<_>>(), vec![(2, 2), (3, 1)]);
 /// // distinct prime factors of 2048: (2, 11)
@@ -97,7 +97,7 @@ pub fn distinct_prime_factors(x: u64) -> impl Iterator<Item = (u64, u64)> {
 /// If the number is less than 2.
 /// # Example
 /// ```
-/// use peuler::math::primes::is_prime;
+/// use peuler::math::prime::is_prime;
 /// // 7 is prime
 /// assert_eq!(is_prime(7), (true, 1));
 /// // 12 is not prime, smallest divisor is 2
@@ -135,7 +135,7 @@ pub fn is_prime(n: u64) -> (bool, u64) {
 /// * `f64` - The estimated number of primes less than or equal to x.
 /// # Example
 /// ```
-/// use peuler::math::primes::pcf;
+/// use peuler::math::prime::pcf;
 /// // number of primes less than or equal to 100: 25
 /// assert!(pcf(100u8) < 25.0);
 /// ```
@@ -164,7 +164,7 @@ where
 /// * `u64` - The exact number of primes less than or equal to x.
 /// # Example
 /// ```
-/// use peuler::math::primes::pcf_exact;
+/// use peuler::math::prime::pcf_exact;
 /// // number of primes less than or equal to 100: 25
 /// assert_eq!(pcf_exact(100), 25);
 /// ```
@@ -181,7 +181,7 @@ pub fn pcf_exact(x: u64) -> u64 {
 /// * Iterator over the prime factors.
 /// # Example
 /// ```
-/// use peuler::math::primes::prime_factors;
+/// use peuler::math::prime::prime_factors;
 /// // prime factors of 12: 2, 2, 3
 /// assert_eq!(prime_factors(12).collect::<Vec<_>>(), vec![2, 2, 3]);
 /// ```
@@ -223,7 +223,7 @@ pub fn prime_factors(mut x: u64) -> impl Iterator<Item = u64> {
 /// * `Vec<u64>` - All primes less than or equal to n.
 /// # Example
 /// ```
-/// use peuler::math::primes::sieve_of_eratosthenes;
+/// use peuler::math::prime::sieve_of_eratosthenes;
 /// // primes less than or equal to 10: 2, 3, 5, 7
 /// assert_eq!(sieve_of_eratosthenes(10), vec![2, 3, 5, 7]);
 /// ```

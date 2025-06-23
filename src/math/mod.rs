@@ -1,45 +1,21 @@
 //! Mathematical functions.
 
 pub mod linalg;
-pub mod primes;
+pub mod prime;
+pub mod sequence;
 
 use std::borrow::Borrow;
 use std::collections::HashSet;
 use std::iter;
 use std::mem;
 
+use prime::{distinct_prime_factors, sieve_of_eratosthenes};
+
 use itertools::Itertools;
 use malachite::Integer;
 use malachite::base::num::basic::traits::{One, Zero};
 use malachite::rational::Rational;
 use num_traits::{ConstOne, ConstZero, NumCast, PrimInt, ToPrimitive, Unsigned};
-
-/// Returns the iterator of the Collatz sequence starting at a number.
-/// The iterator starts at the number itself and ends at 1.
-/// # Arguments
-/// * `num` - The number to start the Collatz sequence at.
-/// # Returns
-/// * The iterator over the Collatz sequence.
-/// # Example
-/// ```
-/// use project_euler::shared::math::collatz_seq;
-/// // Collatz sequence starting at 13: 13, 40, 20, 10, 5, 16, 8, 4, 2, 1
-/// assert_eq!(collatz_seq(13).collect::<Vec<u64>>(), vec![13, 40, 20, 10, 5, 16, 8, 4, 2, 1]);
-/// ```
-pub fn collatz_seq(num: u64) -> impl Iterator<Item = u64> {
-    let mut current = num;
-    iter::once(current).chain(iter::from_fn(move || {
-        if current == 1 {
-            return None;
-        }
-        if current % 2 == 0 {
-            current >>= 1;
-        } else {
-            current = 3 * current + 1;
-        }
-        Some(current)
-    }))
-}
 
 /// Represents a continued fraction.
 /// # Example
@@ -159,7 +135,7 @@ impl ContinuedFraction {
 /// * The iterator over the digits of the number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::digits;
+/// use peuler::math::digits;
 ///
 /// assert_eq!(digits(123, 10).collect::<Vec<u8>>(), vec![1, 2, 3]);
 /// assert_eq!(digits(123, 10).rev().collect::<Vec<u8>>(), vec![3, 2, 1]);
@@ -239,7 +215,7 @@ pub fn digits(n: u64, radix: u8) -> impl DoubleEndedIterator<Item = u8> + ExactS
 /// * `u64` - The integer.
 /// # Example
 /// ```
-/// use project_euler::shared::math::digits_to_int;
+/// use peuler::math::digits_to_int;
 /// // 123 -> 123
 /// assert_eq!(digits_to_int([1u8, 2u8, 3u8], 10), 123);
 /// ```
@@ -263,7 +239,7 @@ where
 /// * The factorial of the number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::factorial;
+/// use peuler::math::factorial;
 /// // 5! = 120
 /// assert_eq!(factorial(5u8), 120);
 /// ```
@@ -287,7 +263,7 @@ where
 /// * `Vec<u64>` - The factorials of numbers from 0 to n. Index represents the number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::factorial_1_to_n;
+/// use peuler::math::factorial_1_to_n;
 /// assert_eq!(factorial_1_to_n(5u8), vec![1, 1, 2, 6, 24, 120]);
 /// ```
 pub fn factorial_1_to_n<T>(n: T) -> Vec<u64>
@@ -311,7 +287,7 @@ where
 /// * The greatest common divisor.
 /// # Example
 /// ```
-/// use project_euler::shared::math::gcd;
+/// use peuler::math::gcd;
 /// // gcd of 12 and 18 is 6
 /// assert_eq!(gcd(12u8, 18u8), 6);
 /// // gcd of 0 and 0 is 0
@@ -341,7 +317,7 @@ where
 /// If there are less than 2 numbers.
 /// # Example
 /// ```
-/// use project_euler::shared::math::gcd_multiple;
+/// use peuler::math::gcd_multiple;
 /// // gcd of 12, 18 and 24 is 6
 /// assert_eq!(gcd_multiple([12u8, 18u8, 24u8]), 6);
 /// ```
@@ -375,7 +351,7 @@ where
 /// * `bool` - Whether the number is a palindrome.
 /// # Example
 /// ```
-/// use project_euler::shared::math::is_palindrome;
+/// use peuler::math::is_palindrome;
 /// // 12321 is a palindrome
 /// assert!(is_palindrome(12321u16, 10));
 /// // 12345 is not a palindrome
@@ -399,7 +375,7 @@ where
 /// * `bool` - Whether the numbers are permutations of each other.
 /// # Example
 /// ```
-/// use project_euler::shared::math::is_permutation;
+/// use peuler::math::is_permutation;
 /// // 123 and 321 are permutations
 /// assert!(is_permutation(123, 321, 10));
 /// // 123 and 3210 are not permutations
@@ -430,7 +406,7 @@ pub fn is_permutation(n: u64, m: u64, radix: u8) -> bool {
 /// * `u64` - The integer square root.
 /// # Example
 /// ```
-/// use project_euler::shared::math::isqrt;
+/// use peuler::math::isqrt;
 /// // isqrt of 12 is 3
 /// assert_eq!(isqrt(12), 3);
 /// ```
@@ -456,7 +432,7 @@ pub fn isqrt(n: u64) -> u64 {
 /// * `u128` - The integer square root.
 /// # Example
 /// ```
-/// use project_euler::shared::math::isqrt_128;
+/// use peuler::math::isqrt_128;
 /// // isqrt of 12 is 3
 /// assert_eq!(isqrt_128(12), 3);
 /// ```
@@ -482,7 +458,7 @@ pub fn isqrt_128(n: u128) -> u128 {
 /// * The least common multiple.
 /// # Example
 /// ```
-/// use project_euler::shared::math::lcm;
+/// use peuler::math::lcm;
 /// // lcm of 12 and 18 is 36
 /// assert_eq!(lcm(12u8, 18u8), 36);
 /// ```
@@ -502,7 +478,7 @@ where
 /// If there are less than 2 numbers.
 /// # Example
 /// ```
-/// use project_euler::shared::math::lcm_multiple;
+/// use peuler::math::lcm_multiple;
 /// // lcm of 12, 18 and 24 is 72
 /// assert_eq!(lcm_multiple([12u8, 18u8, 24u8]), 72);
 /// ```
@@ -541,7 +517,7 @@ where
 /// If the derivative is 0 at some of the evaluated points.
 /// # Example
 /// ```
-/// use project_euler::shared::math::newtons_method;
+/// use peuler::math::newtons_method;
 /// // zero of x^2 - 2 = 0 is sqrt(2)
 /// let x0 = 1.0;
 /// let precision = 1e-10;
@@ -572,7 +548,7 @@ where
 /// * `u64` - The number of divisors of the number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::num_of_divisors;
+/// use peuler::math::num_of_divisors;
 /// // divisors of 12: 1, 2, 3, 4, 6, 12
 /// assert_eq!(num_of_divisors(12), 6);
 /// ```
@@ -597,7 +573,7 @@ pub fn num_of_divisors(n: u64) -> u64 {
 /// * `Vec<u64>` - The number of divisors of numbers from 0 to n. Index represents the number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::num_of_divisors_1_to_n;
+/// use peuler::math::num_of_divisors_1_to_n;
 /// assert_eq!(num_of_divisors_1_to_n(10u8), vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]);
 /// ```
 pub fn num_of_divisors_1_to_n<T>(n: T) -> Vec<u64>
@@ -623,7 +599,7 @@ where
 /// * `u64` - The number of proper divisors of the number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::num_of_proper_divisors;
+/// use peuler::math::num_of_proper_divisors;
 /// // proper divisors of 12: 1, 2, 3, 4, 6
 /// assert_eq!(num_of_proper_divisors(12), 5);
 /// ```
@@ -639,7 +615,7 @@ pub fn num_of_proper_divisors(n: u64) -> u64 {
 /// * `Vec<u64>` - The number of proper divisors of numbers from 0 to n. Index represents the number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::num_of_proper_divisors_1_to_n;
+/// use peuler::math::num_of_proper_divisors_1_to_n;
 /// assert_eq!(num_of_proper_divisors_1_to_n(10u8), vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]);
 /// ```
 pub fn num_of_proper_divisors_1_to_n<T>(n: T) -> Vec<u64>
@@ -668,7 +644,7 @@ where
 /// If a and n are not coprime.
 /// # Example
 /// ```
-/// use project_euler::shared::math::ord;
+/// use peuler::math::ord;
 /// // ord(3, 7) = 6
 /// assert_eq!(ord(3, 7), 6);
 /// ```
@@ -699,7 +675,7 @@ pub fn ord(a: u64, n: u64) -> u64 {
 /// * `u64` - The number of partitions of the number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::partition_p;
+/// use peuler::math::partition_p;
 /// // Partitions of 5: {5}, {4, 1}, {3, 2}, {3, 1, 1}, {2, 2, 1}, {2, 1, 1, 1}, {1, 1, 1, 1, 1} == 7
 /// assert_eq!(partition_p(5u8), 7);
 /// ```
@@ -721,7 +697,7 @@ where
 /// * `Vec<u64>` - The number of partitions of numbers from 0 to n. Index represents the number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::partition_p_1_to_n;
+/// use peuler::math::partition_p_1_to_n;
 /// assert_eq!(partition_p_1_to_n(10u8), vec![1, 1, 2, 3, 5, 7, 11, 15, 22, 30, 42]);
 /// ```
 pub fn partition_p_1_to_n<T>(n: T) -> Vec<u64>
@@ -779,7 +755,7 @@ where
 /// * `u64` - The number of prime partitions of the number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::partition_prime;
+/// use peuler::math::partition_prime;
 /// // Prime partitions of 7: {7}, {5, 2}, {3, 2, 2}
 /// assert_eq!(partition_prime(7u8), 3);
 /// ```
@@ -800,7 +776,7 @@ where
 /// * `Vec<u64>` - The number of prime partitions of numbers from 0 to n. Index represents the number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::partition_prime_1_to_n;
+/// use peuler::math::partition_prime_1_to_n;
 /// assert_eq!(partition_prime_1_to_n(10u8), vec![1, 0, 1, 1, 1, 2, 2, 3, 3, 4, 5]);
 /// ```
 pub fn partition_prime_1_to_n<T>(n: T) -> Vec<u64>
@@ -832,7 +808,7 @@ where
 /// * `u64` - The Euler's totient function of the number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::phi;
+/// use peuler::math::phi;
 /// // phi(0) = 0, phi(1) = 1, phi(2) = 1, phi(3) = 2, phi(4) = 2, phi(5) = 4
 /// assert_eq!(phi(0), 0);
 /// assert_eq!(phi(1), 1);
@@ -859,7 +835,7 @@ pub fn phi(n: u64) -> u64 {
 /// * `Vec<u64>` - The Euler's totient function of numbers from 0 to n. Index represents the number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::phi_1_to_n;
+/// use peuler::math::phi_1_to_n;
 /// // phi(0) = 0, phi(1) = 1, phi(2) = 1, phi(3) = 2, phi(4) = 2, phi(5) = 4
 /// assert_eq!(phi_1_to_n(5), vec![0, 1, 1, 2, 2, 4]);
 /// ```
@@ -885,7 +861,7 @@ pub fn phi_1_to_n(n: u64) -> Vec<u64> {
 /// * The reversed number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::reverse;
+/// use peuler::math::reverse;
 /// // 123 -> 321
 /// assert_eq!(reverse(123u16, 10), 321);
 /// // 0 -> 0
@@ -913,7 +889,7 @@ where
 /// * The sum of the first n natural numbers.
 /// # Example
 /// ```
-/// use project_euler::shared::math::sum_n;
+/// use peuler::math::sum_n;
 /// // 1 + 2 + 3 + 4 + 5 = 15
 /// assert_eq!(sum_n(5u8), 15);
 /// ```
@@ -931,7 +907,7 @@ where
 /// * The sum of the first n even natural numbers.
 /// # Example
 /// ```
-/// use project_euler::shared::math::sum_n_even;
+/// use peuler::math::sum_n_even;
 /// // 2 + 4 + 6 + 8 + 10 = 30
 /// assert_eq!(sum_n_even(5u8), 30);
 /// ```
@@ -949,7 +925,7 @@ where
 /// * The sum of the squares of the first n even natural numbers.
 /// # Example
 /// ```
-/// use project_euler::shared::math::sum_n_even_squares;
+/// use peuler::math::sum_n_even_squares;
 /// // 2^2 + 4^2 + 6^2 + 8^2 + 10^2 = 220
 /// assert_eq!(sum_n_even_squares(5u16), 220);
 /// ```
@@ -968,7 +944,7 @@ where
 /// * The sum of the first n odd natural numbers.
 /// # Example
 /// ```
-/// use project_euler::shared::math::sum_n_odd;
+/// use peuler::math::sum_n_odd;
 /// // 1 + 3 + 5 + 7 + 9 = 25
 /// assert_eq!(sum_n_odd(5u8), 25);
 /// ```
@@ -986,7 +962,7 @@ where
 /// * The sum of the squares of the first n odd natural numbers.
 /// # Example
 /// ```
-/// use project_euler::shared::math::sum_n_odd_squares;
+/// use peuler::math::sum_n_odd_squares;
 /// // 1^2 + 3^2 + 5^2 + 7^2 + 9^2 = 165
 /// assert_eq!(sum_n_odd_squares(5u16), 165);
 /// ```
@@ -1009,7 +985,7 @@ where
 /// * The sum of the squares of the first n natural numbers.
 /// # Example
 /// ```
-/// use project_euler::shared::math::sum_n_squares;
+/// use peuler::math::sum_n_squares;
 /// // 1^2 + 2^2 + 3^2 + 4^2 + 5^2 = 55
 /// assert_eq!(sum_n_squares(5u16), 55);
 /// ```
@@ -1027,7 +1003,7 @@ where
 /// * `u64` - The sum of the divisors of the number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::sum_of_divisors;
+/// use peuler::math::sum_of_divisors;
 /// // sum of divisors of 10 is 18
 /// assert_eq!(sum_of_divisors(10), 18);
 /// ```
@@ -1066,7 +1042,7 @@ pub fn sum_of_divisors(n: u64) -> u64 {
 /// * `Vec<u64>` - The sum of the divisors of numbers from 0 to n. Index represents the number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::sum_of_divisors_1_to_n;
+/// use peuler::math::sum_of_divisors_1_to_n;
 /// // sum of divisors of 1 is 1
 /// assert_eq!(sum_of_divisors_1_to_n(1), vec![0, 1]);
 /// // sum of divisors of 2 is 3
@@ -1092,7 +1068,7 @@ pub fn sum_of_divisors_1_to_n(n: u64) -> Vec<u64> {
 /// * `u64` - The sum of the proper divisors of the number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::sum_of_proper_divisors;
+/// use peuler::math::sum_of_proper_divisors;
 /// // sum of proper divisors of 10 is 8
 /// assert_eq!(sum_of_proper_divisors(10), 8);
 /// ```
@@ -1109,7 +1085,7 @@ pub fn sum_of_proper_divisors(n: u64) -> u64 {
 /// * `Vec<u64>` - The sum of the proper divisors of numbers from 0 to n. Index represents the number.
 /// # Example
 /// ```
-/// use project_euler::shared::math::sum_of_proper_divisors_1_to_n;
+/// use peuler::math::sum_of_proper_divisors_1_to_n;
 /// // sum of proper divisors of 1 is 0
 /// assert_eq!(sum_of_proper_divisors_1_to_n(1), vec![0, 0]);
 /// // sum of proper divisors of 2 is 1

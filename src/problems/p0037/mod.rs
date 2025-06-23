@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::primes::is_prime;
+use crate::math::prime::is_prime;
 use crate::math::{digits, digits_to_int};
 use itertools::Itertools;
 

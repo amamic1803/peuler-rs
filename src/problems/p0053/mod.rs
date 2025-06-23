@@ -1,39 +1,44 @@
-//! **Problem 53** - *Combinatoric Selections*
-use crate::shared::structures::Problem;
-
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(53, "Combinatoric Selections", solve)
-}
-
+use crate::Problem;
 use malachite::Natural;
 use malachite::base::num::basic::traits::One;
 use std::sync::LazyLock;
 
+problem!(Problem0053, 53, "Combinatoric Selections");
+
+impl Problem for Problem0053 {
+    fn id(&self) -> usize {
+        self.id
+    }
+
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        let mut result = 0;
+        let limit = Natural::from(LIMIT);
+
+        for n in LOW_N..(N + 1) {
+            let limit_r = (n >> 1) + 1;
+            for r in 0..limit_r {
+                let value = &FACT_CACHE[n] / (&FACT_CACHE[r] * &FACT_CACHE[n - r]);
+                if value > limit {
+                    result += (limit_r - r) << 1;
+                    if n % 2 == 0 {
+                        result -= 1;
+                    }
+                    break;
+                }
+            }
+        }
+
+        result.to_string()
+    }
+}
+
 const LOW_N: usize = 23;
 const N: usize = 100;
 const LIMIT: usize = 1_000_000;
-
-fn solve() -> String {
-    let mut result = 0;
-    let limit = Natural::from(LIMIT);
-
-    for n in LOW_N..(N + 1) {
-        let limit_r = (n >> 1) + 1;
-        for r in 0..limit_r {
-            let value = &FACT_CACHE[n] / (&FACT_CACHE[r] * &FACT_CACHE[n - r]);
-            if value > limit {
-                result += (limit_r - r) << 1;
-                if n % 2 == 0 {
-                    result -= 1;
-                }
-                break;
-            }
-        }
-    }
-
-    result.to_string()
-}
 
 static FACT_CACHE: LazyLock<[Natural; N + 1]> = LazyLock::new(|| {
     let mut cache = [Natural::ONE; N + 1];

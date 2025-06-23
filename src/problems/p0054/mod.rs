@@ -1,22 +1,27 @@
-//! **Problem 54** - *Poker Hands*
-use crate::shared::structures::Problem;
-
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(54, "Poker Hands", solve)
-}
-
+use crate::Problem;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 
-fn solve() -> String {
-    let input = include_str!("0054_poker.txt");
-    input
-        .lines()
-        .map(|line| Game::new(line).winner())
-        .filter(|&winner| winner == 1)
-        .count()
-        .to_string()
+problem!(Problem0054, 54, "Poker Hands");
+
+impl Problem for Problem0054 {
+    fn id(&self) -> usize {
+        self.id
+    }
+
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        let input = include_str!("0054_poker.txt");
+        input
+            .lines()
+            .map(|line| Game::new(line).winner())
+            .filter(|&winner| winner == 1)
+            .count()
+            .to_string()
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]

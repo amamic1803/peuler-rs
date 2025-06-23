@@ -1,38 +1,43 @@
-//! **Problem 92** - *Square Digit Chains*
-use crate::shared::structures::Problem;
+use crate::Problem;
+use crate::math::digits;
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(92, "Square Digit Chains", solve)
-}
+problem!(Problem0092, 92, "Square Digit Chains");
 
-use crate::shared::math::digits;
-
-const LIMIT: usize = 10_000_000;
-
-fn solve() -> String {
-    // index 0 is not used
-    // None = not yet calculated
-    // Some(true) = ends at 89
-    // Some(false) = ends at 1
-    let mut cache: Vec<Option<bool>> = vec![None; LIMIT];
-    cache[1] = Some(false);
-    cache[89] = Some(true);
-
-    // process all numbers in the cache
-    for i in 2..LIMIT {
-        if cache[i].is_none() {
-            cache[i] = Some(process_number(i as u64, &mut cache));
-        }
+impl Problem for Problem0092 {
+    fn id(&self) -> usize {
+        self.id
     }
 
-    // count the number of true values in the cache
-    cache
-        .iter()
-        .filter(|&&x| x == Some(true))
-        .count()
-        .to_string()
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        // index 0 is not used
+        // None = not yet calculated
+        // Some(true) = ends at 89
+        // Some(false) = ends at 1
+        let mut cache: Vec<Option<bool>> = vec![None; LIMIT];
+        cache[1] = Some(false);
+        cache[89] = Some(true);
+
+        // process all numbers in the cache
+        for i in 2..LIMIT {
+            if cache[i].is_none() {
+                cache[i] = Some(process_number(i as u64, &mut cache));
+            }
+        }
+
+        // count the number of true values in the cache
+        cache
+            .iter()
+            .filter(|&&x| x == Some(true))
+            .count()
+            .to_string()
+    }
 }
+
+const LIMIT: usize = 10_000_000;
 
 fn process_number(num: u64, cache: &mut Vec<Option<bool>>) -> bool {
     // if num is 1 return false

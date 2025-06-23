@@ -187,3 +187,75 @@ pub use p0048::Problem0048;
 pub use p0049::Problem0049;
 #[doc(inline)]
 pub use p0050::Problem0050;
+#[doc(inline)]
+pub use p0052::Problem0052;
+#[doc(inline)]
+pub use p0053::Problem0053;
+#[doc(inline)]
+pub use p0054::Problem0054;
+#[doc(inline)]
+pub use p0055::Problem0055;
+#[doc(inline)]
+pub use p0056::Problem0056;
+#[doc(inline)]
+pub use p0057::Problem0057;
+#[doc(inline)]
+pub use p0058::Problem0058;
+#[doc(inline)]
+pub use p0059::Problem0059;
+#[doc(inline)]
+pub use p0061::Problem0061;
+#[doc(inline)]
+pub use p0062::Problem0062;
+#[doc(inline)]
+pub use p0063::Problem0063;
+#[doc(inline)]
+pub use p0064::Problem0064;
+#[doc(inline)]
+pub use p0065::Problem0065;
+#[doc(inline)]
+pub use p0066::Problem0066;
+#[doc(inline)]
+pub use p0067::Problem0067;
+#[doc(inline)]
+pub use p0069::Problem0069;
+#[doc(inline)]
+pub use p0070::Problem0070;
+#[doc(inline)]
+pub use p0071::Problem0071;
+#[doc(inline)]
+pub use p0072::Problem0072;
+#[doc(inline)]
+pub use p0073::Problem0073;
+#[doc(inline)]
+pub use p0074::Problem0074;
+#[doc(inline)]
+pub use p0075::Problem0075;
+#[doc(inline)]
+pub use p0076::Problem0076;
+#[doc(inline)]
+pub use p0077::Problem0077;
+#[doc(inline)]
+pub use p0078::Problem0078;
+#[doc(inline)]
+pub use p0081::Problem0081;
+#[doc(inline)]
+pub use p0085::Problem0085;
+#[doc(inline)]
+pub use p0089::Problem0089;
+#[doc(inline)]
+pub use p0091::Problem0091;
+#[doc(inline)]
+pub use p0092::Problem0092;
+#[doc(inline)]
+pub use p0095::Problem0095;
+#[doc(inline)]
+pub use p0097::Problem0097;
+#[doc(inline)]
+pub use p0098::Problem0098;
+#[doc(inline)]
+pub use p0099::Problem0099;
+#[doc(inline)]
+pub use p0100::Problem0100;
+#[doc(inline)]
+pub use p0102::Problem0102;

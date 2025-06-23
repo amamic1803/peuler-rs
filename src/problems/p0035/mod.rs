@@ -1,6 +1,6 @@
 use crate::Problem;
 use crate::math::digits;
-use crate::math::primes::sieve_of_eratosthenes;
+use crate::math::prime::sieve_of_eratosthenes;
 use std::collections::HashMap;
 
 problem!(Problem0035, 35, "Circular Primes");

@@ -1,25 +1,30 @@
-//! **Problem 64** - *Odd Period Square Roots*
-use crate::shared::structures::Problem;
+use crate::Problem;
+use crate::math::ContinuedFraction;
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(64, "Odd Period Square Roots", solve)
-}
+problem!(Problem0064, 64, "Odd Period Square Roots");
 
-use crate::shared::math::ContinuedFraction;
-const MAX: i64 = 10_000;
-
-fn solve() -> String {
-    // number of continued fractions with odd period
-    let mut odd_period = 0;
-
-    for n in 2..=MAX {
-        if let Some(periodic_part) = ContinuedFraction::from_sqrt(n).periodic() {
-            if periodic_part.len() % 2 == 1 {
-                odd_period += 1;
-            }
-        }
+impl Problem for Problem0064 {
+    fn id(&self) -> usize {
+        self.id
     }
 
-    odd_period.to_string()
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        const MAX: i64 = 10_000;
+        // number of continued fractions with odd period
+        let mut odd_period = 0;
+
+        for n in 2..=MAX {
+            if let Some(periodic_part) = ContinuedFraction::from_sqrt(n).periodic() {
+                if periodic_part.len() % 2 == 1 {
+                    odd_period += 1;
+                }
+            }
+        }
+
+        odd_period.to_string()
+    }
 }

@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::primes::prime_factors;
+use crate::math::prime::prime_factors;
 
 problem!(Problem0003, 3, "Largest Prime Factor");
 impl Problem for Problem0003 {

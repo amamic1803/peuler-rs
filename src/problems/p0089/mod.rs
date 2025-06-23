@@ -1,21 +1,27 @@
-//! **Problem 89** - *Roman Numerals*
-use crate::shared::structures::Problem;
+use crate::Problem;
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(89, "Roman Numerals", solve)
-}
+problem!(Problem0089, 89, "Roman Numerals");
 
-fn solve() -> String {
-    let roman_numerals = include_str!("0089_roman.txt");
-    let mut saved_chars = 0;
-
-    for roman_numeral in roman_numerals.lines() {
-        saved_chars += roman_numeral.chars().count();
-        saved_chars -= int_2_roman(roman_2_int(roman_numeral)).chars().count();
+impl Problem for Problem0089 {
+    fn id(&self) -> usize {
+        self.id
     }
 
-    saved_chars.to_string()
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        let roman_numerals = include_str!("0089_roman.txt");
+        let mut saved_chars = 0;
+
+        for roman_numeral in roman_numerals.lines() {
+            saved_chars += roman_numeral.chars().count();
+            saved_chars -= int_2_roman(roman_2_int(roman_numeral)).chars().count();
+        }
+
+        saved_chars.to_string()
+    }
 }
 
 fn int_2_roman(mut num: u16) -> String {

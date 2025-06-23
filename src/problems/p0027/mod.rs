@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::primes::{is_prime, sieve_of_eratosthenes};
+use crate::math::prime::{is_prime, sieve_of_eratosthenes};
 
 problem!(Problem0027, 27, "Quadratic Primes");
 impl Problem for Problem0027 {

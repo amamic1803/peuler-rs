@@ -1,112 +1,120 @@
-//! **Problem 61** - *Cyclical Figurate Numbers*
-
-use crate::shared::structures::Problem;
+use crate::Problem;
 use std::collections::HashMap;
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(61, "Cyclical Figurate Numbers", solve)
+problem!(Problem0061, 61, "Cyclical Figurate Numbers");
+
+impl Problem for Problem0061 {
+    fn id(&self) -> usize {
+        self.id
+    }
+
+    fn title(&self) -> &str {
+        self.title
+    }
+
+    fn run(&self) -> String {
+        // generate all 4-digit numbers for each cyclical figurate number type
+
+        let triangle = generate_numbers(
+            || {
+                let first_n = ((-1.0 + (1.0f64 - 4.0 * 1.0 * -2.0 * MIN_4_DIGIT as f64).sqrt())
+                    / 2.0)
+                    .ceil() as u16;
+                let first_value = first_n * (first_n + 1) / 2;
+                (first_n, first_value)
+            },
+            |n, value| value + n + 1,
+        );
+        let square = generate_numbers(
+            || {
+                let first_n = (MIN_4_DIGIT as f64).sqrt().ceil() as u16;
+                let first_value = first_n * first_n;
+                (first_n, first_value)
+            },
+            |n, value| value + 2 * n + 1,
+        );
+        let pentagonal = generate_numbers(
+            || {
+                let first_n = ((1.0 + (1.0f64 - 4.0 * 3.0 * -2.0 * MIN_4_DIGIT as f64).sqrt())
+                    / 6.0)
+                    .ceil() as u16;
+                let first_value = first_n * (3 * first_n - 1) / 2;
+                (first_n, first_value)
+            },
+            |n, value| value + 3 * n + 1,
+        );
+        let hexagonal = generate_numbers(
+            || {
+                let first_n = ((1.0 + (1.0f64 - 4.0 * 2.0 * -(MIN_4_DIGIT as f64)).sqrt()) / 4.0)
+                    .ceil() as u16;
+                let first_value = first_n * (2 * first_n - 1);
+                (first_n, first_value)
+            },
+            |n, value| value + 4 * n + 1,
+        );
+        let heptagonal = generate_numbers(
+            || {
+                let first_n = ((3.0 + (9.0f64 - 4.0 * 5.0 * -2.0 * MIN_4_DIGIT as f64).sqrt())
+                    / 10.0)
+                    .ceil() as u16;
+                let first_value = first_n * (5 * first_n - 3) / 2;
+                (first_n, first_value)
+            },
+            |n, value| value + 5 * n + 1,
+        );
+        let octagonal = generate_numbers(
+            || {
+                let first_n = ((2.0 + (4.0f64 - 4.0 * 3.0 * -(MIN_4_DIGIT as f64)).sqrt()) / 6.0)
+                    .ceil() as u16;
+                let first_value = first_n * (3 * first_n - 2);
+                (first_n, first_value)
+            },
+            |n, value| value + 6 * n + 1,
+        );
+
+        // we need to find 6 numbers, one from each type, that form a cyclical chain
+        // therefore we can lock the first number to be a triangle number,
+        // and try to find a chain of numbers that are cyclical
+
+        // generate maps for each type of number, where the key is the first two digits of the number,
+        // and the value is a list of numbers of that type that start with those two digits
+        // this will allow us to quickly find the next number in the chain, if it exists
+
+        let square_map = generate_map(&square);
+        let pentagonal_map = generate_map(&pentagonal);
+        let hexagonal_map = generate_map(&hexagonal);
+        let heptagonal_map = generate_map(&heptagonal);
+        let octagonal_map = generate_map(&octagonal);
+
+        // we will try to find the chain by recursively trying to find the next number in the chain
+
+        let maps = [
+            &square_map,
+            &pentagonal_map,
+            &hexagonal_map,
+            &heptagonal_map,
+            &octagonal_map,
+        ];
+        let mut visited_maps = [false; 5];
+        let mut stack = Vec::with_capacity(6);
+
+        // try to do that for each triangle number
+        for n in triangle {
+            stack.push(n);
+            // if rec returns true, we found the chain
+            if rec(&mut stack, &maps, &mut visited_maps) {
+                break;
+            }
+            stack.pop();
+        }
+
+        // sum the numbers in the chain and return the result
+        stack.into_iter().map(|n| n as u32).sum::<u32>().to_string()
+    }
 }
 
 const MIN_4_DIGIT: u16 = 1000;
 const MAX_4_DIGIT: u16 = 9999;
-
-fn solve() -> String {
-    // generate all 4-digit numbers for each cyclical figurate number type
-
-    let triangle = generate_numbers(
-        || {
-            let first_n = ((-1.0 + (1.0f64 - 4.0 * 1.0 * -2.0 * MIN_4_DIGIT as f64).sqrt()) / 2.0)
-                .ceil() as u16;
-            let first_value = first_n * (first_n + 1) / 2;
-            (first_n, first_value)
-        },
-        |n, value| value + n + 1,
-    );
-    let square = generate_numbers(
-        || {
-            let first_n = (MIN_4_DIGIT as f64).sqrt().ceil() as u16;
-            let first_value = first_n * first_n;
-            (first_n, first_value)
-        },
-        |n, value| value + 2 * n + 1,
-    );
-    let pentagonal = generate_numbers(
-        || {
-            let first_n = ((1.0 + (1.0f64 - 4.0 * 3.0 * -2.0 * MIN_4_DIGIT as f64).sqrt()) / 6.0)
-                .ceil() as u16;
-            let first_value = first_n * (3 * first_n - 1) / 2;
-            (first_n, first_value)
-        },
-        |n, value| value + 3 * n + 1,
-    );
-    let hexagonal = generate_numbers(
-        || {
-            let first_n =
-                ((1.0 + (1.0f64 - 4.0 * 2.0 * -(MIN_4_DIGIT as f64)).sqrt()) / 4.0).ceil() as u16;
-            let first_value = first_n * (2 * first_n - 1);
-            (first_n, first_value)
-        },
-        |n, value| value + 4 * n + 1,
-    );
-    let heptagonal = generate_numbers(
-        || {
-            let first_n = ((3.0 + (9.0f64 - 4.0 * 5.0 * -2.0 * MIN_4_DIGIT as f64).sqrt()) / 10.0)
-                .ceil() as u16;
-            let first_value = first_n * (5 * first_n - 3) / 2;
-            (first_n, first_value)
-        },
-        |n, value| value + 5 * n + 1,
-    );
-    let octagonal = generate_numbers(
-        || {
-            let first_n =
-                ((2.0 + (4.0f64 - 4.0 * 3.0 * -(MIN_4_DIGIT as f64)).sqrt()) / 6.0).ceil() as u16;
-            let first_value = first_n * (3 * first_n - 2);
-            (first_n, first_value)
-        },
-        |n, value| value + 6 * n + 1,
-    );
-
-    // we need to find 6 numbers, one from each type, that form a cyclical chain
-    // therefore we can lock the first number to be a triangle number,
-    // and try to find a chain of numbers that are cyclical
-
-    // generate maps for each type of number, where the key is the first two digits of the number,
-    // and the value is a list of numbers of that type that start with those two digits
-    // this will allow us to quickly find the next number in the chain, if it exists
-
-    let square_map = generate_map(&square);
-    let pentagonal_map = generate_map(&pentagonal);
-    let hexagonal_map = generate_map(&hexagonal);
-    let heptagonal_map = generate_map(&heptagonal);
-    let octagonal_map = generate_map(&octagonal);
-
-    // we will try to find the chain by recursively trying to find the next number in the chain
-
-    let maps = [
-        &square_map,
-        &pentagonal_map,
-        &hexagonal_map,
-        &heptagonal_map,
-        &octagonal_map,
-    ];
-    let mut visited_maps = [false; 5];
-    let mut stack = Vec::with_capacity(6);
-
-    // try to do that for each triangle number
-    for n in triangle {
-        stack.push(n);
-        // if rec returns true, we found the chain
-        if rec(&mut stack, &maps, &mut visited_maps) {
-            break;
-        }
-        stack.pop();
-    }
-
-    // sum the numbers in the chain and return the result
-    stack.into_iter().map(|n| n as u32).sum::<u32>().to_string()
-}
 
 // recursive function that tries to find the next number in the chain
 fn rec(stack: &mut Vec<u16>, maps: &[&HashMap<u16, Vec<u16>>], visited_maps: &mut [bool]) -> bool {

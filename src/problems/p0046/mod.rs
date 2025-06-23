@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::primes::is_prime;
+use crate::math::prime::is_prime;
 
 problem!(Problem0046, 46, "Goldbach's Other Conjecture");
 

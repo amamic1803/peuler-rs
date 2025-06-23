@@ -1,16 +1,21 @@
-//! **Problem 76** - *Counting Summations*
-use crate::shared::structures::Problem;
+use crate::Problem;
+use crate::math::partition_p;
 
-/// Get `Problem` struct.
-pub fn get_problem() -> Problem {
-    Problem::new(76, "Counting Summations", solve)
-}
+problem!(Problem0076, 76, "Counting Summations");
 
-use crate::shared::math::partition_p;
+impl Problem for Problem0076 {
+    fn id(&self) -> usize {
+        self.id
+    }
 
-fn solve() -> String {
-    // the solution is the number of partitions of 100 minus 1
-    // because 100 itself is counted as a partition
+    fn title(&self) -> &str {
+        self.title
+    }
 
-    (partition_p(100u8) - 1).to_string()
+    fn run(&self) -> String {
+        // the solution is the number of partitions of 100 minus 1
+        // because 100 itself is counted as a partition
+
+        (partition_p(100u8) - 1).to_string()
+    }
 }
