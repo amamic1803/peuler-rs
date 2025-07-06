@@ -12,8 +12,8 @@ impl Problem for Problem0025 {
     }
 
     fn run(&self) -> String {
-        // let a = 1 + sqrt(5) / 2
-        // let b = 1 - sqrt(5) / 2
+        // let a = (1 + sqrt(5)) / 2
+        // let b = (1 - sqrt(5)) / 2
         // we can use binet's formula to calculate the nth fibonacci number
         // f(n) = (a^n - b^n) / sqrt(5)
 

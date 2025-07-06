@@ -343,25 +343,28 @@ where
     result
 }
 
-/// Checks if a number is a palindrome.
+/// Checks whether an unsigned integer is a palindrome.
 /// # Arguments
-/// * `num` - The number to check.
-/// * `radix` - The radix of the number.
+/// * `num` - The unsigned integer to check.
+/// * `radix` - The radix to use for checking.
 /// # Returns
 /// * `bool` - Whether the number is a palindrome.
 /// # Example
 /// ```
 /// use peuler::math::is_palindrome;
+///
 /// // 12321 is a palindrome
 /// assert!(is_palindrome(12321u16, 10));
+///
 /// // 12345 is not a palindrome
 /// assert!(!is_palindrome(12345u16, 10));
-/// // binary 11011 is a palindrome
-/// assert!(is_palindrome(0b11011u8, 2));
+///
+/// // binary 110011 is a palindrome
+/// assert!(is_palindrome(0b110011u8, 2));
 /// ```
 pub fn is_palindrome<T>(num: T, radix: u8) -> bool
 where
-    T: PrimInt + Unsigned + ConstZero + NumCast,
+    T: PrimInt + Unsigned + ConstZero,
 {
     num == reverse(num, radix)
 }
@@ -450,28 +453,29 @@ pub fn isqrt_128(n: u128) -> u128 {
     }
 }
 
-/// Finds the least common multiple of two numbers.
+/// Finds the least common multiple of two integers.
 /// # Arguments
-/// * `num1` - The first number.
-/// * `num2` - The second number.
+/// * `n1` - The first integer.
+/// * `n2` - The second integer.
 /// # Returns
 /// * The least common multiple.
 /// # Example
 /// ```
 /// use peuler::math::lcm;
+///
 /// // lcm of 12 and 18 is 36
 /// assert_eq!(lcm(12u8, 18u8), 36);
 /// ```
-pub fn lcm<T>(num1: T, num2: T) -> T
+pub fn lcm<T>(n1: T, n2: T) -> T
 where
     T: PrimInt + Unsigned + ConstZero,
 {
-    (num1 / gcd(num1, num2)) * num2
+    (n1 / gcd(n1, n2)) * n2
 }
 
-/// Finds the least common multiple of multiple numbers.
+/// Finds the least common multiple of multiple integers.
 /// # Arguments
-/// * `nums` - The numbers.
+/// * `nums` - The integers to find the least common multiple of.
 /// # Returns
 /// * The least common multiple.
 /// # Panics
@@ -479,6 +483,7 @@ where
 /// # Example
 /// ```
 /// use peuler::math::lcm_multiple;
+///
 /// // lcm of 12, 18 and 24 is 72
 /// assert_eq!(lcm_multiple([12u8, 18u8, 24u8]), 72);
 /// ```
@@ -853,12 +858,12 @@ pub fn phi_1_to_n(n: u64) -> Vec<u64> {
     phi_values
 }
 
-/// Reverses a number.
+/// Reverses an unsigned integer.
 /// # Arguments
-/// * `num` - The number to reverse.
-/// * `radix` - The radix of the number.
+/// * `num` - The unsigned integer to reverse.
+/// * `radix` - The radix to use for reversing the integer.
 /// # Returns
-/// * The reversed number.
+/// * The reversed integer.
 /// # Example
 /// ```
 /// use peuler::math::reverse;
@@ -871,7 +876,7 @@ pub fn phi_1_to_n(n: u64) -> Vec<u64> {
 /// ```
 pub fn reverse<T>(mut num: T, radix: u8) -> T
 where
-    T: PrimInt + Unsigned + ConstZero + NumCast,
+    T: PrimInt + Unsigned + ConstZero,
 {
     let radix = T::from(radix).unwrap();
     let mut new_num = T::ZERO;
@@ -880,24 +885,6 @@ where
         num = num / radix;
     }
     new_num
-}
-
-/// Finds the sum of the first n natural numbers.
-/// # Arguments
-/// * `n` - The number of natural numbers to sum.
-/// # Returns
-/// * The sum of the first n natural numbers.
-/// # Example
-/// ```
-/// use peuler::math::sum_n;
-/// // 1 + 2 + 3 + 4 + 5 = 15
-/// assert_eq!(sum_n(5u8), 15);
-/// ```
-pub fn sum_n<T>(n: T) -> T
-where
-    T: PrimInt + Unsigned + ConstOne + NumCast,
-{
-    n * (n + T::ONE) / T::from(2).unwrap()
 }
 
 /// Finds the sum of the first n even natural numbers.
@@ -976,24 +963,6 @@ where
     } else {
         n * (two * n + T::ONE) * (two * n - T::ONE) / T::from(3).unwrap()
     }
-}
-
-/// Finds the sum of the squares of the first n natural numbers.
-/// # Arguments
-/// * `n` - The number of natural numbers to sum.
-/// # Returns
-/// * The sum of the squares of the first n natural numbers.
-/// # Example
-/// ```
-/// use peuler::math::sum_n_squares;
-/// // 1^2 + 2^2 + 3^2 + 4^2 + 5^2 = 55
-/// assert_eq!(sum_n_squares(5u16), 55);
-/// ```
-pub fn sum_n_squares<T>(n: T) -> T
-where
-    T: PrimInt + Unsigned + ConstOne + NumCast,
-{
-    n * (n + T::ONE) * (T::from(2).unwrap() * n + T::ONE) / T::from(6).unwrap()
 }
 
 /// Finds the sum of the divisors of a number.

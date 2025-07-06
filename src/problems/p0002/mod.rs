@@ -1,4 +1,5 @@
 use crate::Problem;
+use crate::math::sequence::FibonacciSeq;
 
 problem!(Problem0002, 2, "Even Fibonacci Numbers");
 impl Problem for Problem0002 {
@@ -12,12 +13,14 @@ impl Problem for Problem0002 {
 
     fn run(&self) -> String {
         let mut sum = 0;
-        let mut values = [1, 2];
-        while values[1] < 4000000 {
-            if values[1] % 2 == 0 {
-                sum += values[1];
+        for i in FibonacciSeq::<i32>::new() {
+            if i > 4000000 {
+                break;
             }
-            (values[0], values[1]) = (values[1], values[0] + values[1]);
+            if i % 2 == 0 {
+                sum += i;
+            }
+
         }
         sum.to_string()
     }

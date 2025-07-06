@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::{sum_n, sum_n_squares};
+use crate::math::sequence::{NaturalNumbersSeq, NaturalNumbersSquaredSeq, Sequence};
 
 problem!(Problem0006, 6, "Sum Square Difference");
 impl Problem for Problem0006 {
@@ -12,8 +12,8 @@ impl Problem for Problem0006 {
     }
 
     fn run(&self) -> String {
-        let sum_of_squares = sum_n_squares(100u32);
-        let square_of_sum = sum_n(100u32).pow(2);
+        let sum_of_squares = NaturalNumbersSquaredSeq::<i32>::new().sum_next_n(100);
+        let square_of_sum = NaturalNumbersSeq::<i32>::new().sum_next_n(100).pow(2);
 
         sum_of_squares.abs_diff(square_of_sum).to_string()
     }
