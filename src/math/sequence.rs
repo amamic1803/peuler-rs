@@ -1,11 +1,14 @@
-//! This module provides functions to generate mathematical sequences.
+//! Iterators for various mathematical sequences.
 
 use num_traits::{ConstOne, ConstZero, NumCast, PrimInt};
 
-/// Trait for sequences that can be iterated over.
+/// A trait for mathematical sequences that can be iterated over.
 pub trait Sequence<T>: Iterator {
     /// Sums the next `n` elements of the sequence.
     /// Advances the iterator by `n` elements.
+    /// If the iterator has fewer than `n` elements left, it sums as many as possible.
+    /// This should be used instead of `.take(n).sum()` because
+    /// some sequences may have a more efficient way to compute the sum.
     /// # Arguments
     /// * `n` - The number of elements to sum.
     /// # Returns
@@ -13,14 +16,17 @@ pub trait Sequence<T>: Iterator {
     fn sum_next_n(&mut self, n: usize) -> T;
 }
 
-/// The Collatz sequence starting at a given number.
-/// The sequence starts with the given number and ends with 1.
+/// The Collatz sequence, defined as follows:
+/// - If the number is even, divide it by 2.
+/// - If the number is odd, multiply it by 3 and add 1.
+/// - The sequence ends when it reaches 1.
 /// # Example
 /// ```
 /// use peuler::math::sequence::CollatzSeq;
 ///
 /// assert_eq!(CollatzSeq::new(13).collect::<Vec<_>>(), vec![13, 40, 20, 10, 5, 16, 8, 4, 2, 1]);
 /// ```
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub struct CollatzSeq<T> {
     current: T,
     t2: T,
@@ -68,18 +74,31 @@ impl<T> Sequence<T> for CollatzSeq<T>
 where T: PrimInt + ConstZero + ConstOne
 {
     fn sum_next_n(&mut self, n: usize) -> T {
-        self.take(n).fold(T::ZERO, |acc, x| acc + x)
+        let mut sum = T::ZERO;
+        for _ in 0..n {
+            match self.next() {
+                Some(x) => {
+                    sum = sum + x;
+                },
+                None => {
+                    break;
+                }
+            }
+        }
+        sum
     }
 }
 
-/// The Fibonacci sequence.
+/// The Fibonacci sequence, defined as follows:
+/// - The first two elements are 0 and 1.
+/// - Each subsequent element is the sum of the two preceding ones.
 /// # Example
 /// ```
 /// use peuler::math::sequence::FibonacciSeq;
 ///
 /// assert_eq!(FibonacciSeq::new().take(10).collect::<Vec<u64>>(), vec![0, 1, 1, 2, 3, 5, 8, 13, 21, 34]);
-/// assert_eq!(FibonacciSeq::from_index(10).take(10).collect::<Vec<u64>>(), vec![55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181]);
 /// ```
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub struct FibonacciSeq<T> {
     curr: T,
     next: T,
@@ -107,28 +126,6 @@ where
             index: 0,
         }
     }
-
-    /// Creates a Fibonacci sequence starting from the nth number.
-    /// # Arguments
-    /// * `n` - The index of the Fibonacci number to start from.
-    /// # Returns
-    /// * A Fibonacci sequence iterator starting from the nth number.
-    /// # Example
-    /// ```
-    /// use peuler::math::sequence::FibonacciSeq;
-    ///
-    /// // 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, ...
-    /// // 21 is at index 8, so:
-    /// assert_eq!(FibonacciSeq::<u64>::from_index(8).next().unwrap(), 21);
-    /// ```
-    pub fn from_index(n: usize) -> Self {
-        let mut seq = Self::new();
-        if n == 0 {
-            return seq;
-        }
-        seq.nth(n - 1);
-        seq
-    }
 }
 impl<T> Iterator for FibonacciSeq<T>
 where
@@ -145,8 +142,8 @@ where
 
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
         // Binet's formula for Fibonacci numbers
-        self.index = n;
-        let n = n as f64;
+        self.index = self.index + n;
+        let n = self.index as f64;
         let sqrt5 = 5f64.sqrt();
         let a = (1.0 + sqrt5) / 2.0;
         let b = (1.0 - sqrt5) / 2.0;
@@ -157,19 +154,37 @@ where
 }
 impl<T> Sequence<T> for FibonacciSeq<T> where T: PrimInt + ConstZero {
     fn sum_next_n(&mut self, n: usize) -> T {
-        self.take(n).fold(T::ZERO, |acc, x| acc + x)
+        let mut sum = T::ZERO;
+        for _ in 0..n {
+            match self.next() {
+                Some(x) => {
+                    sum = sum + x;
+                },
+                None => {
+                    break;
+                }
+            }
+        }
+        sum
     }
 }
 
-/// The sequence of natural numbers starting from 1.
+/// The natural numbers sequence, defined as follows:
+/// - The first element is 1.
+/// - Each subsequent element is the previous element plus 1.
 /// # Example
 /// ```
 /// use peuler::math::sequence::{NaturalNumbersSeq, Sequence};
 ///
 /// let mut nat = NaturalNumbersSeq::<u32>::new();
-/// assert_eq!(nat.take(10).collect::<Vec<_>>(), vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+/// let mut seq = Vec::new();
+/// for _ in 0..10 {
+///   seq.push(nat.next().unwrap());
+/// }
+/// assert_eq!(seq, vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 /// assert_eq!(nat.sum_next_n(10), 155);
 /// ```
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub struct NaturalNumbersSeq<T> {
     current: T
 }
@@ -185,6 +200,9 @@ impl<T> NaturalNumbersSeq<T>
 where
     T: ConstOne,
 {
+    /// Creates a new natural numbers sequence starting from 1.
+    /// # Returns
+    /// * A new natural numbers sequence iterator.
     pub fn new() -> Self {
         Self { current: T::ONE }
     }
@@ -200,22 +218,32 @@ where
         self.current = self.current + T::ONE;
         Some(value)
     }
+
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        self.current = self.current + T::from(n).expect("Overflow in nth calculation in NaturalNumbersSeq");
+        self.next()
+    }
 }
 impl<T> Sequence<T> for NaturalNumbersSeq<T>
 where
-    T: PrimInt + ConstOne,
+    T: PrimInt + ConstZero + ConstOne,
 {
     fn sum_next_n(&mut self, n: usize) -> T {
+        if n == 0 {
+            return T::ZERO;
+        }
         let t2 = T::from(2).unwrap();
+        let tn = T::from(n).unwrap() + self.current - T::ONE;
         let curr_sum = self.current * (self.current - T::ONE) / t2;
-        let tn = T::from(n).unwrap();
         let next_sum = tn * (tn + T::ONE) / t2;
-        let _ = self.take(n);
+        self.nth(n - 1);
         next_sum - curr_sum
     }
 }
 
-/// The sequence of natural numbers starting from 0.
+/// The natural numbers with zero sequence, defined as follows:
+/// - The first element is 0.
+/// - Each subsequent element is the previous element plus 1.
 /// # Example
 /// ```
 /// use peuler::math::sequence::{NaturalNumbersWithZeroSeq, Sequence};
@@ -224,6 +252,7 @@ where
 /// assert_eq!(nat_zero.sum_next_n(5), 10);
 /// assert_eq!(nat_zero.take(10).collect::<Vec<_>>(), vec![5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
 /// ```
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub struct NaturalNumbersWithZeroSeq<T> {
     current: T,
 }
@@ -254,27 +283,260 @@ where
         self.current = self.current + T::ONE;
         Some(value)
     }
+
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        self.current = self.current + T::from(n).expect("Overflow in nth calculation in NaturalNumbersWithZeroSeq");
+        self.next()
+    }
 }
 impl<T> Sequence<T> for NaturalNumbersWithZeroSeq<T>
 where
     T: PrimInt + ConstZero + ConstOne,
 {
     fn sum_next_n(&mut self, n: usize) -> T {
-        let tn = T::from(n).unwrap();
+        if n == 0 {
+            return T::ZERO;
+        }
+        let tn = self.current + T::from(n).unwrap() - T::ONE;
         let t2 = T::from(2).unwrap();
         if self.current == T::ZERO {
-            let _ = self.take(n);
-            tn * (tn - T::ONE) / t2
+            self.nth(n - 1);
+            tn * (tn + T::ONE) / t2
         } else {
             let curr_sum = self.current * (self.current - T::ONE) / t2;
             let next_sum = tn * (tn + T::ONE) / t2;
-            let _ = self.take(n);
+            self.nth(n - 1);
             next_sum - curr_sum
         }
     }
 }
 
-/// The sequence of squares of natural numbers starting from 1.
+/// The odd natural numbers sequence, defined as follows:
+/// - The first element is 1.
+/// - Each subsequent element is the previous element plus 2.
+/// # Example
+/// ```
+/// use peuler::math::sequence::{OddNaturalNumbersSeq, Sequence};
+///
+/// let mut odd_nat = OddNaturalNumbersSeq::<i32>::new();
+/// assert_eq!(odd_nat.sum_next_n(5), 25);
+/// odd_nat.nth(4); // skip 11, 13, 15, 17, 19
+/// assert_eq!(odd_nat.take(5).collect::<Vec<_>>(), vec![21, 23, 25, 27, 29]);
+/// ```
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
+pub struct OddNaturalNumbersSeq<T> {
+    current: T,
+}
+impl<T> Default for OddNaturalNumbersSeq<T>
+where
+    T: ConstOne,
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl<T> OddNaturalNumbersSeq<T>
+where
+    T: ConstOne,
+{
+    /// Creates a new odd natural numbers sequence starting from 1.
+    /// # Returns
+    /// * A new odd natural numbers sequence iterator.
+    pub fn new() -> Self {
+        Self { current: T::ONE }
+    }
+}
+impl<T> Iterator for OddNaturalNumbersSeq<T>
+where
+    T: PrimInt,
+{
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let value = self.current;
+        self.current = self.current + T::from(2).unwrap(); // increment by 2 to get the next odd number
+        Some(value)
+    }
+
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        self.current = self.current + T::from(2).unwrap() * T::from(n).expect("Overflow in nth calculation in OddNaturalNumbersSeq");
+        self.next()
+    }
+}
+impl<T> Sequence<T> for OddNaturalNumbersSeq<T>
+where
+    T: PrimInt + ConstZero + ConstOne,
+{
+    fn sum_next_n(&mut self, n: usize) -> T {
+        if n == 0 {
+            return T::ZERO;
+        }
+        let t2 = T::from(2).unwrap();
+        let n_curr = self.current / t2 + T::ONE;
+        let n_next = n_curr + T::from(n).unwrap() - T::ONE;
+        let curr_sum = (n_curr - T::ONE) * (n_curr - T::ONE);
+        let next_sum = n_next * n_next;
+        self.nth(n - 1);
+        next_sum - curr_sum
+    }
+}
+
+/// The even natural numbers sequence, defined as follows:
+/// - The first element is 2.
+/// - Each subsequent element is the previous element plus 2.
+/// # Example
+/// ```
+/// use peuler::math::sequence::{EvenNaturalNumbersSeq, Sequence};
+///
+/// let mut even_nat = EvenNaturalNumbersSeq::<i32>::new();
+/// assert_eq!(even_nat.sum_next_n(5), 30);
+/// even_nat.nth(4); // skip 12, 14, 16, 18, 20
+/// assert_eq!(even_nat.take(5).collect::<Vec<_>>(), vec![22, 24, 26, 28, 30]);
+/// ```
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
+pub struct EvenNaturalNumbersSeq<T> {
+    current: T,
+}
+impl<T> Default for EvenNaturalNumbersSeq<T>
+where
+    T: NumCast,
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl<T> EvenNaturalNumbersSeq<T>
+where
+    T: NumCast,
+{
+    /// Creates a new even natural numbers sequence starting from 2.
+    /// # Returns
+    /// * A new even natural numbers sequence iterator.
+    pub fn new() -> Self {
+        Self { current: T::from(2).unwrap() }
+    }
+}
+impl<T> Iterator for EvenNaturalNumbersSeq<T>
+where
+    T: PrimInt,
+{
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let value = self.current;
+        self.current = self.current + T::from(2).unwrap(); // increment by 2 to get the next even number
+        Some(value)
+    }
+
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        self.current = self.current + T::from(2).unwrap() * T::from(n).expect("Overflow in nth calculation in EvenNaturalNumbersSeq");
+        self.next()
+    }
+}
+impl<T> Sequence<T> for EvenNaturalNumbersSeq<T>
+where
+    T: PrimInt + ConstZero + ConstOne,
+{
+    fn sum_next_n(&mut self, n: usize) -> T {
+        if n == 0 {
+            return T::ZERO;
+        }
+        let t2 = T::from(2).unwrap();
+        let n_curr = self.current / t2;
+        let n_next = n_curr + T::from(n).unwrap() - T::ONE;
+        let curr_sum = n_curr * (n_curr - T::ONE);
+        let next_sum = n_next * (n_next + T::ONE);
+        self.nth(n - 1);
+        next_sum - curr_sum
+    }
+}
+
+/// The even natural numbers sequence, defined as follows:
+/// - The first element is 0.
+/// - Each subsequent element is the previous element plus 2.
+/// # Example
+/// ```
+/// use peuler::math::sequence::{EvenNaturalNumbersWithZeroSeq, Sequence};
+///
+/// let mut even_nat = EvenNaturalNumbersWithZeroSeq::<i32>::new();
+/// assert_eq!(even_nat.sum_next_n(5), 20);
+/// even_nat.nth(5); // skip 10, 12, 14, 16, 18, 20
+/// assert_eq!(even_nat.take(5).collect::<Vec<_>>(), vec![22, 24, 26, 28, 30]);
+/// ```
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
+pub struct EvenNaturalNumbersWithZeroSeq<T> {
+    current: T,
+}
+impl<T> Default for EvenNaturalNumbersWithZeroSeq<T>
+where
+    T: ConstZero,
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl<T> EvenNaturalNumbersWithZeroSeq<T>
+where
+    T: ConstZero,
+{
+    /// Creates a new even natural numbers sequence starting from 0.
+    /// # Returns
+    /// * A new even natural numbers sequence iterator.
+    pub fn new() -> Self {
+        Self { current: T::ZERO }
+    }
+}
+impl<T> Iterator for EvenNaturalNumbersWithZeroSeq<T>
+where
+    T: PrimInt,
+{
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let value = self.current;
+        self.current = self.current + T::from(2).unwrap(); // increment by 2 to get the next even number
+        Some(value)
+    }
+
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        self.current = self.current + T::from(2).unwrap() * T::from(n).expect("Overflow in nth calculation in EvenNaturalNumbersWithZeroSeq");
+        self.next()
+    }
+}
+impl<T> Sequence<T> for EvenNaturalNumbersWithZeroSeq<T>
+where
+    T: PrimInt + ConstZero + ConstOne,
+{
+    fn sum_next_n(&mut self, n: usize) -> T {
+        if n == 0 {
+            return T::ZERO;
+        }
+        let t2 = T::from(2).unwrap();
+        let n_curr = self.current / t2;
+        let n_next = n_curr + T::from(n).unwrap() - T::ONE;
+        if n_curr == T::ZERO {
+            self.nth(n - 1);
+            n_next * (n_next + T::ONE)
+        } else {
+            let curr_sum = n_curr * (n_curr - T::ONE);
+            let next_sum = n_next * (n_next + T::ONE);
+            self.nth(n - 1);
+            next_sum - curr_sum
+        }
+    }
+}
+
+/// The natural numbers squared sequence, defined as follows:
+/// - Each element is the square of the natural number that should be at that position.
+/// # Example
+/// ```
+/// use peuler::math::sequence::{NaturalNumbersSquaredSeq, Sequence};
+///
+/// let mut squared_seq = NaturalNumbersSquaredSeq::<u32>::new();
+/// assert_eq!(squared_seq.sum_next_n(5), 55);
+/// assert_eq!(squared_seq.take(5).collect::<Vec<_>>(), vec![36, 49, 64, 81, 100]);
+/// ```
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub struct NaturalNumbersSquaredSeq<T> {
     current: T,
 }
@@ -305,22 +567,41 @@ where
         self.current = self.current + T::ONE;
         Some(value)
     }
+
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        self.current = self.current + T::from(n).expect("Overflow in nth calculation in NaturalNumbersSquaredSeq");
+        self.next()
+    }
 }
 impl<T> Sequence<T> for NaturalNumbersSquaredSeq<T>
 where
-    T: PrimInt + ConstOne,
+    T: PrimInt + ConstZero + ConstOne,
 {
     fn sum_next_n(&mut self, n: usize) -> T {
-        let tn = T::from(n).unwrap();
+        if n == 0 {
+            return T::ZERO;
+        }
         let t2 = T::from(2).unwrap();
         let t6 = T::from(6).unwrap();
+        let n_next = self.current + T::from(n).unwrap() - T::ONE;
         let curr_sum = (self.current - T::ONE) * self.current * (t2 * self.current - T::ONE) / t6;
-        let next_sum = tn * (tn + T::ONE) * (tn * t2 + T::ONE) / t6;
-        let _ = self.take(n);
+        let next_sum = n_next * (n_next + T::ONE) * (n_next * t2 + T::ONE) / t6;
+        self.nth(n - 1);
         next_sum - curr_sum
     }
 }
 
+/// The natural numbers with zero squared sequence, defined as follows:
+/// - Each element is the square of the natural number that should be at that position, starting from 0.
+/// # Example
+/// ```
+/// use peuler::math::sequence::{NaturalNumbersWithZeroSquaredSeq, Sequence};
+///
+/// let mut squared_seq = NaturalNumbersWithZeroSquaredSeq::<u32>::new();
+/// assert_eq!(squared_seq.sum_next_n(5), 30);
+/// assert_eq!(squared_seq.take(5).collect::<Vec<_>>(), vec![25, 36, 49, 64, 81]);
+/// ```
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub struct NaturalNumbersWithZeroSquaredSeq<T> {
     current: T,
 }
@@ -351,42 +632,31 @@ where
         self.current = self.current + T::ONE;
         Some(value)
     }
+
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        self.current = self.current + T::from(n).expect("Overflow in nth calculation in NaturalNumbersWithZeroSquaredSeq");
+        self.next()
+    }
 }
 impl<T> Sequence<T> for NaturalNumbersWithZeroSquaredSeq<T>
 where
     T: PrimInt + ConstZero + ConstOne,
 {
     fn sum_next_n(&mut self, n: usize) -> T {
-        let tn = T::from(n).unwrap();
+        if n == 0 {
+            return T::ZERO;
+        }
         let t2 = T::from(2).unwrap();
         let t6 = T::from(6).unwrap();
+        let n_next = self.current + T::from(n).unwrap() - T::ONE;
         if self.current == T::ZERO {
-            let _ = self.take(n);
-            tn * (tn - T::ONE) * (tn * t2 - T::ONE) / t6
+            self.nth(n - 1);
+            n_next * (n_next + T::ONE) * (n_next * t2 + T::ONE) / t6
         } else {
             let curr_sum = self.current * (self.current - T::ONE) * (t2 * self.current - T::ONE) / t6;
-            let next_sum = tn * (tn + T::ONE) * (tn * t2 + T::ONE) / t6;
-            let _ = self.take(n);
+            let next_sum = n_next * (n_next + T::ONE) * (n_next * t2 + T::ONE) / t6;
+            self.nth(n - 1);
             next_sum - curr_sum
         }
     }
-}
-
-
-
-
-
-
-pub struct EvenNaturalNumbersSeq<T> {
-    current: T,
-}
-
-pub struct OddNaturalNumbersSeq<T> {
-    current: T,
-}
-
-
-
-pub struct EvenNaturalNumbersWithZeroSeq<T> {
-    current: T,
 }

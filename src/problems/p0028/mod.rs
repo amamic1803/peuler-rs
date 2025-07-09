@@ -1,5 +1,6 @@
 use crate::Problem;
-use crate::math::{sum_n_odd, sum_n_odd_squares};
+use crate::math::sum_n_odd_squares;
+use crate::math::sequence::{OddNaturalNumbersSeq, Sequence};
 
 problem!(Problem0028, 28, "Number Spiral Diagonals");
 
@@ -29,7 +30,7 @@ impl Problem for Problem0028 {
         // note that these formulas are valid only for odd numbers, but that is ok because spiral size is always odd
 
         let result: u64 = 1 + 4 * (sum_n_odd_squares(SPIRAL_SIZE / 2 + 1) - 1)
-            - 6 * (sum_n_odd(SPIRAL_SIZE / 2 + 1) - 1)
+            - 6 * (OddNaturalNumbersSeq::<u64>::new().sum_next_n((SPIRAL_SIZE / 2 + 1) as usize) - 1)
             + 6 * (SPIRAL_SIZE / 2);
 
         result.to_string()

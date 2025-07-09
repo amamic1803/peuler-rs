@@ -887,24 +887,6 @@ where
     new_num
 }
 
-/// Finds the sum of the first n even natural numbers.
-/// # Arguments
-/// * `n` - The number of even natural numbers to sum.
-/// # Returns
-/// * The sum of the first n even natural numbers.
-/// # Example
-/// ```
-/// use peuler::math::sum_n_even;
-/// // 2 + 4 + 6 + 8 + 10 = 30
-/// assert_eq!(sum_n_even(5u8), 30);
-/// ```
-pub fn sum_n_even<T>(n: T) -> T
-where
-    T: PrimInt + Unsigned + ConstOne,
-{
-    n * (n + T::ONE)
-}
-
 /// Finds the sum of the squares of the first n even natural numbers.
 /// # Arguments
 /// * `n` - The number of even natural numbers to sum.
@@ -922,24 +904,6 @@ where
 {
     let two = T::from(2).unwrap();
     two * n * (n + T::ONE) * (two * n + T::ONE) / T::from(3).unwrap()
-}
-
-/// Finds the sum of the first n odd natural numbers.
-/// # Arguments
-/// * `n` - The number of odd natural numbers to sum.
-/// # Returns
-/// * The sum of the first n odd natural numbers.
-/// # Example
-/// ```
-/// use peuler::math::sum_n_odd;
-/// // 1 + 3 + 5 + 7 + 9 = 25
-/// assert_eq!(sum_n_odd(5u8), 25);
-/// ```
-pub fn sum_n_odd<T>(n: T) -> T
-where
-    T: PrimInt + Unsigned,
-{
-    n * n
 }
 
 /// Finds the sum of the squares of the first n odd natural numbers.
