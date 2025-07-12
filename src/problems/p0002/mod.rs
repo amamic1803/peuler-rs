@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::sequence::FibonacciSeq;
+use crate::math::sequences::FibonacciSeq;
 
 problem!(Problem0002, 2, "Even Fibonacci Numbers");
 impl Problem for Problem0002 {

@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::digits_to_int;
+use crate::math::digits::digits_to_int;
 use std::collections::HashMap;
 use std::sync::LazyLock;
 

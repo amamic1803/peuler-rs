@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::{digits, digits_to_int};
+use crate::math::digits::{digits, digits_to_int};
 use itertools::Itertools;
 
 problem!(Problem0038, 38, "Pandigital Multiples");

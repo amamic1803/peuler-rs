@@ -1,5 +1,6 @@
 use crate::Problem;
-use crate::math::{digits, gcd};
+use crate::math::gcd;
+use crate::math::digits::digits;
 use itertools::Itertools;
 
 problem!(Problem0033, 33, "Digit Cancelling Fractions");

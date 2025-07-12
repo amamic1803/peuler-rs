@@ -173,7 +173,7 @@ impl Display for PEuler {
         for _ in 0..max_line_len {
             write!(f, "#")?;
         }
-        write!(f, "\n")?;
+        writeln!(f)?;
 
         for _ in 0..((max_line_len - 15) / 2) {
             write!(f, "#")?;
@@ -182,12 +182,12 @@ impl Display for PEuler {
         for _ in 0..((max_line_len - 15) / 2) {
             write!(f, "#")?;
         }
-        write!(f, "\n")?;
+        writeln!(f)?;
 
         for _ in 0..max_line_len {
             write!(f, "#")?;
         }
-        write!(f, "\n")?;
+        writeln!(f)?;
 
         for problem in self.problems() {
             writeln!(f, "Problem {:04}: {}", problem.id(), problem.title())?;

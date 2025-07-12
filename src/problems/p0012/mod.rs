@@ -36,7 +36,7 @@ impl Problem for Problem0012 {
         let mut n = 5;
         // since 5 is odd, we can calculate initial values of d_t1 and d_t2
         let mut d_t1: u64 = num_of_divisors(n);
-        let mut d_t2: u64 = num_of_divisors((n + 1) / 2);
+        let mut d_t2: u64 = num_of_divisors(n.div_ceil(2));
 
         while d_t1 * d_t2 <= 500 {
             n += 1;
@@ -44,7 +44,7 @@ impl Problem for Problem0012 {
             if n % 2 == 0 {
                 d_t2 = num_of_divisors(n + 1);
             } else {
-                d_t2 = num_of_divisors((n + 1) / 2);
+                d_t2 = num_of_divisors(n.div_ceil(2));
             }
         }
 

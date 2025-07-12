@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::digits;
+use crate::math::digits::digits;
 
 problem!(Problem0040, 40, "Champernowne's Constant");
 

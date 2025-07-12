@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::digits;
+use crate::math::digits::digits;
 use std::collections::{HashMap, HashSet};
 
 problem!(Problem0062, 62, "Cubic Permutations");

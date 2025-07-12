@@ -16,7 +16,7 @@ impl Problem for Problem0017 {
     fn run(&self) -> String {
         let mut sum = 0;
         for n in 1..1001 {
-            sum += num_to_string(n)
+            sum += num_to_text(n)
                 .chars()
                 .filter(|c| ![' ', '-'].contains(c))
                 .count();
@@ -25,8 +25,8 @@ impl Problem for Problem0017 {
     }
 }
 
-fn num_to_string(mut n: u64) -> String {
-    //! Returns the plain english name of a number.
+fn num_to_text(mut n: u64) -> String {
+    //! Returns the plain English name of a number.
     //! (smaller than or equal to 1000)
 
     let mut name = String::new();

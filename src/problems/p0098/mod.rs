@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::{digits, is_permutation};
+use crate::math::digits::{digits, is_permutation};
 use itertools::Itertools;
 
 problem!(Problem0098, 98, "Anagramic Squares");

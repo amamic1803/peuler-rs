@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::is_palindrome;
+use crate::math::digits::is_palindrome;
 
 problem!(Problem0004, 4, "Largest Palindrome Product");
 impl Problem for Problem0004 {

@@ -1,5 +1,6 @@
 use crate::Problem;
-use crate::math::{digits, factorial_1_to_n};
+use crate::math::factorial_1_to_n;
+use crate::math::digits::digits;
 
 problem!(Problem0074, 74, "Digit Factorial Chains");
 

@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::{is_palindrome, reverse};
+use crate::math::digits::{is_palindrome, reverse};
 
 problem!(Problem0055, 55, "Lychrel Numbers");
 

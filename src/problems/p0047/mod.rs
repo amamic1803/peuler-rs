@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::prime::distinct_prime_factors;
+use crate::math::factors::distinct_prime_factors;
 
 problem!(Problem0047, 47, "Distinct Primes Factors");
 

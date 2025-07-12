@@ -1,6 +1,6 @@
 use crate::Problem;
-use crate::math::prime::sieve_of_eratosthenes;
-use crate::math::{digits, digits_to_int};
+use crate::math::primes::sieve_of_eratosthenes;
+use crate::math::digits::{digits, digits_to_int};
 use itertools::Itertools;
 use std::collections::BTreeSet;
 

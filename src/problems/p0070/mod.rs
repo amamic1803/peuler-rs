@@ -1,5 +1,6 @@
 use crate::Problem;
-use crate::math::{is_permutation, phi_1_to_n};
+use crate::math::phi_1_to_n;
+use crate::math::digits::is_permutation;
 
 problem!(Problem0070, 70, "Totient Permutation");
 

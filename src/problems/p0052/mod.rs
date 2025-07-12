@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::digits;
+use crate::math::digits::digits;
 
 problem!(Problem0052, 52, "Permuted Multiples");
 

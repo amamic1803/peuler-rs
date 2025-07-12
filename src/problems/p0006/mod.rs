@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::sequence::{NaturalNumbersSeq, NaturalNumbersSquaredSeq, Sequence};
+use crate::math::sequences::{NaturalNumbersSeq, NaturalNumbersSquaredSeq, Sequence};
 
 problem!(Problem0006, 6, "Sum Square Difference");
 impl Problem for Problem0006 {

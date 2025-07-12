@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::prime::{apcf, sieve_of_eratosthenes};
+use crate::math::primes::{apcf, sieve_of_eratosthenes};
 
 problem!(Problem0007, 7, "10001st Prime");
 impl Problem for Problem0007 {

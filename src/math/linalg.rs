@@ -139,7 +139,7 @@ impl<const N: usize> Vector<N> {
     /// # Returns
     /// * `f64` - The angle between the two vectors.
     /// # Panics
-    /// If at any of the vectors are zero.
+    /// If any of the vectors are zero.
     /// # Example
     /// ```
     /// use peuler::math::linalg::Vector;

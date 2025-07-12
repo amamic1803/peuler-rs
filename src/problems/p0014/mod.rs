@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::sequence::CollatzSeq;
+use crate::math::sequences::CollatzSeq;
 
 problem!(Problem0014, 14, "Longest Collatz Sequence");
 impl Problem for Problem0014 {

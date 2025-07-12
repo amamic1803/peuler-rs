@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::prime::is_prime;
+use crate::math::primes::is_prime;
 
 problem!(Problem0058, 58, "Spiral Primes");
 

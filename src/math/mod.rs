@@ -1,21 +1,23 @@
 //! Mathematical functions.
 
+pub mod digits;
+pub mod factors;
 pub mod linalg;
-pub mod prime;
-pub mod sequence;
+pub mod primes;
+pub mod sequences;
 
 use std::borrow::Borrow;
 use std::collections::HashSet;
 use std::iter;
 use std::mem;
 
-use prime::{distinct_prime_factors, sieve_of_eratosthenes};
-
+use primes::sieve_of_eratosthenes;
+use factors::distinct_prime_factors;
 use itertools::Itertools;
 use malachite::Integer;
 use malachite::base::num::basic::traits::{One, Zero};
 use malachite::rational::Rational;
-use num_traits::{ConstOne, ConstZero, NumCast, PrimInt, ToPrimitive, Unsigned};
+use num_traits::{ConstOne, ConstZero, PrimInt, ToPrimitive, Unsigned};
 
 /// Represents a continued fraction.
 /// # Example
@@ -123,113 +125,6 @@ impl ContinuedFraction {
     pub fn convergent_n(&self, n: usize) -> Option<Rational> {
         self.convergents().nth(n)
     }
-}
-
-/// Returns the iterator over the digits of a number.
-/// The iterator iterates from the most significant digit to the least significant digit,
-/// but can be reversed easily with `.rev()`.
-/// # Arguments
-/// * `n` - The number to get the digits of.
-/// * `radix` - The radix of the number.
-/// # Returns
-/// * The iterator over the digits of the number.
-/// # Example
-/// ```
-/// use peuler::math::digits;
-///
-/// assert_eq!(digits(123, 10).collect::<Vec<u8>>(), vec![1, 2, 3]);
-/// assert_eq!(digits(123, 10).rev().collect::<Vec<u8>>(), vec![3, 2, 1]);
-/// assert_eq!(digits(0, 10).len(), 0);
-/// assert_eq!(digits(123, 10).rev().len(), 3);
-/// ```
-pub fn digits(n: u64, radix: u8) -> impl DoubleEndedIterator<Item = u8> + ExactSizeIterator {
-    struct DigitsIter {
-        num: u64,
-        radix: u64,
-        front_weight: u64,
-        length: usize,
-    }
-    impl DigitsIter {
-        fn new(num: u64, radix: u8) -> Self {
-            let radix = radix as u64;
-            let length;
-            let front_weight;
-            if num == 0 {
-                length = 0;
-                front_weight = 0;
-            } else {
-                length = num.ilog(radix) + 1;
-                front_weight = radix.pow(length - 1);
-            }
-            Self {
-                num,
-                radix,
-                front_weight,
-                length: length as usize,
-            }
-        }
-    }
-    impl Iterator for DigitsIter {
-        type Item = u8;
-
-        fn next(&mut self) -> Option<Self::Item> {
-            if self.num == 0 && self.front_weight == 0 {
-                None
-            } else {
-                let next_digit = self.num / self.front_weight;
-                self.num %= self.front_weight;
-                self.front_weight /= self.radix;
-                self.length -= 1;
-                Some(next_digit as Self::Item)
-            }
-        }
-
-        fn size_hint(&self) -> (usize, Option<usize>) {
-            (self.length, Some(self.length))
-        }
-    }
-    impl DoubleEndedIterator for DigitsIter {
-        fn next_back(&mut self) -> Option<Self::Item> {
-            if self.num == 0 {
-                None
-            } else {
-                let next_digit = self.num % self.radix;
-                self.num /= self.radix;
-                self.front_weight /= self.radix;
-                self.length -= 1;
-                Some(next_digit as Self::Item)
-            }
-        }
-    }
-    impl ExactSizeIterator for DigitsIter {}
-
-    DigitsIter::new(n, radix)
-}
-
-/// Creates an integer from digits.
-/// Digits can be any type that implements [IntoIterator].
-/// # Arguments
-/// * `digits` - The type that implements [IntoIterator] and contains digits.
-/// * `radix` - The radix of the number.
-/// # Returns
-/// * `u64` - The integer.
-/// # Example
-/// ```
-/// use peuler::math::digits_to_int;
-/// // 123 -> 123
-/// assert_eq!(digits_to_int([1u8, 2u8, 3u8], 10), 123);
-/// ```
-pub fn digits_to_int<T, U>(digits: T, radix: u8) -> u64
-where
-    T: IntoIterator<Item = U>,
-    U: Borrow<u8>,
-{
-    let mut result = 0;
-    let radix = radix as u64;
-    for digit in digits {
-        result = result * radix + *digit.borrow() as u64;
-    }
-    result
 }
 
 /// Calculates the factorial of a number.
@@ -343,111 +238,38 @@ where
     result
 }
 
-/// Checks whether an unsigned integer is a palindrome.
-/// # Arguments
-/// * `num` - The unsigned integer to check.
-/// * `radix` - The radix to use for checking.
-/// # Returns
-/// * `bool` - Whether the number is a palindrome.
-/// # Example
-/// ```
-/// use peuler::math::is_palindrome;
+/// Integer square root.
 ///
-/// // 12321 is a palindrome
-/// assert!(is_palindrome(12321u16, 10));
-///
-/// // 12345 is not a palindrome
-/// assert!(!is_palindrome(12345u16, 10));
-///
-/// // binary 110011 is a palindrome
-/// assert!(is_palindrome(0b110011u8, 2));
-/// ```
-pub fn is_palindrome<T>(num: T, radix: u8) -> bool
-where
-    T: PrimInt + Unsigned + ConstZero,
-{
-    num == reverse(num, radix)
-}
-
-/// Checks if two numbers are permutations of each other.
-/// # Arguments
-/// * `n` - The first number.
-/// * `m` - The second number.
-/// * `radix` - The radix of the numbers.
-/// # Returns
-/// * `bool` - Whether the numbers are permutations of each other.
-/// # Example
-/// ```
-/// use peuler::math::is_permutation;
-/// // 123 and 321 are permutations
-/// assert!(is_permutation(123, 321, 10));
-/// // 123 and 3210 are not permutations
-/// assert!(!is_permutation(123, 3210, 10));
-/// // binary 1101 and 1011 are permutations
-/// assert!(is_permutation(0b1101, 0b1011, 2));
-/// ```
-pub fn is_permutation(n: u64, m: u64, radix: u8) -> bool {
-    let mut seen_digits = [0_i8; 256];
-
-    for digit in digits(n, radix) {
-        seen_digits[digit as usize] += 1;
-    }
-    for digit in digits(m, radix) {
-        seen_digits[digit as usize] -= 1;
-    }
-
-    seen_digits.iter().all(|&count| count == 0)
-}
-
-/// Calculate the integer square root.
-/// Slower than casting to f64 and using .sqrt().floor().
-/// To be used with big numbers which would lose precision if cast to f64.
-/// Uses Newton's method.
+/// Square root of a number rounded down to the nearest integer.
+/// Slower than casting to `f64` and using `.sqrt().floor()`.
+/// To be used with big numbers which would lose precision if cast to `f64`.
 /// # Arguments
 /// * `n` - The number to find the integer square root of.
 /// # Returns
-/// * `u64` - The integer square root.
+/// * `T` - The integer square root.
+/// # Panics
+/// If `n` is negative.
 /// # Example
 /// ```
 /// use peuler::math::isqrt;
 /// // isqrt of 12 is 3
 /// assert_eq!(isqrt(12), 3);
 /// ```
-pub fn isqrt(n: u64) -> u64 {
-    if n <= 1 {
+pub fn isqrt<T>(n: T) -> T
+where
+    T: PrimInt + ConstZero + ConstOne,
+{
+    if n < T::ZERO {
+        panic!("Cannot calculate square root of a negative number.");
+    } else if n <= T::ONE {
         n
     } else {
-        let mut x0 = 2_u64.pow((n.ilog2() >> 1) + 1);
-        let mut x1 = (x0 + n / x0) >> 1;
+        let t2 = T::from(2).unwrap();
+        let mut x0 = t2.pow((n.to_u128().unwrap().ilog2() / 2) + 1);
+        let mut x1 = (x0 + n / x0) / t2;
         while x1 < x0 {
             x0 = x1;
-            x1 = (x0 + n / x0) >> 1;
-        }
-        x0
-    }
-}
-
-/// Calculate the integer square root of an u128 number.
-/// Same as isqrt, but for u128.
-/// # Arguments
-/// * `n` - The number to find the integer square root of.
-/// # Returns
-/// * `u128` - The integer square root.
-/// # Example
-/// ```
-/// use peuler::math::isqrt_128;
-/// // isqrt of 12 is 3
-/// assert_eq!(isqrt_128(12), 3);
-/// ```
-pub fn isqrt_128(n: u128) -> u128 {
-    if n <= 1 {
-        n
-    } else {
-        let mut x0 = 2_u128.pow((n.ilog2() >> 1) + 1);
-        let mut x1 = (x0 + n / x0) >> 1;
-        while x1 < x0 {
-            x0 = x1;
-            x1 = (x0 + n / x0) >> 1;
+            x1 = (x0 + n / x0) / t2;
         }
         x0
     }
@@ -856,77 +678,6 @@ pub fn phi_1_to_n(n: u64) -> Vec<u64> {
     }
 
     phi_values
-}
-
-/// Reverses an unsigned integer.
-/// # Arguments
-/// * `num` - The unsigned integer to reverse.
-/// * `radix` - The radix to use for reversing the integer.
-/// # Returns
-/// * The reversed integer.
-/// # Example
-/// ```
-/// use peuler::math::reverse;
-/// // 123 -> 321
-/// assert_eq!(reverse(123u16, 10), 321);
-/// // 0 -> 0
-/// assert_eq!(reverse(0u8, 10), 0);
-/// // binary 1101 -> 1011
-/// assert_eq!(reverse(0b1101u8, 2), 0b1011);
-/// ```
-pub fn reverse<T>(mut num: T, radix: u8) -> T
-where
-    T: PrimInt + Unsigned + ConstZero,
-{
-    let radix = T::from(radix).unwrap();
-    let mut new_num = T::ZERO;
-    while num > T::ZERO {
-        new_num = new_num * radix + num % radix;
-        num = num / radix;
-    }
-    new_num
-}
-
-/// Finds the sum of the squares of the first n even natural numbers.
-/// # Arguments
-/// * `n` - The number of even natural numbers to sum.
-/// # Returns
-/// * The sum of the squares of the first n even natural numbers.
-/// # Example
-/// ```
-/// use peuler::math::sum_n_even_squares;
-/// // 2^2 + 4^2 + 6^2 + 8^2 + 10^2 = 220
-/// assert_eq!(sum_n_even_squares(5u16), 220);
-/// ```
-pub fn sum_n_even_squares<T>(n: T) -> T
-where
-    T: PrimInt + Unsigned + ConstOne + NumCast,
-{
-    let two = T::from(2).unwrap();
-    two * n * (n + T::ONE) * (two * n + T::ONE) / T::from(3).unwrap()
-}
-
-/// Finds the sum of the squares of the first n odd natural numbers.
-/// # Arguments
-/// * `n` - The number of odd natural numbers to sum.
-/// # Returns
-/// * The sum of the squares of the first n odd natural numbers.
-/// # Example
-/// ```
-/// use peuler::math::sum_n_odd_squares;
-/// // 1^2 + 3^2 + 5^2 + 7^2 + 9^2 = 165
-/// assert_eq!(sum_n_odd_squares(5u16), 165);
-/// ```
-pub fn sum_n_odd_squares<T>(n: T) -> T
-where
-    T: PrimInt + Unsigned + ConstZero + ConstOne + NumCast,
-{
-    let two = T::from(2).unwrap();
-    if n == T::ZERO {
-        T::ZERO
-    } else {
-        n * (two * n + T::ONE) * (two * n - T::ONE) / T::from(3).unwrap()
-    }
 }
 
 /// Finds the sum of the divisors of a number.

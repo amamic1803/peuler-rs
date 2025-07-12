@@ -1,6 +1,6 @@
 use crate::Problem;
-use crate::math::prime::is_prime;
-use crate::math::{digits, digits_to_int};
+use crate::math::primes::is_prime;
+use crate::math::digits::{digits, digits_to_int};
 use itertools::Itertools;
 
 problem!(Problem0037, 37, "Truncatable Primes");
