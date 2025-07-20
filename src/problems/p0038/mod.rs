@@ -17,8 +17,8 @@ impl Problem for Problem0038 {
         // to solve this one we will use this logic:
         // generate permutations of digits 1 to 9, but in reverse order
         // so that bigger numbers are generated first
-        // that way when first number that satisfies the condition is found
-        // it will be the biggest one
+        // that way the first number that satisfies the condition is found
+        // it will be the largest one
         // to find the multiplicand we will take first x digits of the permutation
         // and divide by 1 (which doesn't change the number)
         // for x we are taking 1, 2, 3, 4 because if we were to take 5 or more,
@@ -30,7 +30,7 @@ impl Problem for Problem0038 {
         for perm in (1..=9).rev().permutations(9) {
             for i in 1..=4 {
                 let mut digit_count = i;
-                let multiplicand = digits_to_int(&perm[0..i], 10);
+                let multiplicand: i32 = digits_to_int(perm[0..i].iter().rev(), 10);
 
                 let mut pandigital_multiple = true;
 
@@ -40,9 +40,8 @@ impl Problem for Problem0038 {
                     n += 1;
                     let next_digit_count = digit_count + digits(next_product, 10).len();
 
-                    if (next_digit_count > 9)
-                        || (next_product != digits_to_int(&perm[digit_count..next_digit_count], 10))
-                    {
+                    let next_product_digits: i32 = digits_to_int(perm[digit_count..next_digit_count.min(9)].iter().rev(), 10);
+                    if (next_digit_count > 9) || (next_product != next_product_digits) {
                         pandigital_multiple = false;
                         break;
                     }
@@ -51,11 +50,12 @@ impl Problem for Problem0038 {
                 }
 
                 if pandigital_multiple {
-                    return digits_to_int(perm, 10).to_string();
+                    let integer: i32 = digits_to_int(perm.iter().rev(), 10);
+                    return integer.to_string();
                 }
             }
         }
 
-        String::from("No solution found.")
+        panic!("No solution found.")
     }
 }

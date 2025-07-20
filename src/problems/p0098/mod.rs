@@ -138,7 +138,7 @@ fn word_matches_num(word: &str, num: u64) -> (bool, [char; 10]) {
     // match characters of the word to digits of the number
     // if a digit is already matched to a character, and the current character is different,
     // but should be matched to the same digit, return false
-    for (n, c) in digits(num, 10).zip(word.chars()) {
+    for (n, c) in digits(num, 10).rev().zip(word.chars()) {
         if num_char_dict[n as usize] == ' ' {
             num_char_dict[n as usize] = c;
         } else if num_char_dict[n as usize] != c {

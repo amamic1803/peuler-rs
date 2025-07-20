@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::num_of_divisors;
+use crate::math::factors::num_of_divisors;
 
 problem!(Problem0012, 12, "Highly Divisible Triangular Number");
 impl Problem for Problem0012 {

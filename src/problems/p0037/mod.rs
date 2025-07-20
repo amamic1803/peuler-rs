@@ -45,7 +45,7 @@ impl Problem for Problem0037 {
 
             // iterate over cartesian product of these iterators over digits (they make numbers)
             for i in iterables.into_iter().multi_cartesian_product() {
-                let num = digits_to_int(i, 10); // convert vector of digits to number
+                let num = digits_to_int(i.iter().rev(), 10); // convert vector of digits to number
 
                 // check if number is truncatable prime
                 if is_trunc_prime(num) {

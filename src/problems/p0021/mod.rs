@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::sum_of_proper_divisors;
+use crate::math::factors::sum_of_proper_divisors;
 
 problem!(Problem0021, 21, "Amicable Numbers");
 

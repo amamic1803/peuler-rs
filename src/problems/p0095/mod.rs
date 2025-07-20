@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::sum_of_proper_divisors_1_to_n;
+use crate::math::factors::sum_of_proper_divisors_1_to_n;
 
 problem!(Problem0095, 95, "Amicable Chains");
 

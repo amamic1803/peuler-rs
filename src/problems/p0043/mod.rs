@@ -73,7 +73,8 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
                     working.push(*i);
-                    if digits_to_int(&working[2..5], 10) % 3 == 0 {
+                    let value: i32 = digits_to_int(working[2..5].iter().rev(), 10);
+                    if value % 3 == 0 {
                         recursive_search(working, sum, depth + 1);
                     }
                     working.pop();
@@ -84,7 +85,8 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
                     working.push(*i);
-                    if digits_to_int(&working[4..7], 10) % 7 == 0 {
+                    let value: i32 = digits_to_int(working[4..7].iter().rev(), 10);
+                    if value % 7 == 0 {
                         recursive_search(working, sum, depth + 1);
                     }
                     working.pop();
@@ -95,7 +97,8 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
                     working.push(*i);
-                    if digits_to_int(&working[5..8], 10) % 11 == 0 {
+                    let value: i32 = digits_to_int(working[5..8].iter().rev(), 10);
+                    if value % 11 == 0 {
                         recursive_search(working, sum, depth + 1);
                     }
                     working.pop();
@@ -106,7 +109,8 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
                     working.push(*i);
-                    if digits_to_int(&working[6..9], 10) % 13 == 0 {
+                    let value: i32 = digits_to_int(working[6..9].iter().rev(), 10);
+                    if value % 13 == 0 {
                         recursive_search(working, sum, depth + 1);
                     }
                     working.pop();
@@ -117,14 +121,18 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
                     working.push(*i);
-                    if digits_to_int(&working[7..10], 10) % 17 == 0 {
+                    let value: i32 = digits_to_int(working[7..10].iter().rev(), 10);
+                    if value % 17 == 0 {
                         recursive_search(working, sum, depth + 1);
                     }
                     working.pop();
                 }
             }
         }
-        11 => *sum += digits_to_int(working, 10),
+        11 => {
+            let value: u64 = digits_to_int(working.iter().rev(), 10);
+            *sum += value;
+        },
         _ => unreachable!("Invalid depth"),
     }
 }

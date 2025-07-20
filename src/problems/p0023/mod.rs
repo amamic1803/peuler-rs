@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::sum_of_proper_divisors;
+use crate::math::factors::sum_of_proper_divisors;
 use std::collections::HashSet;
 
 problem!(Problem0023, 23, "Non-Abundant Sums");
