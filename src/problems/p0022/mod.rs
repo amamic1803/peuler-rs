@@ -32,7 +32,7 @@ fn parse_input(input: &str) -> Vec<&str> {
         .map(|s| s.trim_matches('"'))
         .collect();
 
-    input.sort();
+    input.sort_unstable();
 
     input
 }

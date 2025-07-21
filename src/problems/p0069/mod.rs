@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::phi_1_to_n;
+use crate::math::phi_0_to_n;
 
 problem!(Problem0069, 69, "Totient Maximum");
 
@@ -14,7 +14,7 @@ impl Problem for Problem0069 {
 
     fn run(&self) -> String {
         const MAX_N: u64 = 1_000_000; // maximum n value
-        let phi_values = phi_1_to_n(MAX_N); // precompute phi values
+        let phi_values = phi_0_to_n(MAX_N); // precompute phi values
 
         // find the maximum n/phi(n) ratio
         let mut max_ratio = 0.0;

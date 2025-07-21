@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::factors::sum_of_proper_divisors_1_to_n;
+use crate::math::factors::sum_of_proper_divisors_0_to_n;
 
 problem!(Problem0095, 95, "Amicable Chains");
 
@@ -16,7 +16,7 @@ impl Problem for Problem0095 {
         const LIMIT: usize = 1_000_000; // upper limit for numbers to check
 
         // find the sum of proper divisors for each number 1 to LIMIT
-        let divisors_sums = sum_of_proper_divisors_1_to_n(LIMIT as u64);
+        let divisors_sums = sum_of_proper_divisors_0_to_n(LIMIT as u64);
 
         // vector to store the length of the amicable chain for each number
         let mut chain_lengths = vec![None; LIMIT + 1];

@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::phi_1_to_n;
+use crate::math::phi_0_to_n;
 use crate::math::digits::is_permutation;
 
 problem!(Problem0070, 70, "Totient Permutation");
@@ -16,7 +16,7 @@ impl Problem for Problem0070 {
     fn run(&self) -> String {
         const MAX_N: u64 = 10_000_000; // maximum n value
 
-        let phi_values = phi_1_to_n(MAX_N); // precompute phi values
+        let phi_values = phi_0_to_n(MAX_N); // precompute phi values
 
         // find the minimum n/phi(n) ratio for (n, phi(n)) that are permutations of each other
         let mut min_ratio = f64::INFINITY;

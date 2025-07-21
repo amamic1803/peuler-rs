@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::factors::sum_of_proper_divisors;
+use crate::math::factors::proper_divisors;
 
 problem!(Problem0021, 21, "Amicable Numbers");
 
@@ -24,7 +24,7 @@ impl Problem for Problem0021 {
 
         // calculate the sums of proper divisors for each number
         for (i, store_pos) in sums.iter_mut().enumerate().skip(1) {
-            *store_pos = sum_of_proper_divisors(i as u64);
+            *store_pos = proper_divisors(i as u64).sum();
         }
 
         // now it is checked whether the number is amicable, and if it is, it is added to the sum

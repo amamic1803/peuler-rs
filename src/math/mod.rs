@@ -13,7 +13,6 @@ use std::mem;
 
 use primes::sieve_of_eratosthenes;
 use factors::distinct_prime_factors;
-use itertools::Itertools;
 use malachite::Integer;
 use malachite::base::num::basic::traits::{One, Zero};
 use malachite::rational::Rational;
@@ -158,10 +157,10 @@ where
 /// * `Vec<u64>` - The factorials of numbers from 0 to n. Index represents the number.
 /// # Example
 /// ```
-/// use peuler::math::factorial_1_to_n;
-/// assert_eq!(factorial_1_to_n(5u8), vec![1, 1, 2, 6, 24, 120]);
+/// use peuler::math::factorial_0_to_n;
+/// assert_eq!(factorial_0_to_n(5u8), vec![1, 1, 2, 6, 24, 120]);
 /// ```
-pub fn factorial_1_to_n<T>(n: T) -> Vec<u64>
+pub fn factorial_0_to_n<T>(n: T) -> Vec<u64>
 where
     T: PrimInt + Unsigned + ConstOne,
 {
@@ -536,16 +535,17 @@ where
     dp
 }
 
-/// Calculate the Euler's totient function.
+/// Euler's totient function.
+///
 /// Finds the number of positive integers less than n that are coprime to n.
 /// # Arguments
 /// * `n` - The number to find the Euler's totient function of.
 /// # Returns
-/// * `u64` - The Euler's totient function of the number.
+/// * `T` - The Euler's totient function of the number.
 /// # Example
 /// ```
 /// use peuler::math::phi;
-/// // phi(0) = 0, phi(1) = 1, phi(2) = 1, phi(3) = 2, phi(4) = 2, phi(5) = 4
+///
 /// assert_eq!(phi(0), 0);
 /// assert_eq!(phi(1), 1);
 /// assert_eq!(phi(2), 1);
@@ -553,35 +553,42 @@ where
 /// assert_eq!(phi(4), 2);
 /// assert_eq!(phi(5), 4);
 /// ```
-pub fn phi(n: u64) -> u64 {
-    let mut result = n;
+pub fn phi<T>(n: T) -> T
+where
+    T: PrimInt + ConstZero + ConstOne
+{
     distinct_prime_factors(n)
         .map(|(factor, _)| factor)
-        .for_each(|factor| {
-            result -= result / factor;
-        });
-    result
+        .fold(n, |acc, factor| acc - (acc / factor))
 }
 
-/// Calculate the Euler's totient function for numbers from 1 to n.
-/// Returns a vector of the results, indices represent the number.
+/// Euler's totient function for integers `0` to `n`.
 /// # Arguments
 /// * `n` - The number to find the Euler's totient function of.
 /// # Returns
-/// * `Vec<u64>` - The Euler's totient function of numbers from 0 to n. Index represents the number.
+/// * `Vec<T>` - The Euler's totient function of numbers from `0` to `n`. Index represents the number.
 /// # Example
 /// ```
-/// use peuler::math::phi_1_to_n;
-/// // phi(0) = 0, phi(1) = 1, phi(2) = 1, phi(3) = 2, phi(4) = 2, phi(5) = 4
-/// assert_eq!(phi_1_to_n(5), vec![0, 1, 1, 2, 2, 4]);
+/// use peuler::math::phi_0_to_n;
+///
+/// assert_eq!(phi_0_to_n(5), vec![0, 1, 1, 2, 2, 4]);
 /// ```
-pub fn phi_1_to_n(n: u64) -> Vec<u64> {
-    let mut phi_values = (0..=n).collect_vec();
+pub fn phi_0_to_n<T>(n: T) -> Vec<T>
+where
+    T: PrimInt + ConstZero + ConstOne
+{
+    let n = n.to_usize().expect("Cannot convert n to usize.");
+    let mut phi_values = Vec::with_capacity(n + 1);
+    phi_values.push(T::ZERO);
+    for _ in 0..n {
+        phi_values.push(*phi_values.last().unwrap() + T::ONE);
+    }
 
     for i in 2..=n {
-        if phi_values[i as usize] == i {
-            for j in (i..=n).step_by(i as usize) {
-                phi_values[j as usize] -= phi_values[j as usize] / i;
+        let ti = T::from(i).unwrap();
+        if phi_values[i] == ti {
+            for j in (i..=n).step_by(i) {
+                phi_values[j] = phi_values[j] - phi_values[j] / ti;
             }
         }
     }

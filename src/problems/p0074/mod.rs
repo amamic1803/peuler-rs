@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::factorial_1_to_n;
+use crate::math::factorial_0_to_n;
 use crate::math::digits::digits;
 
 problem!(Problem0074, 74, "Digit Factorial Chains");
@@ -20,7 +20,7 @@ impl Problem for Problem0074 {
         let mut chains = vec![0_u8; MAX];
 
         // precalculate factorials for digits
-        let digit_factorials = factorial_1_to_n(9u8);
+        let digit_factorials = factorial_0_to_n(9u8);
 
         // add known chains
         chains[169] = 3;

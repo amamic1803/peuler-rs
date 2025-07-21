@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::factors::num_of_divisors;
+use crate::math::factors::divisors;
 
 problem!(Problem0012, 12, "Highly Divisible Triangular Number");
 impl Problem for Problem0012 {
@@ -33,18 +33,18 @@ impl Problem for Problem0012 {
         // we can reuse that term and only calculate the second term of d(x(n+1))
 
         // let's start from n = 5
-        let mut n = 5;
+        let mut n: u32 = 5;
         // since 5 is odd, we can calculate initial values of d_t1 and d_t2
-        let mut d_t1: u64 = num_of_divisors(n);
-        let mut d_t2: u64 = num_of_divisors(n.div_ceil(2));
+        let mut d_t1 = divisors(n).count() as i32;
+        let mut d_t2 = divisors(n.div_ceil(2)).count() as i32;
 
         while d_t1 * d_t2 <= 500 {
             n += 1;
             d_t1 = d_t2;
             if n % 2 == 0 {
-                d_t2 = num_of_divisors(n + 1);
+                d_t2 = divisors(n + 1).count() as i32;
             } else {
-                d_t2 = num_of_divisors(n.div_ceil(2));
+                d_t2 = divisors(n.div_ceil(2)).count() as i32;
             }
         }
 

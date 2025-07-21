@@ -53,7 +53,7 @@ impl Problem for Problem0049 {
             }
 
             // sort the permutations so that combinations are increasing for easier arithmetic sequence check
-            prime_perms.sort();
+            prime_perms.sort_unstable();
 
             // check for arithmetic sequences
             for (n1, n2, n3) in prime_perms.iter().tuple_combinations() {

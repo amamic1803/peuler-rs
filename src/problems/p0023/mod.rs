@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::factors::sum_of_proper_divisors;
+use crate::math::factors::proper_divisors;
 use std::collections::HashSet;
 
 problem!(Problem0023, 23, "Non-Abundant Sums");
@@ -21,7 +21,7 @@ impl Problem for Problem0023 {
         let mut abundant_numbers = Vec::new();
 
         for n in MIN_ABUNDANT..(UPPER_BOUND + 1) {
-            let sum = sum_of_proper_divisors(n);
+            let sum = proper_divisors(n).sum::<u64>();
             if sum > n {
                 abundant_numbers.push(n);
             }

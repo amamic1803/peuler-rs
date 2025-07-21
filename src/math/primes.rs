@@ -149,7 +149,7 @@ where
 /// # Returns
 /// * `Vec<T>` - All primes less than or equal to `n`.
 /// # Panics
-/// If the sieve would require more elements than can be represented as `usize`.
+/// If the sieve requires more elements than can be represented as `usize`.
 /// # Example
 /// ```
 /// use peuler::math::primes::sieve_of_eratosthenes;

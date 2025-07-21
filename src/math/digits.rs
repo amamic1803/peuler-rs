@@ -114,10 +114,7 @@ where
         }
     }
 }
-impl<T> ExactSizeIterator for DigitsIter<T>
-where
-    T: PrimInt + ConstZero
-{}
+impl<T: PrimInt + ConstZero> ExactSizeIterator for DigitsIter<T> {}
 
 /// Creates an iterator over the digits of a number in the given radix.
 ///
@@ -131,11 +128,7 @@ where
 /// * If `radix` does not fit in the type `T`.
 /// # Returns
 /// * An iterator over the digits of the number in the given radix.
-pub fn digits<T>(n: T, radix: u8)
-    -> impl Iterator<Item = u8> + DoubleEndedIterator + ExactSizeIterator
-where
-    T: PrimInt + ConstZero + ConstOne
-{
+pub fn digits<T: PrimInt + ConstZero + ConstOne>(n: T, radix: u8) -> DigitsIter<T> {
     DigitsIter::new(n, radix)
 }
 
@@ -300,9 +293,6 @@ where
 /// // binary 1101 -> 1011
 /// assert_eq!(reverse(0b1101u8, 2), 0b1011);
 /// ```
-pub fn reverse<T>(n: T, radix: u8) -> T
-where
-    T: PrimInt + ConstZero + ConstOne,
-{
+pub fn reverse<T: PrimInt + ConstZero + ConstOne>(n: T, radix: u8) -> T {
     digits_to_int(digits(n, radix).rev(), radix)
 }
