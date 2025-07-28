@@ -20,7 +20,7 @@ impl Problem for Problem0074 {
         let mut chains = vec![0_u8; MAX];
 
         // precalculate factorials for digits
-        let digit_factorials = factorial_0_to_n(9u8);
+        let digit_factorials = factorial_0_to_n(9u64);
 
         // add known chains
         chains[169] = 3;

@@ -29,8 +29,7 @@ impl Problem for Problem0034 {
             0.01,
             |n| 10.0_f64.powf(n) - FACTORIALS[9] as f64 * n,
             |n| 10.0_f64.powf(n) * 10.0_f64.ln() - FACTORIALS[9] as f64,
-        )
-        .ceil() as u64;
+        ).unwrap().ceil() as u64;
 
         // we can calculate the upper bound now
         let upper_bound = FACTORIALS[9] * n;

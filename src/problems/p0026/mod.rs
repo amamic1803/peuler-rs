@@ -1,5 +1,6 @@
 use crate::Problem;
-use crate::math::{gcd, ord};
+use crate::math::ord;
+use crate::math::primes::coprime;
 
 problem!(Problem0026, 26, "Reciprocal Cycles");
 
@@ -25,7 +26,7 @@ impl Problem for Problem0026 {
         let mut longest_cycle = 0;
 
         for d in 2..MAX_D {
-            if gcd(10, d) == 1 {
+            if coprime(10, d) {
                 let cycle_len = ord(10, d);
                 if cycle_len > longest_cycle {
                     longest_cycle = cycle_len;

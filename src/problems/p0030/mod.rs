@@ -30,8 +30,7 @@ impl Problem for Problem0030 {
             1e-10,
             |n| 10.0_f64.powf(n) - n * (9_u32.pow(5) as f64),
             |n| 10.0_f64.powf(n) * 10.0_f64.ln() - (9_u32.pow(5) as f64),
-        )
-        .ceil() as u32;
+        ).unwrap().ceil() as u32;
 
         // we now know that the number x can have at most max_digits digits
         // but what value of x should be the upper bound?

@@ -39,7 +39,7 @@ impl<T: PrimInt + ConstZero + ConstOne> PrimeFactors<T> {
     /// * [PrimeFactors] - An iterator over the prime factors of the integer in ascending order.
     /// # Panics
     /// * If `n` is negative.
-    /// * If `n` cannot be converted to `f64`.
+    /// * If `n` cannot be converted to [f64].
     pub fn new(n: T) -> Self {
         if n < T::ZERO {
             panic!("Cannot find prime factors of negative numbers.");
@@ -113,11 +113,11 @@ impl<T: PrimInt + ConstZero + ConstOne> DistinctPrimeFactors<T> {
     /// * `n` - The integer to find the distinct prime factors of.
     /// # Returns
     /// * [DistinctPrimeFactors] -
-    /// An iterator over the distinct prime factors of the integer and
-    /// their multiplicities in ascending order.
+    ///   An iterator over the distinct prime factors of the integer and
+    ///   their multiplicities in ascending order.
     /// # Panics
     /// * If `n` is negative.
-    /// * If `n` cannot be converted to `f64`.
+    /// * If `n` cannot be converted to [f64].
     pub fn new(n: T) -> Self {
         let prime_factors = PrimeFactors::new(n);
         let factor = T::ZERO;
@@ -170,7 +170,7 @@ impl<T: PrimInt + ConstZero + ConstOne> Iterator for DistinctPrimeFactors<T> {
 /// * [PrimeFactors] - An iterator over the prime factors of the integer in ascending order.
 /// # Panics
 /// * If `n` is negative.
-/// * If `n` cannot be converted to `f64`.
+/// * If `n` cannot be converted to [f64].
 pub fn prime_factors<T: PrimInt + ConstZero + ConstOne>(n: T) -> PrimeFactors<T> {
     PrimeFactors::new(n)
 }
@@ -182,11 +182,11 @@ pub fn prime_factors<T: PrimInt + ConstZero + ConstOne>(n: T) -> PrimeFactors<T>
 /// * `n` - The integer to find the distinct prime factors of.
 /// # Returns
 /// * [DistinctPrimeFactors] -
-/// An iterator over the distinct prime factors of the integer and
-/// their multiplicities in ascending order.
+///   An iterator over the distinct prime factors of the integer and
+///   their multiplicities in ascending order.
 /// # Panics
 /// * If `n` is negative.
-/// * If `n` cannot be converted to `f64`.
+/// * If `n` cannot be converted to [f64].
 pub fn distinct_prime_factors<T: PrimInt + ConstZero + ConstOne>(n: T) -> DistinctPrimeFactors<T> {
     DistinctPrimeFactors::new(n)
 }
@@ -204,7 +204,7 @@ pub struct Divisors<T> {
 impl<T: PrimInt + ConstZero + ConstOne> Divisors<T> {
     /// # Panics
     /// * If `n` is negative.
-    /// * If `n` cannot be converted to `f64`.
+    /// * If `n` cannot be converted to [f64].
     pub fn new(n: T) -> Self {
         let mut factors = DistinctPrimeFactors::new(n)
             .map(|(prime, count)| (prime, count, T::ONE, 0))
@@ -387,10 +387,10 @@ pub fn proper_divisors<T: PrimInt + ConstZero + ConstOne>(n: T) -> ProperDivisor
 /// * `n` - The integer up to which to calculate the number of divisors.
 /// # Returns
 /// * `Vec<T>` - The number of divisors of integers from `0` to `n`.
-/// Index represents the integer, and the value at that index represents the number of divisors.
+///   Index represents the integer, and the value at that index represents the number of divisors.
 /// # Panics
 /// * If `n` is negative.
-/// * If `n` cannot be converted to `usize`.
+/// * If `n` cannot be converted to [usize].
 /// # Example
 /// ```
 /// use peuler::math::factors::num_of_divisors_0_to_n;
@@ -422,11 +422,11 @@ where
 /// * `n` - The integer up to which to calculate the number of proper divisors.
 /// # Returns
 /// * `Vec<T>` - The number of proper divisors of integers from `0` to `n`.
-/// Index represents the integer,
-/// and the value at that index represents the number of proper divisors.
+///   Index represents the integer,
+///   and the value at that index represents the number of proper divisors.
 /// # Panics
 /// * If `n` is negative.
-/// * If `n` cannot be converted to `usize`.
+/// * If `n` cannot be converted to [usize].
 /// # Example
 /// ```
 /// use peuler::math::factors::num_of_proper_divisors_0_to_n;
@@ -455,10 +455,10 @@ where
 /// * `n` - The integer up to which to calculate the sum of divisors.
 /// # Returns
 /// * `Vec<T>` - The sum of the divisors of numbers from `0` to `n`.
-/// Index represents the integer, and the value at that index represents the sum of divisors.
+///   Index represents the integer, and the value at that index represents the sum of divisors.
 /// # Panics
 /// * If `n` is negative.
-/// * If `n` cannot be converted to `usize`.
+/// * If `n` cannot be converted to [usize].
 /// # Example
 /// ```
 /// use peuler::math::factors::sum_of_divisors_0_to_n;
@@ -491,11 +491,11 @@ where
 /// * `n` - The integer up to which to calculate the sum of proper divisors.
 /// # Returns
 /// * `Vec<T>` - The sum of the proper divisors of integers from `0` to `n`.
-/// Index represents the integer,
-/// and the value at that index represents the sum of proper divisors.
+///   Index represents the integer,
+///   and the value at that index represents the sum of proper divisors.
 /// # Panics
 /// * If `n` is negative.
-/// * If `n` cannot be converted to `usize`.
+/// * If `n` cannot be converted to [usize].
 /// # Example
 /// ```
 /// use peuler::math::factors::sum_of_proper_divisors_0_to_n;

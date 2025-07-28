@@ -16,7 +16,7 @@ use factors::distinct_prime_factors;
 use malachite::Integer;
 use malachite::base::num::basic::traits::{One, Zero};
 use malachite::rational::Rational;
-use num_traits::{ConstOne, ConstZero, PrimInt, ToPrimitive, Unsigned};
+use num_traits::{ConstOne, ConstZero, PrimInt, ToPrimitive};
 
 /// Represents a continued fraction.
 /// # Example
@@ -126,20 +126,267 @@ impl ContinuedFraction {
     }
 }
 
-/// Calculates the factorial of a number.
+#[cfg_attr(doc, katexit::katexit)]
+/// Multiplicative order.
+///
+/// Multiplicative order of an integer `a` modulo `n`, where `a` and `n` are coprime,
+/// is the smallest positive integer `k` such that $ a^k \equiv 1 \pmod n $.
 /// # Arguments
-/// * `n` - The number to find the factorial of.
+/// * `a` - The base.
+/// * `n` - The modulus.
 /// # Returns
-/// * The factorial of the number.
+/// * The multiplicative order.
+/// # Panics
+/// * If `a` or `n` is less than `2`.
+/// * If `a` and `n` are not coprime.
+/// # Example
+/// ```
+/// use peuler::math::ord;
+///
+/// // ord(3, 7) = 6
+/// assert_eq!(ord(3, 7), 6);
+/// ```
+pub fn ord<T>(a: T, n: T) -> T
+where
+    T: PrimInt + ConstOne,
+{
+    let t2 = T::from(2).unwrap();
+    if n < t2 || a < t2 {
+        panic!("a and n must be greater than or equal to 2.");
+    }
+    // we want the smallest k so that a^k ≡ 1 (mod n)
+    // a^k (mod n) = ((a^(k-1) (mod n)) * a) (mod n)
+    // example: 8^2 mod 7 = ((8 mod 7) * 8) mod 7
+    // k <= n - 1 (Fermat's little theorem)
+
+    let mut result = T::ONE;
+    let mut k = T::ONE;
+    while k < n {
+        result = (result * a) % n;
+        if result == T::ONE {
+            return k;
+        }
+        k = k + T::ONE;
+    }
+
+    // because of fermat's little theorem, if a and n are coprime,
+    // the multiplicative order must exist because a^(n-1) ≡ 1 (mod n)
+    // if we reach this point, it means we didn't find the order,
+    // so a and n are not coprime
+    panic!("a and n are not coprime.");
+}
+
+#[cfg_attr(doc, katexit::katexit)]
+/// Partition function.
+///
+/// Partition function P is defined as the number of ways an integer
+/// can be written as a sum of positive integers.
+/// These sums are called partitions of the integer.
+/// It is calculated using the recurrence relation:
+/// $$
+///     p(n) =
+///     \\begin{cases}
+///         0 & \\text{if}\\quad n < 0 \\\\
+///         1 & \\text{if}\\quad n = 0 \\\\
+///         \\sum\_{k=1}\^n (-1)\^{k+1} \\cdot (p(n - \\frac{k \\cdot (3k - 1)}{2}) + p(n - \\frac{k \\cdot (3k + 1)}{2})) & \\text{if}\\quad n > 0
+///     \\end{cases}
+/// $$
+/// # Arguments
+/// * `n` - The integer to find the number of partitions of.
+/// # Returns
+/// * The number of partitions of the integer.
+/// # Panics
+/// * If `n` is too large to fit in a [usize].
+/// # Example
+/// ```
+/// use peuler::math::partition_p;
+///
+/// // Partitions of 5:
+/// // {5}
+/// // {4, 1}
+/// // {3, 2}
+/// // {3, 1, 1}
+/// // {2, 2, 1}
+/// // {2, 1, 1, 1}
+/// // {1, 1, 1, 1, 1}
+/// // p(5) = 7
+/// assert_eq!(partition_p(5), 7);
+/// ```
+pub fn partition_p<T>(n: T) -> T
+where
+    T: PrimInt + ConstZero + ConstOne,
+{
+    if n < T::ZERO {
+        return T::ZERO;
+    }
+    // since calculating p(n) also requires calculating p of every integer less than n,
+    // we can just calculate all values and get the value of p(n) from the vector
+    // (last value)
+    partition_p_0_to_n(n).pop().unwrap()
+}
+
+/// Partition function of integers from `0` to `n`.
+/// # Arguments
+/// * `n` - The integer up to which to calculate the partition function.
+/// # Returns
+/// * `Vec<T>` - The partition function of integers from `0` to `n`.
+///   Index represents the integer,
+///   and the value at that index is the partition function of that integer.
+/// # Panics
+/// * If `n` cannot be converted to [usize].
+/// # Example
+/// ```
+/// use peuler::math::partition_p_0_to_n;
+///
+/// assert_eq!(partition_p_0_to_n(10), vec![1, 1, 2, 3, 5, 7, 11, 15, 22, 30, 42]);
+/// ```
+pub fn partition_p_0_to_n<T>(n: T) -> Vec<T>
+where
+    T: PrimInt + ConstZero + ConstOne,
+{
+    // get n as usize
+    let n = n.to_usize().expect("Cannot convert n to usize.");
+
+    // if n is 0, return 1
+    if n == 0 {
+        return vec![T::ONE];
+    }
+
+    let mut partitions = Vec::with_capacity(n + 1);
+    partitions.push(T::ONE); // p(0) = 1
+    partitions.push(T::ONE); // p(1) = 1
+
+    while partitions.len() <= n {
+        // calculate the next value and add it to vector
+
+        let curr_n = partitions.len();
+        let mut next_val = T::ZERO;
+        for k in 1..=curr_n {
+            let left_value = match curr_n.checked_sub((k * (3 * k - 1)) / 2) {
+                Some(ind) => partitions[ind],
+                None => break, // the greater of the indices is below zero, so any larger k will only be 0, we can break
+            };
+            let right_value = match curr_n.checked_sub((k * (3 * k + 1)) / 2) {
+                Some(ind) => partitions[ind],
+                None => T::ZERO,
+            };
+            let value = left_value + right_value;
+
+            if k % 2 == 0 {
+                next_val = next_val - value;
+            } else {
+                next_val = next_val + value;
+            }
+        }
+
+        // push the newly calculated value to the vector
+        partitions.push(next_val);
+    }
+
+    // return the partitions vector
+    partitions
+}
+
+/// Prime partition function.
+///
+/// Prime partition function is defined as the number of ways an integer
+/// can be written as a sum of prime numbers.
+/// This function is similar to the partition function P,
+/// but it only counts partitions that consist of prime numbers.
+/// # Arguments
+/// * `n` - The integer to find the number of prime partitions of.
+/// # Returns
+/// * The number of prime partitions of the integer.
+/// # Panics
+/// * If `n` is too large to fit in a [usize].
+/// # Notes
+/// * If `n` is negative, the function returns `0` (negative integers cannot be partitioned).
+/// * If `n` is `0`, the function returns `1` (the empty partition {}).
+/// # Example
+/// ```
+/// use peuler::math::partition_prime;
+///
+/// // Prime partitions of 7: {7}, {5, 2}, {3, 2, 2}
+/// assert_eq!(partition_prime(7), 3);
+/// ```
+pub fn partition_prime<T>(n: T) -> T
+where
+    T: PrimInt + ConstZero + ConstOne,
+{
+    if n < T::ZERO {
+        return T::ZERO;
+    }
+    // since calculating p(n) also requires calculating p of every number less than n,
+    // we just calculate all values and get the value of p(n) from the vector (last value)
+    partition_prime_0_to_n(n).pop().unwrap()
+}
+
+/// Prime partition function of integers from `0` to `n`.
+/// # Arguments
+/// * `n` - The integer up to which to calculate the prime partition function.
+/// # Returns
+/// * `Vec<T>` - The prime partition function of integers from `0` to `n`.
+///   Index represents the integer,
+///   and the value at that index is the prime partition function of that integer.
+/// # Panics
+/// * If `n` cannot be converted to [usize].
+/// # Example
+/// ```
+/// use peuler::math::partition_prime_0_to_n;
+///
+/// assert_eq!(partition_prime_0_to_n(10), vec![1, 0, 1, 1, 1, 2, 2, 3, 3, 4, 5]);
+/// ```
+pub fn partition_prime_0_to_n<T>(n: T) -> Vec<T>
+where
+    T: PrimInt + ConstZero + ConstOne,
+{
+    let n = n.to_usize().expect("Cannot convert n to usize.");
+    let primes = sieve_of_eratosthenes(n);
+
+    let mut dp = vec![T::ZERO; n + 1];
+
+    // 0 can be represented in 1 way = {}
+    // (1 can't be represented in the same way, so dp[1] stays 0)
+    dp[0] = T::ONE;
+
+    for prime in primes {
+        for i in prime..=n {
+            dp[i] = dp[i] + dp[i - prime];
+        }
+    }
+
+    dp
+}
+
+#[cfg_attr(doc, katexit::katexit)]
+/// Factorial of an integer.
+///
+/// Factorial function is defined for non-negative integers as:
+/// $$
+///     n! =
+///     \\begin{cases}
+///         1 & \\text{if}\\quad n = 0 \\\\
+///         \\prod\_{i=1}\^{n} i & \\text{if}\\quad n > 0
+///     \\end{cases}
+/// $$
+/// # Arguments
+/// * `n` - The integer to find the factorial of.
+/// # Returns
+/// * The factorial.
+/// # Panics
+/// * If `n` is negative.
 /// # Example
 /// ```
 /// use peuler::math::factorial;
+///
 /// // 5! = 120
-/// assert_eq!(factorial(5u8), 120);
+/// assert_eq!(factorial(5), 120);
+/// // 0! = 1
+/// assert_eq!(factorial(0), 1);
 /// ```
 pub fn factorial<T>(n: T) -> T
 where
-    T: PrimInt + Unsigned + ConstOne,
+    T: PrimInt + ConstOne,
 {
     let mut fact = T::ONE;
     let mut i = T::ONE;
@@ -150,107 +397,47 @@ where
     fact
 }
 
-/// Calculates the factorials of numbers from 1 to n.
+/// Factorials of integers from `0` to `n`.
 /// # Arguments
-/// * `n` - The number to find the factorials of.
+/// * `n` - The integer up to which to calculate the factorials.
 /// # Returns
-/// * `Vec<u64>` - The factorials of numbers from 0 to n. Index represents the number.
+/// * `Vec<T>` - The factorials of integers from `0` to `n`.
+///   Index represents the number, and the value at that index is the factorial of that number.
+/// # Panics
+/// * If `n` cannot be converted to [usize].
 /// # Example
 /// ```
 /// use peuler::math::factorial_0_to_n;
-/// assert_eq!(factorial_0_to_n(5u8), vec![1, 1, 2, 6, 24, 120]);
+///
+/// assert_eq!(factorial_0_to_n(5), vec![1, 1, 2, 6, 24, 120]);
 /// ```
-pub fn factorial_0_to_n<T>(n: T) -> Vec<u64>
+pub fn factorial_0_to_n<T>(n: T) -> Vec<T>
 where
-    T: PrimInt + Unsigned + ConstOne,
+    T: PrimInt + ConstOne,
 {
-    let n = n.to_usize().expect("Number too large.");
-    let mut factorials = vec![1; n + 1];
+    let n = n.to_usize().expect("Cannot convert n to usize.");
+    let mut factorials = vec![T::ONE; n + 1];
     for i in 2..=n {
-        factorials[i] = factorials[i - 1] * (i as u64);
+        factorials[i] = factorials[i - 1] * T::from(i).unwrap();
     }
     factorials
 }
 
-/// Finds the greatest common divisor of two numbers.
-/// Uses the Euclidean algorithm.
-/// # Arguments
-/// * `num1` - The first number.
-/// * `num2` - The second number.
-/// # Returns
-/// * The greatest common divisor.
-/// # Example
-/// ```
-/// use peuler::math::gcd;
-/// // gcd of 12 and 18 is 6
-/// assert_eq!(gcd(12u8, 18u8), 6);
-/// // gcd of 0 and 0 is 0
-/// assert_eq!(gcd(0u8, 0u8), 0);
-/// // gcd of 0 and 5 is 5
-/// assert_eq!(gcd(0u8, 5u8), 5);
-/// ```
-pub fn gcd<T>(mut num1: T, mut num2: T) -> T
-where
-    T: PrimInt + Unsigned + ConstZero,
-{
-    if num1 < num2 {
-        (num1, num2) = (num2, num1);
-    }
-    while num2 != T::ZERO {
-        (num1, num2) = (num2, num1 % num2);
-    }
-    num1
-}
-
-/// Finds the greatest common divisor of multiple numbers.
-/// # Arguments
-/// * `nums` - The numbers.
-/// # Returns
-/// * The greatest common divisor.
-/// # Panics
-/// If there are less than 2 numbers.
-/// # Example
-/// ```
-/// use peuler::math::gcd_multiple;
-/// // gcd of 12, 18 and 24 is 6
-/// assert_eq!(gcd_multiple([12u8, 18u8, 24u8]), 6);
-/// ```
-pub fn gcd_multiple<T, U, I>(nums: I) -> T
-where
-    T: PrimInt + Unsigned + ConstZero,
-    U: Borrow<T>,
-    I: IntoIterator<Item = U>,
-{
-    let mut nums = nums.into_iter();
-    let n1 = *nums
-        .next()
-        .expect("There must be at least 2 numbers.")
-        .borrow();
-    let n2 = *nums
-        .next()
-        .expect("There must be at least 2 numbers.")
-        .borrow();
-    let mut result = gcd(n1, n2);
-    for n in nums {
-        result = gcd(result, *n.borrow());
-    }
-    result
-}
-
 /// Integer square root.
 ///
-/// Square root of a number rounded down to the nearest integer.
-/// Slower than casting to `f64` and using `.sqrt().floor()`.
-/// To be used with big numbers which would lose precision if cast to `f64`.
+/// Square root of an integer rounded down to the nearest integer.
+/// Slower than casting to [f64] and using `.sqrt().floor()`.
+/// To be used with big integers which would lose precision if cast to [f64].
 /// # Arguments
-/// * `n` - The number to find the integer square root of.
+/// * `n` - The integer to find the integer square root of.
 /// # Returns
-/// * `T` - The integer square root.
+/// * The integer square root.
 /// # Panics
-/// If `n` is negative.
+/// * If `n` is negative.
 /// # Example
 /// ```
 /// use peuler::math::isqrt;
+///
 /// // isqrt of 12 is 3
 /// assert_eq!(isqrt(12), 3);
 /// ```
@@ -259,7 +446,7 @@ where
     T: PrimInt + ConstZero + ConstOne,
 {
     if n < T::ZERO {
-        panic!("Cannot calculate square root of a negative number.");
+        panic!("Cannot calculate square root of a negative integer.");
     } else if n <= T::ONE {
         n
     } else {
@@ -274,55 +461,142 @@ where
     }
 }
 
-/// Finds the least common multiple of two integers.
+/// The greatest common divisor of two integers.
+///
+/// Calculated using the Euclidean algorithm.
+/// If both integers are `0`, the result is `0`.
+/// # Arguments
+/// * `num1` - The first integer.
+/// * `num2` - The second integer.
+/// # Returns
+/// * The greatest common divisor.
+/// # Panics
+/// * If either of the integers is negative.
+/// # Example
+/// ```
+/// use peuler::math::gcd;
+///
+/// // gcd of 12 and 18 is 6
+/// assert_eq!(gcd(12, 18), 6);
+/// // gcd of 0 and 0 is 0
+/// assert_eq!(gcd(0, 0), 0);
+/// // gcd of 0 and 5 is 5
+/// assert_eq!(gcd(0, 5), 5);
+/// ```
+pub fn gcd<T>(mut num1: T, mut num2: T) -> T
+where
+    T: PrimInt + ConstZero,
+{
+    if num1 < T::ZERO || num2 < T::ZERO {
+        panic!("Cannot calculate GCD of negative numbers.");
+    }
+    if num1 < num2 {
+        (num1, num2) = (num2, num1);
+    }
+    while num2 > T::ZERO {
+        (num1, num2) = (num2, num1 % num2);
+    }
+    num1
+}
+
+/// The greatest common divisor of multiple integers.
+/// # Arguments
+/// * `nums` - The integers to calculate the GCD of.
+/// # Returns
+/// * The greatest common divisor.
+/// # Panics
+/// * If any of the integers are negative.
+/// # Example
+/// ```
+/// use peuler::math::gcd_multiple;
+///
+/// // gcd of 12, 18 and 24 is 6
+/// assert_eq!(gcd_multiple([12, 18, 24]), 6);
+/// ```
+pub fn gcd_multiple<T, U, I>(nums: I) -> T
+where
+    T: PrimInt + ConstZero,
+    U: Borrow<T>,
+    I: IntoIterator<Item = U>,
+{
+    let mut nums = nums.into_iter();
+    let n1 = match nums.next() {
+        Some(x) => *x.borrow(),
+        None => T::ZERO,
+    };
+    let n2 = match nums.next() {
+        Some(x) => *x.borrow(),
+        None => T::ZERO,
+    };
+    let mut result = gcd(n1, n2);
+    for n in nums {
+        result = gcd(result, *n.borrow());
+    }
+    result
+}
+
+/// The least common multiple of two integers.
+///
+/// If either of the integers is `0`, the result is `0`.
 /// # Arguments
 /// * `n1` - The first integer.
 /// * `n2` - The second integer.
 /// # Returns
 /// * The least common multiple.
+/// # Panics
+/// * If either of the integers is negative.
 /// # Example
 /// ```
 /// use peuler::math::lcm;
 ///
 /// // lcm of 12 and 18 is 36
-/// assert_eq!(lcm(12u8, 18u8), 36);
+/// assert_eq!(lcm(12, 18), 36);
+/// // lcm of 0 and 5 is 0
+/// assert_eq!(lcm(0, 5), 0);
+/// // lcm of 0 and 0 is 0
+/// assert_eq!(lcm(0, 0), 0);
 /// ```
 pub fn lcm<T>(n1: T, n2: T) -> T
 where
-    T: PrimInt + Unsigned + ConstZero,
+    T: PrimInt + ConstZero,
 {
-    (n1 / gcd(n1, n2)) * n2
+    let gcd = gcd(n1, n2);
+    if gcd == T::ZERO {
+        T::ZERO
+    } else {
+        (n1 / gcd) * n2
+    }
 }
 
-/// Finds the least common multiple of multiple integers.
+/// The least common multiple of multiple integers.
 /// # Arguments
-/// * `nums` - The integers to find the least common multiple of.
+/// * `nums` - The integers to calculate the LCM of.
 /// # Returns
 /// * The least common multiple.
 /// # Panics
-/// If there are less than 2 numbers.
+/// * If any of the integers are negative.
 /// # Example
 /// ```
 /// use peuler::math::lcm_multiple;
 ///
 /// // lcm of 12, 18 and 24 is 72
-/// assert_eq!(lcm_multiple([12u8, 18u8, 24u8]), 72);
+/// assert_eq!(lcm_multiple([12, 18, 24]), 72);
 /// ```
 pub fn lcm_multiple<T, U, I>(nums: I) -> T
 where
-    T: PrimInt + Unsigned + ConstZero,
+    T: PrimInt + ConstZero,
     U: Borrow<T>,
     I: IntoIterator<Item = U>,
 {
     let mut nums = nums.into_iter();
-    let n1 = *nums
-        .next()
-        .expect("There must be at least 2 numbers.")
-        .borrow();
-    let n2 = *nums
-        .next()
-        .expect("There must be at least 2 numbers.")
-        .borrow();
+    let n1 = match nums.next() {
+        Some(x) => *x.borrow(),
+        None => T::ZERO,
+    };
+    let n2 = match nums.next() {
+        Some(x) => *x.borrow(),
+        None => T::ZERO,
+    };
     let mut result = lcm(n1, n2);
     for n in nums {
         result = lcm(result, *n.borrow());
@@ -330,218 +604,63 @@ where
     result
 }
 
-/// Calculates the zero of a function using Newton's method.
-/// Note that this will run forever if the function does not converge to a zero.
+/// Newton's method for finding the zero of a function.
+///
+/// If the function does not converge to a zero, this might run indefinitely.
+/// It is recommended to use this method only for functions that are known to converge.
 /// # Arguments
 /// * `x0` - The initial guess.
 /// * `precision` - The precision of the answer (the error will be less than this).
 /// * `function` - The function to find the zero of.
 /// * `derivative` - The derivative of the function.
 /// # Returns
-/// * `f64` - The zero of the function.
+/// * [Some] with the zero of the function if it converges to a zero within the given precision,
+///   or [None] if the value of the derivative is `0` at some of the evaluated points.
 /// # Panics
-/// If the derivative is 0 at some of the evaluated points.
+/// * If `x0` cannot be converted to [f64].
 /// # Example
 /// ```
 /// use peuler::math::newtons_method;
-/// // zero of x^2 - 2 = 0 is sqrt(2)
+///
+/// // f(x) = x^2 - 2
+/// // The zero of f(x) is the square root of 2.
 /// let x0 = 1.0;
 /// let precision = 1e-10;
 /// let function = |x| x * x - 2.0;
 /// let derivative = |x| 2.0 * x;
-/// assert!((newtons_method(x0, precision, function, derivative) - 2.0_f64.sqrt()).abs() < precision);
+/// assert!((newtons_method(x0, precision, function, derivative).unwrap() - 2.0_f64.sqrt()).abs() < precision);
 /// ```
-pub fn newtons_method<F, D>(x0: f64, precision: f64, function: F, derivative: D) -> f64
+pub fn newtons_method<T, F, D>(x0: T, precision: f64, function: F, derivative: D) -> Option<f64>
 where
+    T: ToPrimitive,
     F: Fn(f64) -> f64,
     D: Fn(f64) -> f64,
 {
-    let mut x = x0;
+    let mut x = x0.to_f64().expect("Cannot convert x0 to f64.");
     let mut prev_x = f64::NEG_INFINITY;
 
     while (x - prev_x).abs() > precision {
         prev_x = x;
-        x = prev_x - function(prev_x) / derivative(prev_x);
-    }
-
-    x
-}
-
-/// Calculates multiplicative order.
-/// (smallest positive integer k such that a^k ≡ 1 (mod n)).
-/// a and n must be coprime.
-/// # Arguments
-/// * `a` - The base.
-/// * `n` - The modulus.
-/// # Returns
-/// * `u64` - The multiplicative order.
-/// # Panics
-/// If a and n are not coprime.
-/// # Example
-/// ```
-/// use peuler::math::ord;
-/// // ord(3, 7) = 6
-/// assert_eq!(ord(3, 7), 6);
-/// ```
-pub fn ord(a: u64, n: u64) -> u64 {
-    // a^k ≡ 1 (mod n)
-    // a^k (mod n) = ((a^(k-1) (mod n)) * a) (mod n)
-    // example: 8^2 mod 7 = ((8 mod 7) * 8) mod 7
-    // k <= n - 1 (Fermat's little theorem)
-
-    let mut result = 1;
-    for k in 1..n {
-        result = (result * a) % n;
-        if result == 1 {
-            return k;
+        let derivative_value = derivative(prev_x);
+        if derivative_value == 0.0 {
+            return None; // derivative is zero, cannot proceed
         }
+        x = prev_x - function(prev_x) / derivative_value;
     }
 
-    // since a and n are coprime, multiplicative order must exist
-    panic!("Multiplicative order not found (a and n must be coprime).");
-}
-
-/// Calculates the partition function
-/// (number of ways a number can be written as a sum of positive integers).
-/// Uses the recurrence relation p(n) = Σ(k=1, n)(-1)^(k+1) * (p(n - k(3k - 1) / 2) + p(n - k(3k + 1) / 2)).
-/// # Arguments
-/// * `n` - The number to find the number of partitions of.
-/// # Returns
-/// * `u64` - The number of partitions of the number.
-/// # Example
-/// ```
-/// use peuler::math::partition_p;
-/// // Partitions of 5: {5}, {4, 1}, {3, 2}, {3, 1, 1}, {2, 2, 1}, {2, 1, 1, 1}, {1, 1, 1, 1, 1} == 7
-/// assert_eq!(partition_p(5u8), 7);
-/// ```
-pub fn partition_p<T>(n: T) -> u64
-where
-    T: PrimInt + Unsigned + ToPrimitive,
-{
-    // since calculating p(n) also requires calculating p of every number less than n,
-    // so we just calculate all values and get the value of p(n) from the vector (last value)
-    partition_p_1_to_n(n).pop().unwrap()
-}
-
-/// Calculates the partition function for numbers from 1 to n
-/// (number of ways a number can be written as a sum of positive integers).
-/// Uses the recurrence relation p(n) = Σ(k=1, n)(-1)^(k+1) * (p(n - k(3k - 1) / 2) + p(n - k(3k + 1) / 2)).
-/// # Arguments
-/// * `n` - The number to find the number of partitions of.
-/// # Returns
-/// * `Vec<u64>` - The number of partitions of numbers from 0 to n. Index represents the number.
-/// # Example
-/// ```
-/// use peuler::math::partition_p_1_to_n;
-/// assert_eq!(partition_p_1_to_n(10u8), vec![1, 1, 2, 3, 5, 7, 11, 15, 22, 30, 42]);
-/// ```
-pub fn partition_p_1_to_n<T>(n: T) -> Vec<u64>
-where
-    T: PrimInt + Unsigned + ToPrimitive,
-{
-    // get n as usize
-    let n = n.to_usize().expect("Number too large.");
-
-    // if n is 0, return 1
-    if n == 0 {
-        return vec![1];
-    }
-
-    let mut partitions = Vec::with_capacity(n + 1);
-    partitions.push(1);
-    partitions.push(1);
-
-    while partitions.len() <= n {
-        // calculate next value and add it to vector
-
-        let curr_n = partitions.len();
-        let mut next_val = 0;
-        for k in 1..=curr_n {
-            let left_value = match curr_n.checked_sub((k * (3 * k - 1)) >> 1) {
-                Some(ind) => partitions[ind],
-                None => break, // larger of the indices is below zero, so any larger k will only be 0, we can break
-            };
-            let right_value = match curr_n.checked_sub((k * (3 * k + 1)) >> 1) {
-                Some(ind) => partitions[ind],
-                None => 0,
-            };
-            let value = left_value + right_value;
-
-            if k % 2 == 0 {
-                next_val -= value;
-            } else {
-                next_val += value;
-            }
-        }
-
-        // push the newly calculated value to the vector
-        partitions.push(next_val);
-    }
-
-    // return the partitions vector
-    partitions
-}
-
-/// Calculates the number of prime partitions
-/// (a number of ways a number can be written as a sum of primes).
-/// # Arguments
-/// * `n` - The number to find the number of prime partitions of.
-/// # Returns
-/// * `u64` - The number of prime partitions of the number.
-/// # Example
-/// ```
-/// use peuler::math::partition_prime;
-/// // Prime partitions of 7: {7}, {5, 2}, {3, 2, 2}
-/// assert_eq!(partition_prime(7u8), 3);
-/// ```
-pub fn partition_prime<T>(n: T) -> u64
-where
-    T: PrimInt + Unsigned + ToPrimitive,
-{
-    // since calculating p(n) also requires calculating p of every number less than n,
-    // so we just calculate all values and get the value of p(n) from the vector (last value)
-    partition_prime_1_to_n(n).pop().unwrap()
-}
-
-/// Calculates the number of prime partitions for numbers from 1 to n.
-/// Prime partitions is a number of ways a number can be written as a sum of primes.
-/// # Arguments
-/// * `n` - The number to find the number of prime partitions of.
-/// # Returns
-/// * `Vec<u64>` - The number of prime partitions of numbers from 0 to n. Index represents the number.
-/// # Example
-/// ```
-/// use peuler::math::partition_prime_1_to_n;
-/// assert_eq!(partition_prime_1_to_n(10u8), vec![1, 0, 1, 1, 1, 2, 2, 3, 3, 4, 5]);
-/// ```
-pub fn partition_prime_1_to_n<T>(n: T) -> Vec<u64>
-where
-    T: PrimInt + Unsigned + ToPrimitive,
-{
-    let n = n.to_usize().expect("Number too large.");
-    let primes = sieve_of_eratosthenes(n as u64);
-
-    let mut dp = vec![0; n + 1];
-
-    // 0 can be represented in 1 way = {} (1 can't be represented as a sum of primes so dp[1] stays 0)
-    dp[0] = 1;
-
-    for prime in primes {
-        for i in (prime as usize)..=n {
-            dp[i] += dp[i - prime as usize];
-        }
-    }
-
-    dp
+    Some(x)
 }
 
 /// Euler's totient function.
 ///
-/// Finds the number of positive integers less than n that are coprime to n.
+/// It is defined as the number of positive integers less than `n` that are coprime to `n`.
 /// # Arguments
-/// * `n` - The number to find the Euler's totient function of.
+/// * `n` - The integer to calculate the Euler's totient function of.
 /// # Returns
-/// * `T` - The Euler's totient function of the number.
+/// * `T` - The Euler's totient function of the integer `n`.
+/// # Panics
+/// * If `n` is negative.
+/// * If `n` cannot be converted to [f64].
 /// # Example
 /// ```
 /// use peuler::math::phi;
@@ -562,11 +681,15 @@ where
         .fold(n, |acc, factor| acc - (acc / factor))
 }
 
-/// Euler's totient function for integers `0` to `n`.
+/// Euler's totient function of integers from `0` to `n`.
 /// # Arguments
-/// * `n` - The number to find the Euler's totient function of.
+/// * `n` - The integer up to which to calculate the Euler's totient function.
 /// # Returns
-/// * `Vec<T>` - The Euler's totient function of numbers from `0` to `n`. Index represents the number.
+/// * `Vec<T>` - The Euler's totient function of integers from `0` to `n`.
+///   Index represents the integer,
+///   and the value at that index is the totient function of that integer.
+/// # Panics
+/// * If `n` cannot be converted to [usize].
 /// # Example
 /// ```
 /// use peuler::math::phi_0_to_n;

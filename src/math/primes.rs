@@ -1,6 +1,6 @@
 //! Functions related to prime numbers.
 
-use crate::math::newtons_method;
+use crate::math::{gcd, newtons_method};
 use num_traits::{ConstOne, ConstZero, PrimInt, ToPrimitive};
 
 #[cfg_attr(doc, katexit::katexit)]
@@ -61,7 +61,7 @@ where
 /// # Returns
 /// * `f64` - The estimated inverse of the prime-counting function for $n$.
 /// # Panics
-/// If the number is negative or cannot be converted to `f64`.
+/// * If the number is negative or cannot be converted to [f64].
 /// # Example
 /// ```
 /// use peuler::math::primes::apcf;
@@ -90,8 +90,36 @@ where
         let precision = 1e-10;
         let function = |x: f64| n * x.ln() - x;
         let derivative = |x: f64| n / x - 1.0;
-        newtons_method(x0, precision, function, derivative)
+        newtons_method(x0, precision, function, derivative).unwrap()
     }
+}
+
+/// Checks if two integers are coprime.
+/// # Arguments
+/// * `a` - The first number.
+/// * `b` - The second number.
+/// # Returns
+/// * `bool` - Whether the two numbers are coprime.
+/// # Panics
+/// * If either of the integers is negative.
+/// # Example
+/// ```
+/// use peuler::math::primes::coprime;
+///
+/// assert!(coprime(7, 20)); // 7 and 20 are coprime
+/// assert!(!coprime(12, 18)); // 12 and 18 are not coprime
+/// assert!(coprime(15, 28)); // 15 and 28 are coprime
+/// assert!(!coprime(10, 25)); // 10 and 25 are not coprime
+/// assert!(coprime(1, 1)); // 1 and 1 are coprime
+/// assert!(!coprime(1, 2)); // 1 and 2 are coprime
+/// assert!(coprime(2, 3)); // 2 and 3 are coprime
+/// assert!(coprime(2, 4)); // 2 and 4 are not coprime
+/// ```
+pub fn coprime<T>(a: T, b: T) -> bool
+where
+    T: PrimInt + ConstZero + ConstOne,
+{
+    gcd(a, b) == T::ONE
 }
 
 /// Checks if a number is prime.
@@ -101,7 +129,7 @@ where
 /// * `bool` - Whether the number is prime.
 /// * `T` - The smallest divisor if the number is not prime, otherwise `1`.
 /// # Panics
-/// If the number is less than `2` or cannot be converted to `f64`.
+/// * If the number is less than `2` or cannot be converted to [f64].
 /// # Example
 /// ```
 /// use peuler::math::primes::is_prime;

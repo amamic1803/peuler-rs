@@ -26,9 +26,9 @@ impl<const N: usize> Point<N> {
     /// # Returns
     /// * `Point` - The new point.
     /// # Panics
-    /// If the coordinates are not convertible to `f64`.
+    /// * If the coordinates cannot be converted to [f64].
     pub fn new<T: ToPrimitive>(coords: [T; N]) -> Self {
-        let coords = coords.map(|x| x.to_f64().expect("Coordinates must be convertible to f64"));
+        let coords = coords.map(|x| x.to_f64().expect("Coordinates must be convertible to f64."));
         Self { coords }
     }
     /// Gets the coordinates of the point.
@@ -47,9 +47,9 @@ impl<const N: usize> Point<N> {
     /// # Arguments
     /// * `coords` - The new coordinates of the point.
     /// # Panics
-    /// If the coordinates are not convertible to `f64`.
+    /// * If the coordinates cannot be converted to [f64].
     pub fn set_coords<T: ToPrimitive>(&mut self, coords: [T; N]) {
-        self.coords = coords.map(|x| x.to_f64().expect("Coordinates must be convertible to f64"));
+        self.coords = coords.map(|x| x.to_f64().expect("Coordinates must be convertible to f64."));
     }
 }
 
@@ -81,9 +81,9 @@ impl<const N: usize> Vector<N> {
     /// # Returns
     /// * `Vector` - The vector.
     /// # Panics
-    /// If the coordinates are not convertible to `f64`.
+    /// * If the coordinates cannot be converted to [f64].
     pub fn new<T: ToPrimitive>(coords: [T; N]) -> Self {
-        let coords = coords.map(|x| x.to_f64().expect("Coordinates must be convertible to f64"));
+        let coords = coords.map(|x| x.to_f64().expect("Coordinates must be convertible to f64."));
         Self { coords }
     }
     /// Gets the coordinates of the vector.
@@ -102,9 +102,9 @@ impl<const N: usize> Vector<N> {
     /// # Arguments
     /// * `coords` - The new coordinates of the vector.
     /// # Panics
-    /// If the coordinates are not convertible to `f64`.
+    /// * If the coordinates cannot be converted to [f64].
     pub fn set_coords<T: ToPrimitive>(&mut self, coords: [T; N]) {
-        self.coords = coords.map(|x| x.to_f64().expect("Coordinates must be convertible to f64"));
+        self.coords = coords.map(|x| x.to_f64().expect("Coordinates must be convertible to f64."));
     }
     /// Creates a new vector from 2 points.
     /// # Arguments
@@ -256,7 +256,7 @@ impl<const N: usize, T: ToPrimitive> Mul<T> for Vector<N> {
 
     fn mul(self, rhs: T) -> Self::Output {
         let mut coords = self.coords;
-        coords.iter_mut().for_each(|coord| *coord *= rhs.to_f64().expect("Scalar must be convertible to f64"));
+        coords.iter_mut().for_each(|coord| *coord *= rhs.to_f64().expect("Scalar must be convertible to f64."));
         Self { coords }
     }
 }

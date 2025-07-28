@@ -51,8 +51,7 @@ impl Problem for Problem0063 {
                 |n: f64| {
                     10.0_f64.powf(n - 1.0) * 10.0_f64.ln() - (y as f64).powf(n) * (y as f64).ln()
                 },
-            )
-            .floor() as u64;
+            ).unwrap().floor() as u64;
 
             count += n;
         }
