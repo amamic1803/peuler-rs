@@ -134,6 +134,7 @@ impl PEuler {
                 Box::new(problems::Problem0076::new()),
                 Box::new(problems::Problem0077::new()),
                 Box::new(problems::Problem0078::new()),
+                Box::new(problems::Problem0080::new()),
                 Box::new(problems::Problem0081::new()),
                 Box::new(problems::Problem0085::new()),
                 Box::new(problems::Problem0089::new()),
@@ -198,7 +199,7 @@ impl Display for PEuler {
 }
 impl ProjectEuler for PEuler {
     fn problems<'a>(&'a self) -> Box<dyn Iterator<Item = &'a dyn Problem> + 'a> {
-        Box::new(self.problems.iter().map(|year| year.as_ref()))
+        Box::new(self.problems.iter().map(|problem| problem.as_ref()))
     }
 }
 

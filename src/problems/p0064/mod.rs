@@ -1,5 +1,5 @@
 use crate::Problem;
-use crate::math::ContinuedFraction;
+use crate::math::SimpleContinuedFraction;
 
 problem!(Problem0064, 64, "Odd Period Square Roots");
 
@@ -18,7 +18,7 @@ impl Problem for Problem0064 {
         let mut odd_period = 0;
 
         for n in 2..=MAX {
-            if let Some(periodic_part) = ContinuedFraction::from_sqrt(n).periodic() {
+            if let Some(periodic_part) = SimpleContinuedFraction::from_sqrt(n).periodic() {
                 if periodic_part.len() % 2 == 1 {
                     odd_period += 1;
                 }

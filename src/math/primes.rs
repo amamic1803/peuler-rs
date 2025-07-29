@@ -83,7 +83,7 @@ where
             1.0 => 2.0,
             2.0 => 3.0,
             3.0 => 5.0,
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     } else {
         let x0 = n + 1.0;
@@ -111,9 +111,9 @@ where
 /// assert!(coprime(15, 28)); // 15 and 28 are coprime
 /// assert!(!coprime(10, 25)); // 10 and 25 are not coprime
 /// assert!(coprime(1, 1)); // 1 and 1 are coprime
-/// assert!(!coprime(1, 2)); // 1 and 2 are coprime
+/// assert!(coprime(1, 2)); // 1 and 2 are coprime
 /// assert!(coprime(2, 3)); // 2 and 3 are coprime
-/// assert!(coprime(2, 4)); // 2 and 4 are not coprime
+/// assert!(!coprime(2, 4)); // 2 and 4 are not coprime
 /// ```
 pub fn coprime<T>(a: T, b: T) -> bool
 where
@@ -140,7 +140,7 @@ where
 /// ```
 pub fn is_prime<T>(n: T) -> (bool, T)
 where
-    T: PrimInt + ConstZero + ConstOne
+    T: PrimInt + ConstZero + ConstOne,
 {
     let t2 = T::from(2).unwrap();
     assert!(n >= t2, "Number must be greater than or equal to 2.");
@@ -154,7 +154,8 @@ where
     } else if n % t3 == T::ZERO {
         (false, t3)
     } else {
-        let upper_bound = T::from(n.to_f64().expect("Cannot convert to f64.").sqrt().floor()).unwrap();
+        let upper_bound =
+            T::from(n.to_f64().expect("Cannot convert to f64.").sqrt().floor()).unwrap();
         let mut i = T::from(5).unwrap();
         while i <= upper_bound {
             if n % i == T::ZERO {
@@ -187,7 +188,7 @@ where
 /// ```
 pub fn sieve_of_eratosthenes<T>(n: T) -> Vec<T>
 where
-    T: PrimInt + ConstOne
+    T: PrimInt + ConstOne,
 {
     let t2 = T::from(2).unwrap();
     if n < t2 {
@@ -226,12 +227,13 @@ where
         }
 
         // convert sieve indices that are true to their corresponding number values and add them to results
-        results.extend(
-            sieve
-                .into_iter()
-                .enumerate()
-                .filter_map(|(i, prime)| if prime { Some(T::from(ind_to_val(i)).unwrap()) } else { None }),
-        );
+        results.extend(sieve.into_iter().enumerate().filter_map(|(i, prime)| {
+            if prime {
+                Some(T::from(ind_to_val(i)).unwrap())
+            } else {
+                None
+            }
+        }));
 
         // return results
         results

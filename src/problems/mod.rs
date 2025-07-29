@@ -75,6 +75,7 @@ mod p0075;
 mod p0076;
 mod p0077;
 mod p0078;
+mod p0080;
 mod p0081;
 mod p0085;
 mod p0089;
@@ -237,6 +238,8 @@ pub use p0076::Problem0076;
 pub use p0077::Problem0077;
 #[doc(inline)]
 pub use p0078::Problem0078;
+#[doc(inline)]
+pub use p0080::Problem0080;
 #[doc(inline)]
 pub use p0081::Problem0081;
 #[doc(inline)]

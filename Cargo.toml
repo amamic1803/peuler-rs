@@ -16,7 +16,6 @@ itertools = "0.14.0"
 katexit = "0.1.5"
 malachite = "0.6.1"
 num-traits = "0.2.19"
-tinypool = "0.2.0"
 
 [[bin]]
 name = "peuler"

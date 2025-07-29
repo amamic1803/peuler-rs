@@ -8,32 +8,42 @@ pub mod sequences;
 
 use std::borrow::Borrow;
 use std::collections::HashSet;
+use std::hash::Hash;
 use std::iter;
 use std::mem;
 
-use primes::sieve_of_eratosthenes;
 use factors::distinct_prime_factors;
 use malachite::Integer;
 use malachite::base::num::basic::traits::{One, Zero};
 use malachite::rational::Rational;
-use num_traits::{ConstOne, ConstZero, PrimInt, ToPrimitive};
+use num_traits::{ConstOne, ConstZero, PrimInt, Signed, ToPrimitive};
+use primes::sieve_of_eratosthenes;
 
 /// Represents a continued fraction.
 /// # Example
 /// ```
-/// use peuler::math::ContinuedFraction;
+/// use peuler::math::SimpleContinuedFraction;
 /// // Continued fraction of sqrt(2): [1; 2, 2, 2, ...]
-/// let cf = ContinuedFraction::from_sqrt(2);
+/// let cf = SimpleContinuedFraction::from_sqrt(2);
 /// assert_eq!(cf.non_periodic(), vec![1i64].as_slice());
 /// assert_eq!(cf.periodic(), Some(vec![2i64].as_slice()));
 /// ```
-pub struct ContinuedFraction {
-    non_periodic: Vec<i64>,
-    periodic: Option<Vec<i64>>,
+pub struct SimpleContinuedFraction<T> {
+    non_periodic: Vec<T>,
+    periodic: Option<Vec<T>>,
 }
-impl ContinuedFraction {
+impl<T> SimpleContinuedFraction<T>
+where
+    T: PrimInt + ConstZero + ConstOne + Into<Integer>,
+{
     /// Creates a new continued fraction.
-    pub fn new(non_periodic: Vec<i64>, periodic: Option<Vec<i64>>) -> Self {
+    pub fn new<U, V>(non_periodic: U, periodic: Option<U>) -> Self
+    where
+        U: IntoIterator<Item = V>,
+        V: Borrow<T>,
+    {
+        let non_periodic = non_periodic.into_iter().map(|x| *x.borrow()).collect();
+        let periodic = periodic.map(|p| p.into_iter().map(|x| *x.borrow()).collect());
         Self {
             non_periodic,
             periodic,
@@ -41,11 +51,14 @@ impl ContinuedFraction {
     }
 
     /// Creates the continued fraction by taking the square root of a number.
-    pub fn from_sqrt(n: i64) -> Self {
-        assert!(n >= 0, "Number must be non-negative.");
+    pub fn from_sqrt(n: T) -> Self
+    where
+        T: Signed + Hash,
+    {
+        assert!(n >= T::ZERO, "Number must be non-negative.");
 
         // integer square root of n
-        let root = (n as f64).sqrt().floor() as i64;
+        let root = T::from(n.to_f64().unwrap().sqrt().floor()).unwrap();
 
         let non_periodic = vec![root];
         let mut periodic = None;
@@ -63,7 +76,7 @@ impl ContinuedFraction {
             // here it is stored as positive because calculations take into account the negative sign
             let mut num = root;
             // denominator, starts with 1
-            let mut denom = 1;
+            let mut denom = T::ONE;
 
             // calculate next iteration of the continued fraction
             // until the set contains the numerator and the denominator
@@ -88,12 +101,12 @@ impl ContinuedFraction {
     }
 
     /// Returns the reference to the non-periodic part of the continued fraction.
-    pub fn non_periodic(&self) -> &[i64] {
+    pub fn non_periodic(&self) -> &[T] {
         &self.non_periodic
     }
 
     /// Returns the reference to the periodic part of the continued fraction.
-    pub fn periodic(&self) -> Option<&[i64]> {
+    pub fn periodic(&self) -> Option<&[T]> {
         self.periodic.as_deref()
     }
 
@@ -112,17 +125,12 @@ impl ContinuedFraction {
 
         iter::from_fn(move || {
             let next_value = values.next()?;
-            let next_num = Integer::const_from_signed(*next_value) * &num + &prev_num;
-            let next_den = Integer::const_from_signed(*next_value) * &den + &prev_den;
+            let next_num = (*next_value).into() * &num + &prev_num;
+            let next_den = (*next_value).into() * &den + &prev_den;
             prev_num = mem::replace(&mut num, next_num);
             prev_den = mem::replace(&mut den, next_den);
             Some(Rational::from_integers_ref(&num, &den))
         })
-    }
-
-    /// Returns the convergent at index n.
-    pub fn convergent_n(&self, n: usize) -> Option<Rational> {
-        self.convergents().nth(n)
     }
 }
 
@@ -674,7 +682,7 @@ where
 /// ```
 pub fn phi<T>(n: T) -> T
 where
-    T: PrimInt + ConstZero + ConstOne
+    T: PrimInt + ConstZero + ConstOne,
 {
     distinct_prime_factors(n)
         .map(|(factor, _)| factor)
@@ -698,7 +706,7 @@ where
 /// ```
 pub fn phi_0_to_n<T>(n: T) -> Vec<T>
 where
-    T: PrimInt + ConstZero + ConstOne
+    T: PrimInt + ConstZero + ConstOne,
 {
     let n = n.to_usize().expect("Cannot convert n to usize.");
     let mut phi_values = Vec::with_capacity(n + 1);
