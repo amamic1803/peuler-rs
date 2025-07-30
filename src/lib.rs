@@ -136,6 +136,7 @@ impl PEuler {
                 Box::new(problems::Problem0078::new()),
                 Box::new(problems::Problem0080::new()),
                 Box::new(problems::Problem0081::new()),
+                Box::new(problems::Problem0082::new()),
                 Box::new(problems::Problem0085::new()),
                 Box::new(problems::Problem0089::new()),
                 Box::new(problems::Problem0091::new()),

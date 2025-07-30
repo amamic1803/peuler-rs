@@ -16,18 +16,44 @@ use factors::distinct_prime_factors;
 use malachite::Integer;
 use malachite::base::num::basic::traits::{One, Zero};
 use malachite::rational::Rational;
-use num_traits::{ConstOne, ConstZero, PrimInt, Signed, ToPrimitive};
+use num_traits::{ConstOne, ConstZero, PrimInt, ToPrimitive};
 use primes::sieve_of_eratosthenes;
 
-/// Represents a continued fraction.
+#[cfg_attr(doc, katexit::katexit)]
+/// Simple continued fraction.
+///
+/// A simple continued fraction is a continued fraction
+/// with all numerators equal to `1`.
+///
+/// If it is finite, it is of the form:
+/// $$
+///     a\_0 + \\frac{1}{a\_1 + \\frac{1}{a\_2 + \\frac{1}{\\ddots + \\frac{1}{a\_n}}}}
+/// $$
+/// usually represented by coefficients:
+/// $$
+///    \\left[ a\_0; a\_1, a\_2, \\ldots, a\_n \\right]
+/// $$
+/// If it is infinite, it is of the form:
+/// $$
+///    a\_0 + \\frac{1}{a\_1 + \\frac{1}{a\_2 + \\frac{1}{\\ddots}}}
+/// $$
+/// usually represented by coefficients:
+/// $$
+///   \\left[ a\_0; a\_1, a\_2, \\ldots \\right]
+/// $$
+/// forma
 /// # Example
 /// ```
 /// use peuler::math::SimpleContinuedFraction;
+///
 /// // Continued fraction of sqrt(2): [1; 2, 2, 2, ...]
 /// let cf = SimpleContinuedFraction::from_sqrt(2);
-/// assert_eq!(cf.non_periodic(), vec![1i64].as_slice());
-/// assert_eq!(cf.periodic(), Some(vec![2i64].as_slice()));
+/// assert_eq!(cf.non_periodic(), vec![1].as_slice());
+/// assert_eq!(cf.periodic(), Some(vec![2].as_slice()));
+///
+/// let cf = SimpleContinuedFraction::new(vec![1, 2, 3], Some(vec![4, 5]));
 /// ```
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct SimpleContinuedFraction<T> {
     non_periodic: Vec<T>,
     periodic: Option<Vec<T>>,
@@ -36,7 +62,12 @@ impl<T> SimpleContinuedFraction<T>
 where
     T: PrimInt + ConstZero + ConstOne + Into<Integer>,
 {
-    /// Creates a new continued fraction.
+    /// Creates a new simple continued fraction.
+    /// # Arguments
+    /// * `non_periodic` - The non-repeating coefficients of the continued fraction $( a\_0, a\_1, a\_2, \\ldots, a\_k )$.
+    /// * `periodic` - The repeating coefficients of the continued fraction $( a\_{k+1}, \\ldots, a\_{k+l} )$, if any.
+    /// # Returns
+    /// * A new simple continued fraction.
     pub fn new<U, V>(non_periodic: U, periodic: Option<U>) -> Self
     where
         U: IntoIterator<Item = V>,
@@ -50,15 +81,24 @@ where
         }
     }
 
-    /// Creates the continued fraction by taking the square root of a number.
+    /// Creates a new simple continued fraction of the square root of an integer.
+    /// # Arguments
+    /// * `n` - The integer to find the continued fraction of its square root.
+    /// # Returns
+    /// * A new simple continued fraction representing the square root of the integer.
+    /// # Panics
+    /// * If `n` is negative.
+    /// * If `n` cannot be converted to [f64].
     pub fn from_sqrt(n: T) -> Self
     where
-        T: Signed + Hash,
+        T: Hash,
     {
-        assert!(n >= T::ZERO, "Number must be non-negative.");
+        if n < T::ZERO {
+            panic!("Cannot calculate square root of a negative integer.");
+        }
 
         // integer square root of n
-        let root = T::from(n.to_f64().unwrap().sqrt().floor()).unwrap();
+        let root = T::from(n.to_f64().expect("Cannot convert n to f64.").sqrt().floor()).unwrap();
 
         let non_periodic = vec![root];
         let mut periodic = None;
@@ -72,13 +112,13 @@ where
             // used for detecting the period
             let mut set = HashSet::new();
 
-            // rational part of the numerator, it is negative number such that -root < num < 0
+            // rational part of the numerator, it is a negative number such that -root < num < 0
             // here it is stored as positive because calculations take into account the negative sign
             let mut num = root;
             // denominator, starts with 1
             let mut denom = T::ONE;
 
-            // calculate next iteration of the continued fraction
+            // calculate the next iteration of the continued fraction
             // until the set contains the numerator and the denominator
             // which means the period is found
             while !set.contains(&(num, denom)) {
@@ -90,7 +130,7 @@ where
                 // push the expanded value to the periodic part of the continued fraction
                 periodic.as_mut().unwrap().push(expanded_val);
 
-                num = -(num - denom * expanded_val);
+                num = denom * expanded_val - num; // -(num - denom * expanded_val)
             }
         }
 
@@ -100,12 +140,16 @@ where
         }
     }
 
-    /// Returns the reference to the non-periodic part of the continued fraction.
+    /// The non-repeating coefficients of the continued fraction.
+    /// # Returns
+    /// * A slice of the non-repeating coefficients.
     pub fn non_periodic(&self) -> &[T] {
         &self.non_periodic
     }
 
-    /// Returns the reference to the periodic part of the continued fraction.
+    /// The repeating coefficients of the continued fraction, if any.
+    /// # Returns
+    /// * An [Option] containing a slice of the repeating coefficients.
     pub fn periodic(&self) -> Option<&[T]> {
         self.periodic.as_deref()
     }
