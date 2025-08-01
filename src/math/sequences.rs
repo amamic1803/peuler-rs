@@ -1,19 +1,36 @@
-//! Iterators for various mathematical sequences.
+//! Iterators over mathematical sequences.
 
 use num_traits::{ConstOne, ConstZero, NumCast, PrimInt};
 
 /// A trait for mathematical sequences that can be iterated over.
-pub trait Sequence<T>: Iterator {
-    /// Sums the next `n` elements of the sequence.
+pub trait Sequence<T>: Iterator<Item = T>
+where
+    T: ConstZero,
+{
+    /// Sum the next `n` elements of the sequence.
+    ///
     /// Advances the iterator by `n` elements.
     /// If the iterator has fewer than `n` elements left, it sums as many as possible.
     /// This should be used instead of `.take(n).sum()` because
-    /// some sequences may have a more efficient way to compute the sum.
+    /// some sequences have a more efficient implementation for summing elements.
     /// # Arguments
     /// * `n` - The number of elements to sum.
     /// # Returns
     /// * The sum of the next `n` elements in the sequence.
-    fn sum_next_n(&mut self, n: usize) -> T;
+    fn sum_next_n(&mut self, n: usize) -> T {
+        let mut sum = T::ZERO;
+        for _ in 0..n {
+            match self.next() {
+                Some(x) => {
+                    sum = sum + x;
+                }
+                None => {
+                    break;
+                }
+            }
+        }
+        sum
+    }
 }
 
 #[cfg_attr(doc, katexit::katexit)]
@@ -40,24 +57,23 @@ pub trait Sequence<T>: Iterator {
 #[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub struct CollatzSeq<T> {
     current: T,
-    t2: T,
-    t3: T,
 }
 impl<T> CollatzSeq<T>
 where
-    T: NumCast,
+    T: PrimInt + ConstOne,
 {
-    /// Creates a new Collatz sequence starting at the given number `n`.
+    /// Create a new Collatz sequence starting at the integer `n`.
     /// # Arguments
-    /// * `n` - The number to start the Collatz sequence at.
+    /// * `n` - The integer to start the Collatz sequence at.
     /// # Returns
     /// * The iterator over the Collatz sequence.
+    /// # Panics
+    /// * If `n` < `1` since the Collatz sequence requires a positive integer starting point.
     pub fn new(n: T) -> Self {
-        Self {
-            current: n,
-            t2: T::from(2).unwrap(),
-            t3: T::from(3).unwrap(),
+        if n < T::ONE {
+            panic!("Collatz sequence requires a positive integer starting point.");
         }
+        Self { current: n }
     }
 }
 impl<T> Iterator for CollatzSeq<T>
@@ -71,34 +87,18 @@ where
             return None;
         }
         let value = self.current;
-        if self.current % self.t2 == T::ZERO {
-            self.current = self.current / self.t2;
+        let t2 = T::from(2).unwrap();
+        if self.current % t2 == T::ZERO {
+            self.current = self.current / t2;
         } else if self.current == T::ONE {
             self.current = T::ZERO; // ends the sequence
         } else {
-            self.current = self.t3 * self.current + T::ONE;
+            self.current = T::from(3).unwrap() * self.current + T::ONE;
         }
         Some(value)
     }
 }
-impl<T> Sequence<T> for CollatzSeq<T>
-where T: PrimInt + ConstZero + ConstOne
-{
-    fn sum_next_n(&mut self, n: usize) -> T {
-        let mut sum = T::ZERO;
-        for _ in 0..n {
-            match self.next() {
-                Some(x) => {
-                    sum = sum + x;
-                },
-                None => {
-                    break;
-                }
-            }
-        }
-        sum
-    }
-}
+impl<T> Sequence<T> for CollatzSeq<T> where T: PrimInt + ConstZero + ConstOne {}
 
 #[cfg_attr(doc, katexit::katexit)]
 /// The Fibonacci sequence.
@@ -125,7 +125,7 @@ pub struct FibonacciSeq<T> {
 }
 impl<T> Default for FibonacciSeq<T>
 where
-    T: PrimInt + ConstZero + ConstOne,
+    T: ConstZero + ConstOne,
 {
     fn default() -> Self {
         Self::new()
@@ -133,9 +133,9 @@ where
 }
 impl<T> FibonacciSeq<T>
 where
-    T: PrimInt + ConstZero + ConstOne,
+    T: ConstZero + ConstOne,
 {
-    /// Creates a new Fibonacci sequence starting from `0`.
+    /// Create a new Fibonacci sequence starting from `0`.
     /// # Returns
     /// * A new Fibonacci sequence iterator.
     pub fn new() -> Self {
@@ -166,27 +166,14 @@ where
         let sqrt5 = 5f64.sqrt();
         let a = (1.0 + sqrt5) / 2.0;
         let b = (1.0 - sqrt5) / 2.0;
-        self.curr = T::from(((a.powf(n) - b.powf(n)) / sqrt5).round()).expect("Overflow in Fibonacci calculation");
-        self.next = T::from(((a.powf(n + 1.0) - b.powf(n + 1.0)) / sqrt5).round()).expect("Overflow in Fibonacci calculation");
+        self.curr = T::from(((a.powf(n) - b.powf(n)) / sqrt5).round())
+            .expect("Overflow in Fibonacci calculation");
+        self.next = T::from(((a.powf(n + 1.0) - b.powf(n + 1.0)) / sqrt5).round())
+            .expect("Overflow in Fibonacci calculation");
         self.next()
     }
 }
-impl<T> Sequence<T> for FibonacciSeq<T> where T: PrimInt + ConstZero {
-    fn sum_next_n(&mut self, n: usize) -> T {
-        let mut sum = T::ZERO;
-        for _ in 0..n {
-            match self.next() {
-                Some(x) => {
-                    sum = sum + x;
-                },
-                None => {
-                    break;
-                }
-            }
-        }
-        sum
-    }
-}
+impl<T> Sequence<T> for FibonacciSeq<T> where T: PrimInt + ConstZero {}
 
 #[cfg_attr(doc, katexit::katexit)]
 /// The natural numbers sequence.
@@ -212,7 +199,7 @@ impl<T> Sequence<T> for FibonacciSeq<T> where T: PrimInt + ConstZero {
 /// ```
 #[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub struct NaturalNumbersSeq<T> {
-    current: T
+    current: T,
 }
 impl<T> Default for NaturalNumbersSeq<T>
 where
@@ -226,7 +213,7 @@ impl<T> NaturalNumbersSeq<T>
 where
     T: ConstOne,
 {
-    /// Creates a new natural numbers sequence starting from `1`.
+    /// Create a natural numbers sequence starting from `1`.
     /// # Returns
     /// * A new natural numbers sequence iterator.
     pub fn new() -> Self {
@@ -246,7 +233,8 @@ where
     }
 
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
-        self.current = self.current + T::from(n).expect("Overflow in nth calculation in NaturalNumbersSeq");
+        self.current =
+            self.current + T::from(n).expect("Overflow in nth calculation in NaturalNumbersSeq");
         self.next()
     }
 }
@@ -301,7 +289,7 @@ impl<T> NaturalNumbersWithZeroSeq<T>
 where
     T: ConstZero,
 {
-    /// Creates a new natural numbers sequence starting from `0`.
+    /// Create a natural numbers sequence starting from `0`.
     /// # Returns
     /// * A new natural numbers sequence iterator.
     pub fn new() -> Self {
@@ -321,7 +309,8 @@ where
     }
 
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
-        self.current = self.current + T::from(n).expect("Overflow in nth calculation in NaturalNumbersWithZeroSeq");
+        self.current = self.current
+            + T::from(n).expect("Overflow in nth calculation in NaturalNumbersWithZeroSeq");
         self.next()
     }
 }
@@ -382,7 +371,7 @@ impl<T> OddNaturalNumbersSeq<T>
 where
     T: ConstOne,
 {
-    /// Creates a new odd natural numbers sequence starting from `1`.
+    /// Create an odd natural numbers sequence starting from `1`.
     /// # Returns
     /// * A new odd natural numbers sequence iterator.
     pub fn new() -> Self {
@@ -402,7 +391,9 @@ where
     }
 
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
-        self.current = self.current + T::from(2).unwrap() * T::from(n).expect("Overflow in nth calculation in OddNaturalNumbersSeq");
+        self.current = self.current
+            + T::from(2).unwrap()
+                * T::from(n).expect("Overflow in nth calculation in OddNaturalNumbersSeq");
         self.next()
     }
 }
@@ -459,11 +450,13 @@ impl<T> EvenNaturalNumbersSeq<T>
 where
     T: NumCast,
 {
-    /// Creates a new even natural numbers sequence starting from `2`.
+    /// Create an even natural numbers sequence starting from `2`.
     /// # Returns
     /// * A new even natural numbers sequence iterator.
     pub fn new() -> Self {
-        Self { current: T::from(2).unwrap() }
+        Self {
+            current: T::from(2).unwrap(),
+        }
     }
 }
 impl<T> Iterator for EvenNaturalNumbersSeq<T>
@@ -479,7 +472,9 @@ where
     }
 
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
-        self.current = self.current + T::from(2).unwrap() * T::from(n).expect("Overflow in nth calculation in EvenNaturalNumbersSeq");
+        self.current = self.current
+            + T::from(2).unwrap()
+                * T::from(n).expect("Overflow in nth calculation in EvenNaturalNumbersSeq");
         self.next()
     }
 }
@@ -536,7 +531,7 @@ impl<T> EvenNaturalNumbersWithZeroSeq<T>
 where
     T: ConstZero,
 {
-    /// Creates a new even natural numbers sequence starting from `0`.
+    /// Create an even natural numbers sequence starting from `0`.
     /// # Returns
     /// * A new even natural numbers sequence iterator.
     pub fn new() -> Self {
@@ -556,7 +551,9 @@ where
     }
 
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
-        self.current = self.current + T::from(2).unwrap() * T::from(n).expect("Overflow in nth calculation in EvenNaturalNumbersWithZeroSeq");
+        self.current = self.current
+            + T::from(2).unwrap()
+                * T::from(n).expect("Overflow in nth calculation in EvenNaturalNumbersWithZeroSeq");
         self.next()
     }
 }
@@ -614,7 +611,7 @@ impl<T> NaturalNumbersSquaredSeq<T>
 where
     T: ConstOne,
 {
-    /// Creates a new natural numbers squared sequence starting from `1`.
+    /// Create a natural numbers squared sequence starting from `1`.
     /// # Returns
     /// * A new natural numbers squared sequence iterator.
     pub fn new() -> Self {
@@ -634,7 +631,8 @@ where
     }
 
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
-        self.current = self.current + T::from(n).expect("Overflow in nth calculation in NaturalNumbersSquaredSeq");
+        self.current = self.current
+            + T::from(n).expect("Overflow in nth calculation in NaturalNumbersSquaredSeq");
         self.next()
     }
 }
@@ -687,7 +685,7 @@ impl<T> NaturalNumbersWithZeroSquaredSeq<T>
 where
     T: ConstZero,
 {
-    /// Creates a new natural numbers squared sequence starting from `0`.
+    /// Create a natural numbers squared sequence starting from `0`.
     /// # Returns
     /// * A new natural numbers squared sequence iterator.
     pub fn new() -> Self {
@@ -707,7 +705,8 @@ where
     }
 
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
-        self.current = self.current + T::from(n).expect("Overflow in nth calculation in NaturalNumbersWithZeroSquaredSeq");
+        self.current = self.current
+            + T::from(n).expect("Overflow in nth calculation in NaturalNumbersWithZeroSquaredSeq");
         self.next()
     }
 }
@@ -726,7 +725,8 @@ where
             self.nth(n - 1);
             n_next * (n_next + T::ONE) * (n_next * t2 + T::ONE) / t6
         } else {
-            let curr_sum = self.current * (self.current - T::ONE) * (t2 * self.current - T::ONE) / t6;
+            let curr_sum =
+                self.current * (self.current - T::ONE) * (t2 * self.current - T::ONE) / t6;
             let next_sum = n_next * (n_next + T::ONE) * (n_next * t2 + T::ONE) / t6;
             self.nth(n - 1);
             next_sum - curr_sum
@@ -769,7 +769,7 @@ impl<T> OddNaturalNumbersSquaredSeq<T>
 where
     T: ConstOne,
 {
-    /// Creates a new odd natural numbers squared sequence starting from `1`.
+    /// Create an odd natural numbers squared sequence starting from `1`.
     /// # Returns
     /// * A new odd natural numbers squared sequence iterator.
     pub fn new() -> Self {
@@ -789,7 +789,9 @@ where
     }
 
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
-        self.current = self.current + T::from(2).unwrap() * T::from(n).expect("Overflow in nth calculation in OddNaturalNumbersSquaredSeq");
+        self.current = self.current
+            + T::from(2).unwrap()
+                * T::from(n).expect("Overflow in nth calculation in OddNaturalNumbersSquaredSeq");
         self.next()
     }
 }
@@ -851,11 +853,13 @@ impl<T> EvenNaturalNumbersSquaredSeq<T>
 where
     T: NumCast,
 {
-    /// Creates a new even natural numbers squared sequence starting from `4`.
+    /// Create an even natural numbers squared sequence starting from `4`.
     /// # Returns
     /// * A new even natural numbers squared sequence iterator.
     pub fn new() -> Self {
-        Self { current: T::from(2).unwrap() }
+        Self {
+            current: T::from(2).unwrap(),
+        }
     }
 }
 impl<T> Iterator for EvenNaturalNumbersSquaredSeq<T>
@@ -871,7 +875,9 @@ where
     }
 
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
-        self.current = self.current + T::from(2).unwrap() * T::from(n).expect("Overflow in nth calculation in EvenNaturalNumbersSquaredSeq");
+        self.current = self.current
+            + T::from(2).unwrap()
+                * T::from(n).expect("Overflow in nth calculation in EvenNaturalNumbersSquaredSeq");
         self.next()
     }
 }
@@ -929,7 +935,7 @@ impl<T> EvenNaturalNumbersWithZeroSquaredSeq<T>
 where
     T: ConstZero,
 {
-    /// Creates a new even natural numbers squared sequence starting from `0`.
+    /// Create an even natural numbers squared sequence starting from `0`.
     /// # Returns
     /// * A new even natural numbers squared sequence iterator.
     pub fn new() -> Self {
@@ -949,7 +955,10 @@ where
     }
 
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
-        self.current = self.current + T::from(2).unwrap() * T::from(n).expect("Overflow in nth calculation in EvenNaturalNumbersWithZeroSquaredSeq");
+        self.current = self.current
+            + T::from(2).unwrap()
+                * T::from(n)
+                    .expect("Overflow in nth calculation in EvenNaturalNumbersWithZeroSquaredSeq");
         self.next()
     }
 }

@@ -14,6 +14,7 @@ macro_rules! problem {
             title: &'static str,
         }
         impl $struct_name {
+            #[doc = concat!("Create a new [", stringify!($struct_name), "] instance.")]
             pub fn new() -> Self {
                 Self {
                     id: $id,
@@ -257,22 +258,22 @@ pub trait ProjectEuler: Send + Sync {
 pub trait Problem: Send + Sync {
     /// The identifier of the problem.
     /// # Returns
-    /// An integer greater than 0 representing the problem's ID.
+    /// An integer greater than `0` representing the problem's ID.
     fn id(&self) -> usize;
 
     /// The title of the problem.
     /// # Returns
-    /// A string containing the title.
+    /// The title of the problem.
     fn title(&self) -> &str;
 
-    /// Runs the problem.
+    /// Run the problem.
     /// # Returns
-    /// A string with the answer to the problem.
+    /// The answer to the problem.
     fn run(&self) -> String;
 
-    /// Benchmarks the problem.
+    /// Benchmark the problem.
     /// # Returns
-    /// A tuple with the answer to the problem and the elapsed time.
+    /// The answer to the problem and the elapsed time.
     fn benchmark(&self) -> (String, Duration) {
         let instant = Instant::now();
         let result = self.run();

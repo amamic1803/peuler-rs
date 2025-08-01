@@ -1,12 +1,12 @@
 //! Functions for working with digits.
 
+use num_traits::{ConstOne, ConstZero, PrimInt};
 use std::borrow::Borrow;
 use std::cmp::Ordering;
-use num_traits::{ConstOne, ConstZero, PrimInt};
 
-/// Iterator over the digits of a number in the given radix.
+/// Iterator over the digits of an integer in the given radix.
 ///
-/// Digits are yielded in the order from the least significant to the most significant digit.
+/// Digits are yielded in the least significant to the most significant order.
 /// # Example
 /// ```
 /// use peuler::math::digits::DigitsIter;
@@ -37,27 +37,24 @@ pub struct DigitsIter<T> {
     radix: T,
     front_weight: T,
 }
-impl<T> DigitsIter<T>
-where
-    T: PrimInt + ConstZero + ConstOne
-{
-    /// Creates a new `DigitsIter` for the given number and radix.
+impl<T: PrimInt + ConstZero + ConstOne> DigitsIter<T> {
+    /// Create a new [DigitsIter] for the given integer and radix.
     /// # Arguments
-    /// * `num` - The number to iterate over.
+    /// * `num` - The integer to extract digits from.
     /// * `radix` - The radix to use for the digits.
     /// # Panics
     /// * If `radix` is less than 2.
     /// * If `num` is negative.
     /// * If `radix` does not fit in the type `T`.
     /// # Returns
-    /// * `DigitsIter<T>` - An iterator over the digits of the number in the given radix.
+    /// * An iterator over the digits of the integer in the given radix.
     pub fn new(num: T, radix: u8) -> Self {
         if radix < 2 {
             panic!("Radix must be at least 2.");
         }
         let radix = T::from(radix).expect("Radix must fit in the type T.");
         let length = match num.cmp(&T::ZERO) {
-            Ordering::Less => panic!("Number must be non-negative."),
+            Ordering::Less => panic!("Integer must be non-negative."),
             Ordering::Equal => 1,
             Ordering::Greater => num.to_u128().unwrap().ilog(radix.to_u128().unwrap()) + 1,
         };
@@ -69,10 +66,7 @@ where
         }
     }
 }
-impl<T> Iterator for DigitsIter<T>
-where
-    T: PrimInt + ConstZero
-{
+impl<T: PrimInt + ConstZero> Iterator for DigitsIter<T> {
     type Item = u8;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -90,7 +84,11 @@ where
         let length = if self.front_weight == T::ZERO {
             0
         } else {
-            self.front_weight.to_u128().unwrap().ilog(self.radix.to_u128().unwrap()) as usize + 1
+            self.front_weight
+                .to_u128()
+                .unwrap()
+                .ilog(self.radix.to_u128().unwrap()) as usize
+                + 1
         };
         (length, Some(length))
     }
@@ -99,10 +97,7 @@ where
         self.len()
     }
 }
-impl<T> DoubleEndedIterator for DigitsIter<T>
-where
-    T: PrimInt + ConstZero
-{
+impl<T: PrimInt + ConstZero> DoubleEndedIterator for DigitsIter<T> {
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.num == T::ZERO && self.front_weight == T::ZERO {
             None
@@ -116,30 +111,30 @@ where
 }
 impl<T: PrimInt + ConstZero> ExactSizeIterator for DigitsIter<T> {}
 
-/// Creates an iterator over the digits of a number in the given radix.
+/// Create an iterator over the digits of an integer in the given radix.
+///
+/// Digits are yielded in the order from the least significant to the most significant.
 ///
 /// This function is a convenience wrapper around [DigitsIter::new].
 /// # Arguments
-/// * `n` - The number to iterate over.
+/// * `n` - The integer to extract digits from.
 /// * `radix` - The radix to use for the digits.
 /// # Panics
 /// * If `n` is negative.
 /// * If `radix` is less than 2.
 /// * If `radix` does not fit in the type `T`.
 /// # Returns
-/// * An iterator over the digits of the number in the given radix.
+/// * An iterator over the digits of the integer in the given radix.
 pub fn digits<T: PrimInt + ConstZero + ConstOne>(n: T, radix: u8) -> DigitsIter<T> {
     DigitsIter::new(n, radix)
 }
 
-/// Creates an integer from digits.
+/// Create an integer from digits.
 ///
-/// Digits are interpreted in the least significant to most significant order
-/// and can be any type that implements [IntoIterator].
+/// Digits are expected in the least significant to the most significant order.
 /// # Arguments
-/// * `digits` - The digits to convert to an integer,
-/// in the least significant to the most significant order.
-/// * `radix` - The radix of the number.
+/// * `digits` - The digits to convert to an integer.
+/// * `radix` - The radix of the integer.
 /// # Panics
 /// * If `radix` is less than 2.
 /// * If `radix` does not fit in the type `V`.
@@ -159,7 +154,7 @@ pub fn digits_to_int<T, U, V>(digits: T, radix: u8) -> V
 where
     T: IntoIterator<Item = U>,
     U: Borrow<u8>,
-    V: PrimInt + ConstZero + ConstOne
+    V: PrimInt + ConstZero + ConstOne,
 {
     if radix < 2 {
         panic!("Radix must be at least 2.");
@@ -180,12 +175,12 @@ where
     result
 }
 
-/// Checks whether an integer is a palindrome.
+/// Check whether an integer is a palindrome.
 /// # Arguments
 /// * `n` - The integer to check.
 /// * `radix` - The radix to use for checking.
 /// # Returns
-/// * `bool` - Whether an integer is a palindrome.
+/// * Whether an integer is a palindrome.
 /// # Panics
 /// * If `n` is negative.
 /// * If `radix` is less than 2.
@@ -218,29 +213,29 @@ where
                             return false; // Mismatch found
                         }
                         last_digit = None;
-                    },
+                    }
                     None => return true, // No more digits to compare
                 }
-            },
+            }
             None => {
                 match digits.next() {
                     Some(back) => {
                         last_digit = Some(back);
-                    },
+                    }
                     None => return true, // No more digits to compare
                 }
-            },
+            }
         }
     }
 }
 
-/// Checks if two numbers are permutations of each other.
+/// Check if two integers are permutations of each other.
 /// # Arguments
-/// * `n` - The first number.
-/// * `m` - The second number.
-/// * `radix` - The radix of the numbers.
+/// * `n` - The first integer.
+/// * `m` - The second integer.
+/// * `radix` - The radix of the integers.
 /// # Returns
-/// * `bool` - Whether the numbers are permutations of each other.
+/// * Whether the integers are permutations of each other.
 /// # Panics
 /// * If `n` or `m` is negative.
 /// * If `radix` is less than 2.
@@ -258,7 +253,7 @@ where
 /// ```
 pub fn is_permutation<T>(n: T, m: T, radix: u8) -> bool
 where
-    T: PrimInt + ConstZero + ConstOne
+    T: PrimInt + ConstZero + ConstOne,
 {
     let mut seen_digits = [0_i16; 256];
 

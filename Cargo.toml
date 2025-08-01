@@ -11,12 +11,18 @@ lto = true
 opt-level = 3
 
 [dependencies]
-clap = { version = "4.5.41", features = ["cargo"], optional = true }
+clap = { version = "4.5.42", features = ["cargo"], optional = true }
 itertools = "0.14.0"
 katexit = "0.1.5"
 malachite = "0.6.1"
 num-traits = "0.2.19"
+rand = "0.9.2"
+
+[lib]
+name = "peuler"
+path = "src/lib.rs"
 
 [[bin]]
 name = "peuler"
+path = "src/main.rs"
 required-features = ["clap"]

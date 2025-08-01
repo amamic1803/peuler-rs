@@ -1,10 +1,10 @@
-//! factors
+//! Factors and divisors of integers.
 
+use crate::math::primes::sieve_of_eratosthenes;
+use num_traits::{ConstOne, ConstZero, PrimInt};
 use std::iter::Sum;
 use std::iter::from_fn;
 use std::vec::IntoIter;
-use num_traits::{ConstOne, ConstZero, PrimInt};
-use crate::math::primes::sieve_of_eratosthenes;
 
 /// An iterator over prime factors of an integer.
 ///
@@ -32,11 +32,11 @@ pub struct PrimeFactors<T> {
     prime_table: IntoIter<T>,
 }
 impl<T: PrimInt + ConstZero + ConstOne> PrimeFactors<T> {
-    /// Creates a new [PrimeFactors] iterator for the given integer.
+    /// Create a new [PrimeFactors] iterator for the given integer.
     /// # Arguments
     /// * `n` - The integer to find the prime factors of.
     /// # Returns
-    /// * [PrimeFactors] - An iterator over the prime factors of the integer in ascending order.
+    /// * An iterator over the prime factors of the integer in ascending order.
     /// # Panics
     /// * If `n` is negative.
     /// * If `n` cannot be converted to [f64].
@@ -45,12 +45,15 @@ impl<T: PrimInt + ConstZero + ConstOne> PrimeFactors<T> {
             panic!("Cannot find prime factors of negative numbers.");
         }
         // calculate primes that are less than or equal to the square root of n
-        let mut prime_table = sieve_of_eratosthenes(T::from(n.to_f64().expect("Cannot convert to f64").sqrt().floor()).unwrap()).into_iter();
+        let mut prime_table = sieve_of_eratosthenes(
+            T::from(n.to_f64().expect("Cannot convert to f64").sqrt().floor()).unwrap(),
+        )
+        .into_iter();
         let factor = prime_table.next().unwrap_or(T::from(2).unwrap());
         Self {
             n,
             factor,
-            prime_table
+            prime_table,
         }
     }
 }
@@ -108,12 +111,11 @@ pub struct DistinctPrimeFactors<T> {
     factor_count: usize,
 }
 impl<T: PrimInt + ConstZero + ConstOne> DistinctPrimeFactors<T> {
-    /// Creates a new [DistinctPrimeFactors] iterator for the given integer.
+    /// Create a new [DistinctPrimeFactors] iterator for the given integer.
     /// # Arguments
     /// * `n` - The integer to find the distinct prime factors of.
     /// # Returns
-    /// * [DistinctPrimeFactors] -
-    ///   An iterator over the distinct prime factors of the integer and
+    /// * An iterator over the distinct prime factors of the integer and
     ///   their multiplicities in ascending order.
     /// # Panics
     /// * If `n` is negative.
@@ -125,7 +127,7 @@ impl<T: PrimInt + ConstZero + ConstOne> DistinctPrimeFactors<T> {
         Self {
             prime_factors,
             factor,
-            factor_count
+            factor_count,
         }
     }
 }
@@ -161,13 +163,13 @@ impl<T: PrimInt + ConstZero + ConstOne> Iterator for DistinctPrimeFactors<T> {
     }
 }
 
-/// Creates an iterator over the prime factors of an integer.
+/// Create an iterator over the prime factors of an integer.
 ///
 /// This function is a convenience wrapper around [PrimeFactors::new].
 /// # Arguments
 /// * `n` - The integer to find the prime factors of.
 /// # Returns
-/// * [PrimeFactors] - An iterator over the prime factors of the integer in ascending order.
+/// * An iterator over the prime factors of the integer in ascending order.
 /// # Panics
 /// * If `n` is negative.
 /// * If `n` cannot be converted to [f64].
@@ -175,14 +177,13 @@ pub fn prime_factors<T: PrimInt + ConstZero + ConstOne>(n: T) -> PrimeFactors<T>
     PrimeFactors::new(n)
 }
 
-/// Creates an iterator over the distinct prime factors of an integer.
+/// Create an iterator over the distinct prime factors of an integer.
 ///
 /// This function is a convenience wrapper around [DistinctPrimeFactors::new].
 /// # Arguments
 /// * `n` - The integer to find the distinct prime factors of.
 /// # Returns
-/// * [DistinctPrimeFactors] -
-///   An iterator over the distinct prime factors of the integer and
+/// * An iterator over the distinct prime factors of the integer and
 ///   their multiplicities in ascending order.
 /// # Panics
 /// * If `n` is negative.
@@ -191,7 +192,50 @@ pub fn distinct_prime_factors<T: PrimInt + ConstZero + ConstOne>(n: T) -> Distin
     DistinctPrimeFactors::new(n)
 }
 
-/// divisors iterator not sorted
+/// An iterator over the divisors of an integer.
+///
+/// Divisors are yielded in arbitrary order.
+/// # Example
+/// ```
+/// use peuler::math::factors::Divisors;
+/// use itertools::Itertools;
+///
+/// let mut iter = Divisors::new(12);
+/// assert_eq!(iter.len(), 6);
+/// assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1, 2, 3, 4, 6, 12]);
+/// iter = Divisors::new(12);
+/// assert_eq!(iter.sum::<i32>(), 28);
+///
+/// iter = Divisors::new(28);
+/// assert_eq!(iter.len(), 6);
+/// assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1, 2, 4, 7, 14, 28]);
+/// iter = Divisors::new(28);
+/// assert_eq!(iter.sum::<i32>(), 56);
+///
+/// iter = Divisors::new(2);
+/// assert_eq!(iter.len(), 2);
+/// assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1, 2]);
+/// iter = Divisors::new(2);
+/// assert_eq!(iter.sum::<i32>(), 3);
+///
+/// iter = Divisors::new(500);
+/// assert_eq!(iter.len(), 12);
+/// assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1, 2, 4, 5, 10, 20, 25, 50, 100, 125, 250, 500]);
+/// iter = Divisors::new(500);
+/// assert_eq!(iter.sum::<i32>(), 1092);
+///
+/// iter = Divisors::new(1);
+/// assert_eq!(iter.len(), 1);
+/// assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1]);
+/// iter = Divisors::new(1);
+/// assert_eq!(iter.sum::<i32>(), 1);
+///
+/// iter = Divisors::new(0);
+/// assert_eq!(iter.len(), 0);
+/// assert!(iter.collect::<Vec<_>>().is_empty());
+/// iter = Divisors::new(0);
+/// assert_eq!(iter.sum::<i32>(), 0);
+/// ```
 #[derive(Clone, Eq, PartialEq, Hash)]
 pub struct Divisors<T> {
     factors: Vec<(T, usize, T, usize)>,
@@ -202,6 +246,11 @@ pub struct Divisors<T> {
     curr_sum: T,
 }
 impl<T: PrimInt + ConstZero + ConstOne> Divisors<T> {
+    /// Create a new [Divisors] iterator for the given integer.
+    /// # Arguments
+    /// * `n` - The integer to find the divisors of.
+    /// # Returns
+    /// * An iterator over the divisors of the integer in arbitrary order.
     /// # Panics
     /// * If `n` is negative.
     /// * If `n` cannot be converted to [f64].
@@ -265,7 +314,7 @@ impl<T: PrimInt + ConstZero + ConstOne> Divisors<T> {
             num_of_divisors,
             curr_num,
             sum_of_divisors,
-            curr_sum
+            curr_sum,
         }
     }
 }
@@ -273,25 +322,32 @@ impl<T: PrimInt + ConstOne + Sum<T>> Iterator for Divisors<T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.curr_num >= self.num_of_divisors {
+        if self.curr_num == self.num_of_divisors {
             return None;
         }
-        let mut i = self.factors.len() - 1;
-        loop {
-            if self.factors[i].3 < self.factors[i].1 {
-                self.factors[i].3 += 1;
-                self.factors[i].2 = self.factors[i].2 * self.factors[i].0;
-                self.value = self.value * self.factors[i].0;
-                self.curr_num += 1;
-                self.curr_sum = self.curr_sum + self.value;
-                return Some(self.value);
-            } else {
-                self.factors[i].3 = 0;
-                self.value = self.value / self.factors[i].2;
-                self.factors[i].2 = T::ONE;
-                i -= 1;
+
+        let ret_value = self.value;
+        self.curr_num += 1;
+        self.curr_sum = self.curr_sum + ret_value;
+
+        if self.curr_num < self.num_of_divisors {
+            let mut i = self.factors.len() - 1;
+            loop {
+                if self.factors[i].3 < self.factors[i].1 {
+                    self.factors[i].3 += 1;
+                    self.factors[i].2 = self.factors[i].2 * self.factors[i].0;
+                    self.value = self.value * self.factors[i].0;
+                    break;
+                } else {
+                    self.factors[i].3 = 0;
+                    self.value = self.value / self.factors[i].2;
+                    self.factors[i].2 = T::ONE;
+                    i -= 1;
+                }
             }
         }
+
+        Some(ret_value)
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
@@ -317,19 +373,68 @@ impl<T: PrimInt + ConstOne + Sum<T>> Iterator for Divisors<T> {
 }
 impl<T: PrimInt + ConstOne + Sum<T>> ExactSizeIterator for Divisors<T> {}
 
-/// proper divisors not sorted
+/// An iterator over the proper divisors of an integer.
+///
+/// Proper divisors are all divisors of an integer except the integer itself.
+/// They are yielded in arbitrary order.
+/// # Example
+/// ```
+/// use peuler::math::factors::ProperDivisors;
+/// use itertools::Itertools;
+///
+/// let mut iter = ProperDivisors::new(12);
+/// assert_eq!(iter.len(), 5);
+/// assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1, 2, 3, 4, 6]);
+/// iter = ProperDivisors::new(12);
+/// assert_eq!(iter.sum::<i32>(), 16);
+///
+/// iter = ProperDivisors::new(28);
+/// assert_eq!(iter.len(), 5);
+/// assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1, 2, 4, 7, 14]);
+/// iter = ProperDivisors::new(28);
+/// assert_eq!(iter.sum::<i32>(), 28);
+///
+/// iter = ProperDivisors::new(2);
+/// assert_eq!(iter.len(), 1);
+/// assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1]);
+/// iter = ProperDivisors::new(2);
+/// assert_eq!(iter.sum::<i32>(), 1);
+///
+/// iter = ProperDivisors::new(500);
+/// assert_eq!(iter.len(), 11);
+/// assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1, 2, 4, 5, 10, 20, 25, 50, 100, 125, 250]);
+/// iter = ProperDivisors::new(500);
+/// assert_eq!(iter.sum::<i32>(), 592);
+///
+/// iter = ProperDivisors::new(1);
+/// assert_eq!(iter.len(), 0);
+/// assert!(iter.sorted().collect::<Vec<_>>().is_empty());
+/// iter = ProperDivisors::new(1);
+/// assert_eq!(iter.sum::<i32>(), 0);
+///
+/// iter = ProperDivisors::new(0);
+/// assert_eq!(iter.len(), 0);
+/// assert!(iter.collect::<Vec<_>>().is_empty());
+/// iter = ProperDivisors::new(0);
+/// assert_eq!(iter.sum::<i32>(), 0);
+/// ```
 #[derive(Clone, Eq, PartialEq, Hash)]
 pub struct ProperDivisors<T> {
     n: T,
     divisors: Divisors<T>,
 }
 impl<T: PrimInt + ConstZero + ConstOne> ProperDivisors<T> {
+    /// Create a new [ProperDivisors] iterator for the given integer.
+    /// # Arguments
+    /// * `n` - The integer to find the proper divisors of.
+    /// # Returns
+    /// * An iterator over the proper divisors of the integer in arbitrary order.
+    /// # Panics
+    /// * If `n` is negative.
+    /// * If `n` cannot be converted to [f64].
     pub fn new(n: T) -> Self {
         let divisors = Divisors::new(n);
-        Self {
-            n,
-            divisors,
-        }
+        Self { n, divisors }
     }
 }
 impl<T: PrimInt + ConstZero + ConstOne + Sum<T>> Iterator for ProperDivisors<T> {
@@ -343,8 +448,8 @@ impl<T: PrimInt + ConstZero + ConstOne + Sum<T>> Iterator for ProperDivisors<T> 
                 } else {
                     None
                 }
-            },
-            None => None
+            }
+            None => None,
         }
     }
 
@@ -375,18 +480,40 @@ impl<T: PrimInt + ConstZero + ConstOne + Sum<T>> Iterator for ProperDivisors<T> 
 }
 impl<T: PrimInt + ConstZero + ConstOne + Sum<T>> ExactSizeIterator for ProperDivisors<T> {}
 
+/// Create an iterator over the divisors of an integer.
+///
+/// This function is a convenience wrapper around [Divisors::new].
+/// # Arguments
+/// * `n` - The integer to find the divisors of.
+/// # Returns
+/// * An iterator over the divisors of the integer in arbitrary order.
+/// # Panics
+/// * If `n` is negative.
+/// * If `n` cannot be converted to [f64].
 pub fn divisors<T: PrimInt + ConstZero + ConstOne>(n: T) -> Divisors<T> {
     Divisors::new(n)
 }
+
+/// Create an iterator over the proper divisors of an integer.
+///
+/// Proper divisors are all divisors of an integer except the integer itself.
+/// This function is a convenience wrapper around [ProperDivisors::new].
+/// # Arguments
+/// * `n` - The integer to find the proper divisors of.
+/// # Returns
+/// * An iterator over the proper divisors of the integer in arbitrary order.
+/// # Panics
+/// * If `n` is negative.
+/// * If `n` cannot be converted to [f64].
 pub fn proper_divisors<T: PrimInt + ConstZero + ConstOne>(n: T) -> ProperDivisors<T> {
     ProperDivisors::new(n)
 }
 
-/// Calculates the number of divisors of integers from `0` to `n`.
+/// The number of divisors of integers from `0` to `n`.
 /// # Arguments
 /// * `n` - The integer up to which to calculate the number of divisors.
 /// # Returns
-/// * `Vec<T>` - The number of divisors of integers from `0` to `n`.
+/// * The number of divisors of integers from `0` to `n`.
 ///   Index represents the integer, and the value at that index represents the number of divisors.
 /// # Panics
 /// * If `n` is negative.
@@ -395,7 +522,7 @@ pub fn proper_divisors<T: PrimInt + ConstZero + ConstOne>(n: T) -> ProperDivisor
 /// ```
 /// use peuler::math::factors::num_of_divisors_0_to_n;
 ///
-/// assert_eq!(num_of_divisors_0_to_n(10u8), vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]);
+/// assert_eq!(num_of_divisors_0_to_n(10), vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]);
 /// ```
 pub fn num_of_divisors_0_to_n<T>(n: T) -> Vec<T>
 where
@@ -415,13 +542,13 @@ where
     divisors
 }
 
-/// Calculates the number of proper divisors of integers from `0` to `n`.
+/// The number of proper divisors of integers from `0` to `n`.
 ///
 /// Proper divisors are all divisors of an integer except the integer itself.
 /// # Arguments
 /// * `n` - The integer up to which to calculate the number of proper divisors.
 /// # Returns
-/// * `Vec<T>` - The number of proper divisors of integers from `0` to `n`.
+/// * The number of proper divisors of integers from `0` to `n`.
 ///   Index represents the integer,
 ///   and the value at that index represents the number of proper divisors.
 /// # Panics
@@ -431,7 +558,7 @@ where
 /// ```
 /// use peuler::math::factors::num_of_proper_divisors_0_to_n;
 ///
-/// assert_eq!(num_of_proper_divisors_0_to_n(10u8), vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]);
+/// assert_eq!(num_of_proper_divisors_0_to_n(10), vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]);
 /// ```
 pub fn num_of_proper_divisors_0_to_n<T>(n: T) -> Vec<T>
 where
@@ -450,11 +577,11 @@ where
     divisors
 }
 
-/// Calculates the sum of divisors of integers from `0` to `n`.
+/// The sum of divisors of integers from `0` to `n`.
 /// # Arguments
 /// * `n` - The integer up to which to calculate the sum of divisors.
 /// # Returns
-/// * `Vec<T>` - The sum of the divisors of numbers from `0` to `n`.
+/// * The sum of the divisors of integers from `0` to `n`.
 ///   Index represents the integer, and the value at that index represents the sum of divisors.
 /// # Panics
 /// * If `n` is negative.
@@ -469,7 +596,7 @@ where
 /// ```
 pub fn sum_of_divisors_0_to_n<T>(n: T) -> Vec<T>
 where
-    T: PrimInt + ConstZero
+    T: PrimInt + ConstZero,
 {
     if n < T::ZERO {
         panic!("Cannot find divisors of negative numbers.");
@@ -484,13 +611,13 @@ where
     divisors
 }
 
-/// Calculates the sum of proper divisors of integers from `0` to `n`.
+/// The sum of proper divisors of integers from `0` to `n`.
 ///
 /// Proper divisors are all divisors of an integer except the integer itself.
 /// # Arguments
 /// * `n` - The integer up to which to calculate the sum of proper divisors.
 /// # Returns
-/// * `Vec<T>` - The sum of the proper divisors of integers from `0` to `n`.
+/// * The sum of the proper divisors of integers from `0` to `n`.
 ///   Index represents the integer,
 ///   and the value at that index represents the sum of proper divisors.
 /// # Panics
@@ -506,7 +633,7 @@ where
 /// ```
 pub fn sum_of_proper_divisors_0_to_n<T>(n: T) -> Vec<T>
 where
-    T: PrimInt + ConstZero
+    T: PrimInt + ConstZero,
 {
     if n < T::ZERO {
         panic!("Cannot find proper divisors of negative numbers.");

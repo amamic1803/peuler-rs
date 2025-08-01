@@ -11,11 +11,12 @@ use num_traits::{ConstOne, ConstZero, PrimInt, ToPrimitive};
 /// less than or equal to $x$ is approximately $x / \\ln{(x)}$.
 /// It is exact for $x < 11$ and guaranteed to be an underestimate for $x >= 11$.
 /// # Arguments
-/// * `x` - The number to estimate the number of primes less than or equal to.
+/// * `x` - The integer to estimate the number of primes less than or equal to.
 /// # Returns
-/// * `f64` - The estimated number of primes less than or equal to $x$.
+/// * The estimated number of primes less than or equal to `x`.
 /// # Panics
-/// If the number is negative or too large to convert to `f64`.
+/// * If `x` is negative.
+/// * If `x` cannot be converted to [f64].
 /// # Example
 /// ```
 /// use peuler::math::primes::pcf;
@@ -30,9 +31,9 @@ pub fn pcf<T>(x: T) -> f64
 where
     T: ToPrimitive,
 {
-    let x = x.to_f64().expect("Number too large.");
+    let x = x.to_f64().expect("Cannot convert x to f64.");
     if x < 0.0 {
-        panic!("Number must be non-negative.");
+        panic!("x must be non-negative.");
     } else if x < 2.0 {
         0.0
     } else if x < 3.0 {
@@ -57,11 +58,12 @@ where
 /// For $n <= 3$ it is calculated exactly using $\\lfloor n \\rfloor$ and
 /// guaranteed to be an overestimate for $n > 3$.
 /// # Arguments
-/// * `n` - The number to estimate the inverse of the prime-counting function for.
+/// * `n` - The integer to estimate the inverse of the prime-counting function for.
 /// # Returns
-/// * `f64` - The estimated inverse of the prime-counting function for $n$.
+/// * The estimated inverse of the prime-counting function for `n`.
 /// # Panics
-/// * If the number is negative or cannot be converted to [f64].
+/// * If `n` is negative.
+/// * If `n` cannot be converted to [f64].
 /// # Example
 /// ```
 /// use peuler::math::primes::apcf;
@@ -73,9 +75,9 @@ pub fn apcf<T>(n: T) -> f64
 where
     T: ToPrimitive,
 {
-    let mut n = n.to_f64().expect("Cannot convert to f64.");
+    let mut n = n.to_f64().expect("Cannot convert n to f64.");
     if n < 0.0 {
-        panic!("Number must be non-negative.");
+        panic!("n must be non-negative.");
     } else if n <= 3.0 {
         n = n.floor();
         match n {
@@ -94,12 +96,12 @@ where
     }
 }
 
-/// Checks if two integers are coprime.
+/// Check if two integers are coprime.
 /// # Arguments
-/// * `a` - The first number.
-/// * `b` - The second number.
+/// * `a` - The first integer.
+/// * `b` - The second integer.
 /// # Returns
-/// * `bool` - Whether the two numbers are coprime.
+/// * Whether the two integers are coprime.
 /// # Panics
 /// * If either of the integers is negative.
 /// # Example
@@ -122,17 +124,19 @@ where
     gcd(a, b) == T::ONE
 }
 
-/// Checks if a number is prime.
+/// Check if an integer is prime.
 /// # Arguments
-/// * `n` - The number to check the primality of.
+/// * `n` - The integer to check the primality of.
 /// # Returns
-/// * `bool` - Whether the number is prime.
-/// * `T` - The smallest divisor if the number is not prime, otherwise `1`.
+/// * `bool` - Whether the integer is prime.
+/// * `T` - The smallest divisor if the integer is not prime, otherwise `1`.
 /// # Panics
-/// * If the number is less than `2` or cannot be converted to [f64].
+/// * If `n` is less than `2`.
+/// * If `n` cannot be converted to [f64].
 /// # Example
 /// ```
 /// use peuler::math::primes::is_prime;
+///
 /// // 7 is prime
 /// assert_eq!(is_prime(7), (true, 1));
 /// // 12 is not prime, the smallest divisor is 2
@@ -143,7 +147,9 @@ where
     T: PrimInt + ConstZero + ConstOne,
 {
     let t2 = T::from(2).unwrap();
-    assert!(n >= t2, "Number must be greater than or equal to 2.");
+    if n < t2 {
+        panic!("n must be greater than or equal to 2.");
+    }
     let t3 = T::from(3).unwrap();
     let t6 = T::from(6).unwrap();
 
@@ -155,7 +161,7 @@ where
         (false, t3)
     } else {
         let upper_bound =
-            T::from(n.to_f64().expect("Cannot convert to f64.").sqrt().floor()).unwrap();
+            T::from(n.to_f64().expect("Cannot convert n to f64.").sqrt().floor()).unwrap();
         let mut i = T::from(5).unwrap();
         while i <= upper_bound {
             if n % i == T::ZERO {
@@ -176,9 +182,9 @@ where
 /// # Arguments
 /// * `n` - The number to find all primes less than or equal to.
 /// # Returns
-/// * `Vec<T>` - All primes less than or equal to `n`.
+/// * All primes less than or equal to `n`.
 /// # Panics
-/// If the sieve requires more elements than can be represented as `usize`.
+/// * If the sieve requires more elements than can be represented by [usize].
 /// # Example
 /// ```
 /// use peuler::math::primes::sieve_of_eratosthenes;

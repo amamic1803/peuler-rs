@@ -1,4 +1,4 @@
-//! This module contains all the problems.
+//! Solutions to the _Project Euler_ problems.
 
 mod p0001;
 mod p0002;
