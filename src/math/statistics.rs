@@ -15,7 +15,7 @@ use std::ops::{Deref, DerefMut};
 /// ```
 /// use peuler::math::statistics::Sample;
 ///
-/// let mut sample = Sample::new([2, 2, 2, 4, 3, 3, 3, 3, 4, 5]);
+/// let mut sample = Sample::from_values([2, 2, 2, 4, 3, 3, 3, 3, 4, 5]);
 ///
 /// assert_eq!(sample[0], 2);
 /// sample[0] = 1;
@@ -36,14 +36,21 @@ pub struct Sample<T> {
 }
 impl<T> Sample<T>
 where
-    T: Copy,
+    T: Copy + FromPrimitive + ToPrimitive,
 {
+    /// Create a new empty [Sample].
+    /// # Returns
+    /// * A new [Sample] instance with no data points.
+    pub fn new() -> Self {
+        Self { data: Vec::new() }
+    }
+
     /// Create a new [Sample] from data points.
     /// # Arguments
     /// * `data` - The data points to be included in the sample.
     /// # Returns
     /// * A new [Sample] instance containing the provided data points.
-    pub fn new<U, I>(data: U) -> Self
+    pub fn from_values<U, I>(data: U) -> Self
     where
         U: IntoIterator<Item = I>,
         I: Borrow<T>,
@@ -62,10 +69,7 @@ where
     /// * An [Option] containing the arithmetic mean if the sample is not empty.
     /// # Panics
     /// * If the data points cannot be converted to [f64].
-    pub fn mean(&self) -> Option<f64>
-    where
-        T: ToPrimitive,
-    {
+    pub fn mean(&self) -> Option<f64> {
         if self.is_empty() {
             return None;
         }
@@ -87,10 +91,7 @@ where
     /// * If the data points cannot be converted to [f64].
     /// * If the data points cannot be compared as [f64] values. For example, if the data points
     ///   contain [f64::NAN] values.
-    pub fn median(&self) -> Option<f64>
-    where
-        T: ToPrimitive,
-    {
+    pub fn median(&self) -> Option<f64> {
         if self.is_empty() {
             return None;
         }
@@ -120,10 +121,7 @@ where
     /// * An [Option] containing the mode if the sample is not empty.
     /// # Panics
     /// * If the data points cannot be converted to [f64].
-    pub fn mode(&self) -> Option<T>
-    where
-        T: ToPrimitive + FromPrimitive,
-    {
+    pub fn mode(&self) -> Option<T> {
         if self.is_empty() {
             return None;
         }
@@ -155,10 +153,7 @@ where
     /// * An [Option] containing the sample variance if the sample has at least 2 points.
     /// # Panics
     /// * If the data points cannot be converted to [f64].
-    pub fn sample_variance(&self) -> Option<f64>
-    where
-        T: ToPrimitive,
-    {
+    pub fn sample_variance(&self) -> Option<f64> {
         if self.len() < 2 {
             return None; // Variance is undefined for samples with less than 2 points.
         }
@@ -183,10 +178,7 @@ where
     /// * An [Option] containing the sample standard deviation if the sample has at least 2 points.
     /// # Panics
     /// * If the data points cannot be converted to [f64].
-    pub fn sample_stddev(&self) -> Option<f64>
-    where
-        T: ToPrimitive,
-    {
+    pub fn sample_stddev(&self) -> Option<f64> {
         self.sample_variance().map(|v| v.sqrt())
     }
 
@@ -202,10 +194,7 @@ where
     /// * An [Option] containing the population variance if the sample is not empty.
     /// # Panics
     /// * If the data points cannot be converted to [f64].
-    pub fn population_variance(&self) -> Option<f64>
-    where
-        T: ToPrimitive,
-    {
+    pub fn population_variance(&self) -> Option<f64> {
         let mean = self.mean()?;
         let sum: f64 = self
             .iter()
@@ -229,19 +218,16 @@ where
     /// * An [Option] containing the population standard deviation if the sample is not empty.
     /// # Panics
     /// * If the data points cannot be converted to [f64].
-    pub fn population_stddev(&self) -> Option<f64>
-    where
-        T: ToPrimitive,
-    {
+    pub fn population_stddev(&self) -> Option<f64> {
         self.population_variance().map(|v| v.sqrt())
     }
 }
 impl<T> Default for Sample<T>
 where
-    T: Copy,
+    T: Copy + FromPrimitive + ToPrimitive,
 {
     fn default() -> Self {
-        Self::new::<_, T>([])
+        Self::new()
     }
 }
 impl<T> Deref for Sample<T> {

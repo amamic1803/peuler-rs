@@ -167,46 +167,6 @@ impl Default for PEuler {
         Self::new()
     }
 }
-impl Display for PEuler {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let mut max_line_len = self
-            .problems
-            .iter()
-            .map(|problem| problem.title().chars().count())
-            .max()
-            .unwrap_or(0);
-        if max_line_len < 21 {
-            max_line_len = 21;
-        } else if max_line_len % 2 == 0 {
-            max_line_len += 1;
-        }
-
-        for _ in 0..max_line_len {
-            write!(f, "#")?;
-        }
-        writeln!(f)?;
-
-        for _ in 0..((max_line_len - 15) / 2) {
-            write!(f, "#")?;
-        }
-        write!(f, " Project Euler ")?;
-        for _ in 0..((max_line_len - 15) / 2) {
-            write!(f, "#")?;
-        }
-        writeln!(f)?;
-
-        for _ in 0..max_line_len {
-            write!(f, "#")?;
-        }
-        writeln!(f)?;
-
-        for problem in self.problems() {
-            writeln!(f, "Problem {:04}: {}", problem.id(), problem.title())?;
-        }
-
-        Ok(())
-    }
-}
 impl ProjectEuler for PEuler {
     fn problems<'a>(&'a self) -> Box<dyn Iterator<Item = &'a dyn Problem> + 'a> {
         Box::new(self.problems.iter().map(|problem| problem.as_ref()))
