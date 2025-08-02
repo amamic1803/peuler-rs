@@ -10,7 +10,7 @@ use std::ops::{Deref, DerefMut};
 /// A sample of data points for statistical calculations.
 ///
 /// This struct contains the collection of data points which can be accessed directly
-/// (from underlying [Vec]) since it implements the [Deref] trait.
+/// (from underlying [Vec]) since it implements the [Deref] and [DerefMut] traits.
 /// # Example
 /// ```
 /// use peuler::math::statistics::Sample;
@@ -85,6 +85,8 @@ where
     /// * An [Option] containing the median if the sample is not empty.
     /// # Panics
     /// * If the data points cannot be converted to [f64].
+    /// * If the data points cannot be compared as [f64] values. For example, if the data points
+    ///   contain [f64::NAN] values.
     pub fn median(&self) -> Option<f64>
     where
         T: ToPrimitive,
@@ -112,6 +114,8 @@ where
     /// Calculate mode of the sample.
     ///
     /// Mode of the sample is defined as the value that appears most frequently.
+    /// If there are multiple values with the same highest frequency,
+    /// the randomly chosen one is returned.
     /// # Returns
     /// * An [Option] containing the mode if the sample is not empty.
     /// # Panics
