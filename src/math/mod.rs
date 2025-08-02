@@ -4,6 +4,7 @@ pub mod digits;
 pub mod factors;
 pub mod linalg;
 pub mod primes;
+pub mod probability;
 pub mod sequences;
 pub mod statistics;
 

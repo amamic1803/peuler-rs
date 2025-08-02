@@ -1,7 +1,7 @@
 //! A collection of solutions to the problems from [Project Euler](https://projecteuler.net/).
 
 use std::cmp::Ordering;
-use std::error::Error as StdError;
+use std::error::Error;
 use std::fmt::{self, Display, Formatter};
 use std::time::{Duration, Instant};
 
@@ -33,30 +33,36 @@ macro_rules! problem {
 pub mod math;
 pub mod problems;
 
-/// An enum representing the errors that can occur when using this library.
+/// An enum representing errors that can occur when using [PEuler] and [ProjectEuler].
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
-pub enum Error {
+pub enum PError {
     /// The requested problem is not available.
     UnavailableProblem,
 }
-impl Display for Error {
+impl Display for PError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            Error::UnavailableProblem => write!(f, "The requested problem is not available."),
+            Self::UnavailableProblem => write!(f, "The requested problem is not available."),
         }
     }
 }
-impl StdError for Error {}
+impl Error for PError {}
 
-/// A structure representing the _Project Euler_.
+/// A structure containing the _Project Euler_ problems.
+/// # Example
+/// ```
+/// use peuler::{PEuler, ProjectEuler};
+///
+/// let peuler = PEuler::new();
+/// assert_eq!(peuler.run(1).unwrap(), "233168");
+/// ```
 pub struct PEuler {
-    /// A vector of problems.
     problems: Vec<Box<dyn Problem>>,
 }
 impl PEuler {
-    /// Creates a new `PEuler` instance.
+    /// Create the new [PEuler] instance.
     /// # Returns
-    /// A new `PEuler` instance with all problems initialized.
+    /// * The new [PEuler] instance with all available problems initialized.
     pub fn new() -> Self {
         let mut new_obj = Self {
             problems: vec![
@@ -150,7 +156,9 @@ impl PEuler {
                 Box::new(problems::Problem0102::new()),
             ],
         };
-        new_obj.problems.sort_by_key(|problem| problem.id());
+        new_obj
+            .problems
+            .sort_unstable_by_key(|problem| problem.id());
         new_obj
     }
 }
@@ -207,19 +215,19 @@ impl ProjectEuler for PEuler {
 
 /// A trait representing the _Project Euler_.
 pub trait ProjectEuler: Send + Sync {
-    /// Returns all available problems.
+    /// Get all available problems.
     /// # Returns
-    /// An iterator over the problems, sorted by their ID in ascending order.
+    /// * An iterator over the problems, sorted by their identifier in ascending order.
     fn problems<'a>(&'a self) -> Box<dyn Iterator<Item = &'a dyn Problem> + 'a>;
 
-    /// Returns the problem with the specified ID.
+    /// Get the problem with the specified identifier.
     /// # Arguments
-    /// * `id` - The ID of the problem to retrieve.
+    /// * `id` - The identifier of the problem to retrieve.
     /// # Returns
-    /// A `Result` containing a reference to the problem if it exists or an `Error`.
+    /// * A reference to the specified problem or an [Error].
     /// # Errors
-    /// * `Error::UnavailableProblem` - The problem is not available.
-    fn problem(&self, id: usize) -> Result<&dyn Problem, Error> {
+    /// * [PError::UnavailableProblem] - If the specified problem is not available.
+    fn problem(&self, id: usize) -> Result<&dyn Problem, PError> {
         for iter_problem in self.problems() {
             match iter_problem.id().cmp(&id) {
                 Ordering::Less => {}
@@ -227,53 +235,52 @@ pub trait ProjectEuler: Send + Sync {
                 Ordering::Greater => break,
             }
         }
-        Err(Error::UnavailableProblem)
+        Err(PError::UnavailableProblem)
     }
 
-    /// Runs the specified problem.
+    /// Run the specified problem.
     /// # Arguments
-    /// * `id` - The ID of the problem to run.
+    /// * `id` - The identifier of the problem to run.
     /// # Returns
-    /// A `Result` containing a string with the answer to the problem or the `Error`.
+    /// * The answer to the problem or the [Error].
     /// # Errors
-    /// * `Error::UnavailableProblem` - The problem is not available.
-    fn run(&self, id: usize) -> Result<String, Error> {
+    /// * [PError::UnavailableProblem] - If the specified problem is not available.
+    fn run(&self, id: usize) -> Result<String, PError> {
         Ok(self.problem(id)?.run())
     }
 
-    /// Benchmarks the specified problem.
+    /// Run the specified problem and measure the elapsed time.
     /// # Arguments
-    /// * `id` - The ID of the problem to benchmark.
+    /// * `id` - The identifier of the problem to run.
     /// # Returns
-    /// A `Result` containing a tuple with the answer to the problem
-    /// and the elapsed time or the `Error`.
+    /// * The answer to the problem and the elapsed time or the [Error].
     /// # Errors
-    /// * `Error::UnavailableProblem` - The problem is not available.
-    fn benchmark(&self, id: usize) -> Result<(String, Duration), Error> {
+    /// * [PError::UnavailableProblem] - If the specified problem is not available.
+    fn benchmark(&self, id: usize) -> Result<(String, Duration), PError> {
         Ok(self.problem(id)?.benchmark())
     }
 }
 
-/// A trait representing a problem.
+/// A trait representing the _Project Euler_ problem.
 pub trait Problem: Send + Sync {
     /// The identifier of the problem.
     /// # Returns
-    /// An integer greater than `0` representing the problem's ID.
+    /// * An integer greater than `0` representing the problem's ID.
     fn id(&self) -> usize;
 
     /// The title of the problem.
     /// # Returns
-    /// The title of the problem.
+    /// * The title of the problem.
     fn title(&self) -> &str;
 
     /// Run the problem.
     /// # Returns
-    /// The answer to the problem.
+    /// * The answer to the problem.
     fn run(&self) -> String;
 
-    /// Benchmark the problem.
+    /// Run the problem and measure the elapsed time.
     /// # Returns
-    /// The answer to the problem and the elapsed time.
+    /// * The answer to the problem and the elapsed time.
     fn benchmark(&self) -> (String, Duration) {
         let instant = Instant::now();
         let result = self.run();
