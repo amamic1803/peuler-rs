@@ -1,0 +1,18 @@
+[package]
+name = "pmath"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+katexit = "0.1.5"
+itertools = "0.14.0"
+malachite = "0.6.1"
+num-traits = "0.2.19"
+rand = "0.9.2"
+
+[dev-dependencies]
+assert_float_eq = "1.1.4"
+
+[lib]
+name = "pmath"
+path = "src/lib.rs"

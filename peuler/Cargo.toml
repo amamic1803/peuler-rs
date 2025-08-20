@@ -1,0 +1,21 @@
+[package]
+name = "peuler"
+description = "Project Euler solutions in Rust"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4.5.45", features = ["cargo"], optional = true }
+itertools = "0.14.0"
+malachite = "0.6.1"
+pmath = { path = "../pmath", version = "0.1.0" }
+
+
+[lib]
+name = "peuler"
+path = "src/lib.rs"
+
+[[bin]]
+name = "peuler"
+path = "src/main.rs"
+required-features = ["clap"]
