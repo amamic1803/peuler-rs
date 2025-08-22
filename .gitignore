@@ -1,7 +1,7 @@
 # Build directories
-build/
-target/
-cmake-build-*/
+build*/
+target*/
+cmake-build*/
 
 # Cargo
 Cargo.lock

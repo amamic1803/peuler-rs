@@ -1,4 +1,4 @@
-use js_sys::{Array, BigInt, Number, Object, Reflect};
+use js_sys::{Array, Number, Object, Reflect};
 use peuler::{PEuler as libPEuler, ProjectEuler};
 use pmath::statistics::Sample;
 use wasm_bindgen::prelude::*;
@@ -20,7 +20,7 @@ impl PEuler {
         let arr = Array::new();
         for p in self.inner.problems() {
             let obj = Object::new();
-            Reflect::set(&obj, &JsValue::from_str("id"), &BigInt::from(p.id()))?;
+            Reflect::set(&obj, &JsValue::from_str("id"), &Number::from(p.id() as u32))?;
             Reflect::set(
                 &obj,
                 &JsValue::from_str("title"),
@@ -76,7 +76,7 @@ impl PEuler {
         Reflect::set(
             &obj,
             &JsValue::from_str("iterations"),
-            &BigInt::from(iterations),
+            &Number::from(iterations as u32),
         )?;
         Reflect::set(
             &obj,

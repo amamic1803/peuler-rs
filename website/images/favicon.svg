@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="Layer_1"
+   data-name="Layer 1"
+   viewBox="0 0 100 100"
+   version="1.1"
+   sodipodi:docname="favicon.svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   width="100"
+   height="100"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="9.4970705"
+     inkscape:cx="61.492647"
+     inkscape:cy="53.016349"
+     inkscape:window-width="2560"
+     inkscape:window-height="1369"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Layer_1" />
+  <title
+     id="title1">scale-ruler</title>
+  <path
+     d="M 74.768553,0.68618583 99.289779,25.223689 a 2.3927117,2.3927117 0 0 1 0.284846,0.358093 2.29505,2.29505 0 0 1 0.398786,1.302156 2.3194655,2.3194655 0 0 1 -0.683632,1.627695 L 28.485044,99.316368 A 2.4415426,2.4415426 0 0 1 28.045566,99.650046 2.2543577,2.2543577 0 0 1 26.832933,100 2.3601578,2.3601578 0 0 1 25.205238,99.316368 L 0.68401199,74.770727 a 2.3520194,2.3520194 0 0 1 0,-3.31236 L 71.488747,0.65363193 A 2.3438809,2.3438809 0 0 1 73.116442,-0.03 2.29505,2.29505 0 0 1 74.744137,0.6617704 Z M 30.332478,91.332524 23.894944,84.89499 l 3.09262,-3.092621 6.437534,6.437534 3.458852,-3.458852 -11.654296,-11.670573 3.09262,-3.092621 11.670574,11.670574 3.458852,-3.450714 -6.437534,-6.445672 3.09262,-3.092621 6.437534,6.437534 3.458852,-3.450714 -11.694989,-11.678712 3.092621,-3.09262 11.678712,11.678712 3.458852,-3.491406 -6.437534,-6.437534 3.092621,-3.092621 6.437534,6.437534 3.458852,-3.418159 -11.678712,-11.686851 3.09262,-3.092621 11.678712,11.678713 3.450714,-3.458852 -6.437534,-6.46195 3.09262,-3.09262 6.437534,6.437533 3.458852,-3.458852 L 64.514074,33.80978 67.606694,30.71716 79.277268,42.387733 94.789202,26.851384 73.116442,5.2111781 5.2171427,73.110478 26.857349,94.783237 30.299924,91.332524 Z m 49.42496,-68.094623 a 3.0030974,3.0030974 0 0 0 -3.003097,-3.003097 3.0030974,3.0030974 0 0 0 -2.124142,5.127239 l 0.06511,0.07325 a 3.0193743,3.0193743 0 0 0 4.183177,-0.07325 l 0.06511,-0.06511 a 2.9949589,2.9949589 0 0 0 0.813847,-2.059034 z m 1.391679,-4.394777 a 6.2096567,6.2096567 0 0 1 0.09766,8.691892 l -0.09766,0.1058 a 6.2177951,6.2177951 0 0 1 -8.716307,0.08952 l -0.07325,-0.06511 a 6.2180308,6.2180308 0 0 1 8.797692,-8.789553 z"
+     id="path1"
+     style="fill:#ff6321;fill-opacity:1;stroke-width:0.813848" />
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>scale-ruler</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>
