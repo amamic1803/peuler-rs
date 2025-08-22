@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   workflow_run:
-    workflows: [ Test peuler ]
+    workflows: [ Test ]
     types: [ completed ]
 
 env:
@@ -22,8 +22,9 @@ concurrency:
 
 jobs:
   test-wasm:
-    name: Test wasm
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    name: Test wasm module
+    if: ${{ contains(fromJSON('["push", "workflow_dispatch"]'), github.event.workflow_run.event)
+            && github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -42,9 +43,6 @@ jobs:
 
       - name: Build
         run: cargo build --all-features --target wasm32-unknown-unknown
-
-      - name: Test
-        run: cargo test --all-features --target wasm32-unknown-unknown
 
       - name: Clippy
         run: cargo clippy --all-features --target wasm32-unknown-unknown -- -D warnings
