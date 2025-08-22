@@ -50,7 +50,7 @@ fn main() -> ExitCode {
                 .help("Benchmark the solution for the specified problem or all problems")
                 .required(false)
                 .default_missing_value("100")
-                .value_parser(value_parser!(u64).range(5..))
+                .value_parser(value_parser!(u64).range(3..))
                 .conflicts_with_all(["list", "count", "solutions"]),
         )
         .get_matches();

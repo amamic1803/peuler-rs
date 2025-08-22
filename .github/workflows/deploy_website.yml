@@ -1,0 +1,105 @@
+name: Deploy to GitHub Pages
+
+on:
+  workflow_run:
+    workflows: [ Test peuler ]
+    types: [ completed ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  test-wasm:
+    name: Test wasm
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./website/scripts/wasm
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          targets: wasm32-unknown-unknown
+          components: clippy, rustfmt
+
+      - name: Build
+        run: cargo build --all-features --target wasm32-unknown-unknown
+
+      - name: Test
+        run: cargo test --all-features --target wasm32-unknown-unknown
+
+      - name: Clippy
+        run: cargo clippy --all-features --target wasm32-unknown-unknown -- -D warnings
+
+      - name: Rustfmt
+        run: cargo fmt --all --check
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: test-wasm
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          targets: wasm32-unknown-unknown
+          components: clippy, rustfmt
+
+      - name: Install wasm-bindgen-cli
+        run: cargo install wasm-bindgen-cli
+
+      - name: Install wasm-opt
+        run: cargo install wasm-opt
+
+      - name: Build wasm module
+        run: |
+          cd ./website/scripts/wasm
+          cargo build --release --target wasm32-unknown-unknown
+          cd ../../../
+          rm -rf ./website/scripts/wasm
+          cd ./target/wasm32-unknown-unknown/release
+          wasm-bindgen wasm.wasm --target web --out-dir ./wasm
+          cd ./wasm
+          wasm-opt -O4 wasm_bg.wasm --output wasm_bg.wasm
+          cd ../../../../
+          mv -r ./target/wasm32-unknown-unknown/release/wasm ./website/scripts/wasm
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './website'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
