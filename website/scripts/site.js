@@ -1,18 +1,25 @@
-import init, { PEuler } from "./build-peuler-wasm/wasm.js";
+class PEuler {
+    constructor() {
+        this.initialized = this.init().then(() => {
+            this.updatePicker();
+            this.updateInfo();
+        });
+    }
 
+    async init() {
+        // PEulerWorker is a Web Worker that through which we can access the PEuler WebAssembly module
+        this.peulerWorker = new PEulerWorker();
 
-
-await init();
-let peuler = new PEuler();
-
-
-
-class ProblemsPicker {
-    constructor(peuler) {
+        // initialize basic problems data
         this.problems = new Map();
-        this.minProblemId = 1;
-        this.maxProblemId = 1;
-        for (const problem of peuler.problems()) {
+        const problems = await this.peulerWorker.problems();
+        if (problems.length === 0) {
+            alert("No problems available");
+            throw new Error("No problems available");
+        }
+        this.minProblemId = problems[0].id;
+        this.maxProblemId = problems[0].id;
+        for (const problem of problems) {
             this.problems.set(problem.id, problem.title);
             if (problem.id < this.minProblemId) {
                 this.minProblemId = problem.id;
@@ -22,102 +29,171 @@ class ProblemsPicker {
             }
         }
         this.currProblemId = this.minProblemId;
-        document.getElementById("problems-picker-left-arrow").addEventListener("click", () => {
-            this.left();
+
+        // the first problem id in the page shown in the picker (this and 99 next problems == 100 problems per page)
+        this.currPickerProblemId = Math.floor((this.currProblemId - 1) / 100) * 100 + 1;
+
+        // add event listeners for the problem picker arrows
+        document.getElementById("problem-picker-left-arrow").addEventListener("click", () => {
+            this.pickerLeftClick();
         });
-        document.getElementById("problems-picker-right-arrow").addEventListener("click", () => {
-            this.right();
+        document.getElementById("problem-picker-right-arrow").addEventListener("click", () => {
+            this.pickerRightClick();
         });
-        this.update();
+        
+        // add event listeners for all problem cells in the picker
+        const t_body = document.querySelector("#problem-picker>table>tbody");
+        let i = 0;
+        for (const t_row of t_body.children) {
+            for (const t_d of t_row.children) {
+                const cellIndex = i; // capture the current value of i
+                t_d.addEventListener("click", () => {
+                    this.pickerProblemClick(this.currPickerProblemId + cellIndex);
+                });
+                i += 1;
+            }
+        }
+
+        /*
+        document.getElementById("problem-info").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const problemId = problemsSelect.value;
+            console.log(await this.peulerWorker.solve(problemId));
+        });
+        */
     }
 
-    right() {
-        if (this.currProblemId + 100 <= this.maxProblemId) {
-            this.currProblemId += 100;
-            this.update();
+
+    async pickerLeftClick() {
+        await this.initialized;
+        if (this.currPickerProblemId > this.minProblemId) {
+            this.currPickerProblemId -= 100;
+            this.updatePicker();
         }
     }
 
-    left() {
-        if (this.currProblemId > this.minProblemId) {
-            this.currProblemId -= 100;
-            this.update();
+    async pickerRightClick() {
+        await this.initialized;
+        if (this.currPickerProblemId + 100 <= this.maxProblemId) {
+            this.currPickerProblemId += 100;
+            this.updatePicker();
         }
     }
-    
-    update() {
-        // update arrows in the table header
-        const leftArrow = document.getElementById("problems-picker-left-arrow");
-        const rightArrow = document.getElementById("problems-picker-right-arrow");
-        if (this.minProblemId < this.currProblemId) {
+
+    async pickerProblemClick(clickedId) {
+        if (this.problems.has(clickedId) && clickedId !== this.currProblemId) {
+            console.log(clickedId);
+        }
+    }
+
+    updatePicker() {
+        // update arrows in the picker table header
+        const leftArrow = document.getElementById("problem-picker-left-arrow");
+        const rightArrow = document.getElementById("problem-picker-right-arrow");
+        if (this.minProblemId < this.currPickerProblemId) {
             leftArrow["src"] = "images/left-arrow-green.svg";
             leftArrow.className = "enabled-arrow";
-            
+            leftArrow["alt"] = "Enabled left arrow";
         } else {
             leftArrow["src"] = "images/left-arrow-grey.svg";
             leftArrow.className = "disabled-arrow";
+            leftArrow["alt"] = "Disabled left arrow";
         }
-        if (this.maxProblemId >= this.currProblemId + 100) {
+        if (this.maxProblemId >= this.currPickerProblemId + 100) {
             rightArrow["src"] = "images/right-arrow-green.svg";
             rightArrow.className = "enabled-arrow";
-            
+            rightArrow["alt"] = "Enabled right arrow";
         } else {
             rightArrow["src"] = "images/right-arrow-grey.svg";
             rightArrow.className = "disabled-arrow";
+            rightArrow["alt"] = "Disabled right arrow";
         }
-        
+
         // update table body
-        const table_body = document.querySelector("#problems-picker>table>tbody");
-        while (table_body.firstChild) {
-            table_body.removeChild(table_body.firstChild);
-        }
-        let table_row = document.createElement("tr");
-        for (let i = this.currProblemId; i <= this.currProblemId + 100; i++) {
-            const table_cell_p = document.createElement("p");
-            table_cell_p.innerText = i.toString();
-            
-            const table_cell = document.createElement("td");
-            table_cell.appendChild(table_cell_p);
-            
-            if (this.problems.has(i)) {
-                table_cell.className = "available-problem";
-                table_cell.title = this.problems.get(i);
-                table_cell.addEventListener("click", function() {
-                    console.log(i);
-                });
-            } else {
-                table_cell.className = "unavailable-problem";
-            }
-            
-            table_row.appendChild(table_cell);
-            
-            if (i % 10 === 0) {
-                table_body.appendChild(table_row);
-                table_row = document.createElement("tr");
+        const t_body = document.querySelector("#problem-picker>table>tbody");
+        let i = this.currPickerProblemId;
+        for (const t_row of t_body.children) {
+            for (const t_d of t_row.children) {
+                // t_d contains a <p> element, whose innerText we need to set to i
+                t_d.firstElementChild.innerText = i.toString();
+                
+                t_d.id = "";
+                t_d.title = "";
+                t_d.classList.remove("available-problem", "unavailable-problem");
+                if (this.problems.has(i)) {
+                    if (i === this.currProblemId) {
+                        t_d.id = "current-problem-cell";
+                    } else {
+                        t_d.classList.add("available-problem");
+                    }
+                    t_d.title = this.problems.get(i);
+                } else {
+                    t_d.classList.add("unavailable-problem");
+                }
+
+                i += 1;
             }
         }
+    }
+
+    updateInfo() {
+
+    }
+}
+
+class PEulerWorker {
+    constructor() {
+        this.initialized = this.init();
+    }
+
+    async init() {
+        this.worker = new Worker("./scripts/worker.js", { type: "module" });
+        this.lastJob = new Promise((resolve) => { resolve(); }); // initially resolved promise
+        return new Promise((resolve, reject) => {
+            this.worker.onmessage = (e) => {
+                if (e.data === "[Worker] Ready!") {
+                    resolve();
+                } else {
+                    console.error("[Worker] Error: " + e.data);
+                    reject(new Error("Worker initialization failed"));
+                }
+            };
+            this.worker.onerror = (e) => {
+                console.error("[Worker] Error: " + e.message);
+                reject(e);
+            };
+        });
+    }
+    
+    async problems() {
+        return this.sendJob({ workType: "problems" });
+    }
+
+    async solve(problemId) {
+        return this.sendJob({ workType: "solve", id: problemId });
+    }
+    
+    async benchmark(problemId, iterations) {
+        return this.sendJob({ workType: "benchmark", id: problemId, iterations: iterations });
+    }
+    
+    async sendJob(msg) {
+        await this.initialized;
+        this.lastJob = this.lastJob.then(() => {
+            return new Promise((resolve, reject) => {
+                this.worker.onmessage = function(e) {
+                    resolve(e.data);
+                };
+                this.worker.onerror = function(e) {
+                    reject(e.message);
+                };
+                this.worker.postMessage(msg);
+            });
+        });
+        return this.lastJob;
     }
 }
 
 
 
-let problemsPicker = new ProblemsPicker(peuler);
-
-
-
-const problemsSelect = document.getElementById("problems-select");
-for (const problem of peuler.problems()) {
-    let option = document.createElement("option");
-    option.value = problem.id;
-    option.innerText = problem.id;
-    problemsSelect.appendChild(option);
-}
-
-document.getElementById("runner").addEventListener("submit", function(event) {
-    event.preventDefault();
-    console.log("Login form submitted");
-    const problemId = problemsSelect.value;
-    console.log(peuler.solve(problemId));
-});
-
-
+new PEuler();

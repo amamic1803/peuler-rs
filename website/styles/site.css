@@ -31,20 +31,20 @@ h1 {
 
 
 
-#problems-picker {
+#problem-picker {
     border: 7px solid #7c4f33;
     border-radius: 5px;
 }
-#problems-picker>table {
+#problem-picker>table {
     width: 100%;
     height: 100%;
     border-collapse: collapse;
 }
-#problems-picker>table>thead>tr>th>div {
+#problem-picker>table>thead>tr>th>div {
     width: 2.5em;
     height: 2.5em;
 }
-#problems-picker>table>thead>tr>th>div>img {
+#problem-picker>table>thead>tr>th>div>img {
     padding: 0.4em;
     width: 2.5em;
     height: 2.5em;
@@ -52,22 +52,20 @@ h1 {
 .enabled-arrow {
     cursor: pointer;
 }
-.disabled-arrow {
-
-}
-#problems-picker-title {
+.disabled-arrow {}
+#problem-picker-title {
     font-family: Courier New, monospace;
     font-size: 1.5em;
     text-align: center;
     padding: 0;
     margin: 0;
 }
-#problems-picker>table>tbody>tr>td {
+.problem-picker-cell {
     width: 2.5em;
     height: 2.5em;
     border: 2px solid #444444;
 }
-#problems-picker>table>tbody>tr>td>p {
+#problem-picker>table>tbody>tr>td>p {
     width: 100%;
     height: 100%;
     font-family: Roboto, sans-serif;
@@ -87,4 +85,67 @@ h1 {
     color: #333333;
     background-color: #fdb400;
     cursor: pointer;
+}
+#current-problem-cell {
+    color: #333333;
+    background-color: #fdb400;
+    box-shadow: inset 0 0 10px 4px #ff0000;
+}
+
+
+
+
+
+#problem-info {
+    border: 1px solid green;
+    display: grid;
+    grid-template-areas:
+        "a b"
+        "c d"
+        "e f"
+        "g h"
+        "btns btns";
+    grid-template-columns: auto auto;
+    align-items: center;
+}
+#problem-info label {
+    font-family: Courier New, monospace;
+    font-weight: bold;
+    font-size: 1.5em;
+}
+#problem-info code {
+    justify-self: start;
+    color: #cbcbcb;
+    background-color: #444444;
+    border-radius: 5px;
+    padding: 0.5em;
+    margin: 0.5em;
+    user-select: text;
+}
+#problem-info-id-label {
+    grid-area: a;
+}
+#problem-info-id {
+    grid-area: b;
+}
+#problem-info-title-label {
+    grid-area: c;
+}
+#problem-info-title {
+    grid-area: d;
+}
+#problem-info-solution-label {
+    grid-area: e;
+}
+#problem-info-solution {
+    grid-area: f;
+}
+#problem-info-benchmark-label {
+    grid-area: g;
+}
+#problem-info-benchmark {
+    grid-area: h;
+}
+#problem-info-buttons {
+    grid-area: btns;
 }
