@@ -109,7 +109,7 @@ fn main() -> ExitCode {
                 if mean > 1000.0 {
                     mean /= 1000.0;
                     stddev /= 1000.0;
-                    unit = "us";
+                    unit = "µs";
                 }
                 if mean > 1000.0 {
                     mean /= 1000.0;
@@ -153,7 +153,7 @@ fn main() -> ExitCode {
                     if mean > 1000.0 {
                         mean /= 1000.0;
                         stddev /= 1000.0;
-                        unit = "us";
+                        unit = "µs";
                     }
                     if mean > 1000.0 {
                         mean /= 1000.0;

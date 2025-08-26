@@ -84,11 +84,11 @@ jobs:
           cd ../../../
           rm -rf ./website/scripts/wasm
           cd ./target/wasm32-unknown-unknown/release
-          wasm-bindgen wasm.wasm --target web --out-dir ./build-peuler-wasm
-          cd ./build-peuler-wasm
+          wasm-bindgen wasm.wasm --target web --out-dir ./build-wasm
+          cd ./build-wasm
           wasm-opt -O4 wasm_bg.wasm --output wasm_bg.wasm
           cd ../../../../
-          cp -r ./target/wasm32-unknown-unknown/release/build-peuler-wasm ./website/scripts/build-peuler-wasm
+          cp -r ./target/wasm32-unknown-unknown/release/build-wasm ./website/scripts/build-wasm
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

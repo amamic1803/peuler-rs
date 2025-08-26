@@ -10,7 +10,7 @@
 use std::cmp::Ordering;
 use std::error::Error as StdError;
 use std::fmt::{self, Display, Formatter};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 pub mod problems;
 
@@ -101,9 +101,38 @@ pub trait Solution: Send + Sync {
     /// # Returns
     /// * The solution to the problem and the elapsed time.
     fn benchmark(&self) -> (String, Duration) {
-        let instant = Instant::now();
-        let result = self.solve();
-        let elapsed = instant.elapsed();
+        let result;
+        let elapsed;
+
+        #[cfg(not(all(
+            target_arch = "wasm32",
+            target_vendor = "unknown",
+            target_os = "unknown"
+        )))]
+        {
+            let instant = std::time::Instant::now();
+            result = self.solve();
+            elapsed = instant.elapsed();
+        }
+        #[cfg(all(
+            target_arch = "wasm32",
+            target_vendor = "unknown",
+            target_os = "unknown"
+        ))]
+        {
+            use wasm_bindgen::prelude::*;
+
+            let global_obj = js_sys::global();
+            let performance = js_sys::Reflect::get(&global_obj, &JsValue::from_str("performance"))
+                .unwrap()
+                .dyn_into::<web_sys::Performance>()
+                .unwrap();
+
+            let instant = performance.now();
+            result = self.solve();
+            elapsed = Duration::from_secs_f64((performance.now() - instant) / 1000.0);
+        }
+
         (result, elapsed)
     }
 }

@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-getrandom = { version = "0.3.3", features = ["wasm_js"] }
 js-sys = "0.3.77"
 peuler = { path = "../../../peuler" }
 pmath = { path = "../../../pmath" }

@@ -3,6 +3,7 @@
     padding: 0;
     margin: 0;
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 body {
     font-size: 16px;
@@ -10,10 +11,13 @@ body {
     background-color: #222222;
     color: #ff9933;
     display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    justify-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: 1.5em;
+    row-gap: 1.5em;
+    padding: 1.5em;
+    justify-content: space-evenly;
+    align-content: space-between;
     align-items: center;
 }
 
@@ -21,10 +25,18 @@ body {
 
 
 
+header {
+    flex: 1 0 100%;
+    min-height: 10vh;
+}
 h1 {
     margin: 0.5em;
     font-size: 5em;
     font-family: Courier New, monospace;
+    text-align: center;
+}
+footer {
+    flex: 1 0 100%;
 }
 
 
@@ -52,7 +64,6 @@ h1 {
 .enabled-arrow {
     cursor: pointer;
 }
-.disabled-arrow {}
 #problem-picker-title {
     font-family: Courier New, monospace;
     font-size: 1.5em;
@@ -97,55 +108,216 @@ h1 {
 
 
 #problem-info {
-    border: 1px solid green;
+    padding: 1em 1.5em;
+    border: 7px solid #7c4f33;
+    border-radius: 5px;
     display: grid;
     grid-template-areas:
+        "title title"
         "a b"
         "c d"
-        "e f"
-        "g h"
-        "btns btns";
+        "e solve-cont"
+        "g bench-btns"
+        "iters-label iters-value"
+        "mean-label mean-value"
+        "stddev-label stddev-value";
     grid-template-columns: auto auto;
     align-items: center;
 }
-#problem-info label {
+#problem-info>h2 {
+    grid-area: title;
+    text-align: center;
+    font-family: Courier New, monospace;
+    font-size: 1.5em;
+    padding-bottom: 0.5em;
+    margin-bottom: 0.5em;
+    border-bottom: 2px solid #444444;
+    position: relative;
+}
+#problem-info-link {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 1em;
+    height: 1em;
+    cursor: pointer;
+}
+#problem-info-link>img {
+    padding: 0.15em;
+    width: 100%;
+    height: 100%;
+}
+.problem-info-label1 {
     font-family: Courier New, monospace;
     font-weight: bold;
-    font-size: 1.5em;
+    font-size: 1.25em;
+    margin: 0.75em 0.75em 0.75em 0;
+}
+.problem-info-label2 {
+    font-family: Courier New, monospace;
+    font-weight: bold;
+    font-size: 1em;
+    margin: 0.75em 0.5em 0.75em 0;
+}
+.problem-info-label2::before {
+    content: "• ";
 }
 #problem-info code {
+    font-size: 1em;
+    font-family: Consolas, monospace;
     justify-self: start;
     color: #cbcbcb;
     background-color: #444444;
     border-radius: 5px;
     padding: 0.5em;
-    margin: 0.5em;
     user-select: text;
 }
 #problem-info-id-label {
+    display: inline-block;
     grid-area: a;
 }
 #problem-info-id {
     grid-area: b;
 }
 #problem-info-title-label {
+    display: inline-block;
     grid-area: c;
 }
 #problem-info-title {
     grid-area: d;
 }
 #problem-info-solution-label {
+    display: inline-block;
     grid-area: e;
 }
 #problem-info-solution {
+    display: none;
     grid-area: f;
 }
 #problem-info-benchmark-label {
     grid-area: g;
 }
-#problem-info-benchmark {
-    grid-area: h;
+#solve-btn {
+    display: inline-block;
+    font-size: 1em;
+    font-family: Consolas, monospace;
+    justify-self: start;
+    color: #cbcbcb;
+    background-color: #444444;
+    border-radius: 5px;
+    padding: 0.5em;
+    cursor: pointer;
 }
-#problem-info-buttons {
-    grid-area: btns;
+#solve-loader {
+    display: none;
+}
+#solution-container {
+    grid-area: solve-cont;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    column-gap: 0.5em;
+}
+#benchmark-btns {
+    grid-area: bench-btns;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    column-gap: 0.5em;
+}
+#benchmark-btn {
+    display: inline-block;
+    font-size: 1em;
+    font-family: Consolas, monospace;
+    justify-self: start;
+    color: #cbcbcb;
+    background-color: #444444;
+    border-radius: 5px;
+    padding: 0.5em;
+    cursor: pointer;
+}
+#reset-btn {
+    display: none;
+    font-size: 1em;
+    font-family: Consolas, monospace;
+    justify-self: start;
+    color: #cbcbcb;
+    background-color: #444444;
+    border-radius: 5px;
+    padding: 0.5em;
+    cursor: pointer;
+}
+#benchmark-loader {
+    display: none;
+}
+.problem-info-button {
+    border-top: 2px solid #fbb300;
+    border-left: 2px solid #fbb300;
+    border-right: 2px solid #7c4f33;
+    border-bottom: 2px solid #7c4f33;
+}
+.problem-info-button:hover {
+    transition-duration: 0.2s;
+    border-color: #fbb300;
+}
+.problem-info-button:active {
+    transition-duration: 0.1s;
+    border-color: #7c4f33;
+}
+#problem-info-benchmark-iterations-label {
+    display: none;
+    grid-area: iters-label;
+}
+#problem-info-benchmark-iterations {
+    display: none;
+    grid-area: iters-value;
+}
+#problem-info-benchmark-mean-label {
+    display: none;
+    grid-area: mean-label;
+}
+#problem-info-benchmark-mean {
+    display: none;
+    grid-area: mean-value;
+}
+#problem-info-benchmark-stddev-label {
+    display: none;
+    grid-area: stddev-label;
+}
+#problem-info-benchmark-stddev {
+    display: none;
+    grid-area: stddev-value;
+}
+
+
+
+
+
+.loader {
+    width: 20px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 3px solid #cbcbcb;
+    animation:
+            l20-1 0.8s infinite linear alternate,
+            l20-2 1.6s infinite linear;
+}
+@keyframes l20-1{
+    0%    {clip-path: polygon(50% 50%,0       0,  50%   0%,  50%    0%, 50%    0%, 50%    0%, 50%    0% )}
+    12.5% {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100%   0%, 100%   0%, 100%   0% )}
+    25%   {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100% 100%, 100% 100%, 100% 100% )}
+    50%   {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100% 100%, 50%  100%, 0%   100% )}
+    62.5% {clip-path: polygon(50% 50%,100%    0, 100%   0%,  100%   0%, 100% 100%, 50%  100%, 0%   100% )}
+    75%   {clip-path: polygon(50% 50%,100% 100%, 100% 100%,  100% 100%, 100% 100%, 50%  100%, 0%   100% )}
+    100%  {clip-path: polygon(50% 50%,50%  100%,  50% 100%,   50% 100%,  50% 100%, 50%  100%, 0%   100% )}
+}
+@keyframes l20-2{
+    0%    {transform:scaleY(1)  rotate(0deg)}
+    49.99%{transform:scaleY(1)  rotate(135deg)}
+    50%   {transform:scaleY(-1) rotate(0deg)}
+    100%  {transform:scaleY(-1) rotate(-135deg)}
 }

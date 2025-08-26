@@ -1,4 +1,4 @@
-import init, { PEuler } from "./build-peuler-wasm/wasm.js";
+import init, { PEuler } from "./build-wasm/wasm.js";
 
 await init();
 let peuler = new PEuler();
@@ -12,7 +12,7 @@ onmessage = (e) => {
             postMessage(peuler.solve(e.data.id));
             break;
         case "benchmark":
-            postMessage(peuler.benchmark(e.data.id, e.data.iterations));
+            postMessage(peuler.benchmark(e.data.id));
             break;
         default:
             throw new Error("[Worker] Unknown work type: " + e.data.workType);
