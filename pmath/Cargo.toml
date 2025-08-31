@@ -1,7 +1,14 @@
 [package]
 name = "pmath"
 version = "0.1.0"
+authors = ["Antonio Mamić <antoniomamic007@gmail.com>"]
 edition = "2024"
+description = "A general-purpose mathematics crate for Rust"
+readme = "README.md"
+repository = "https://github.com/amamic1803/peuler-rs/tree/main/pmath"
+license = "MIT"
+keywords = ["algorithms", "mathematics", "wasm", "math"]
+categories = ["algorithms", "mathematics", "wasm"]
 
 [dependencies]
 katexit = "0.1.5"
