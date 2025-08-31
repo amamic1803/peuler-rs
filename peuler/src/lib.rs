@@ -1,11 +1,4 @@
-//! A collection of solutions to the problems from [*Project Euler*](https://projecteuler.net).
-//! # Example
-//! ```
-//! use peuler::{PEuler, ProjectEuler};
-//!
-//! let peuler = PEuler::new();
-//! assert_eq!(peuler.solve(1).unwrap(), "233168");
-//! ```
+#![doc = include_str!("../README.md")]
 
 use std::cmp::Ordering;
 use std::error::Error as StdError;
