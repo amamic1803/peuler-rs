@@ -16,8 +16,8 @@ class PEuler {
         this.problemWorker = new ProblemWorker();
 
         // initialize basic problems data
-        this.problems = new Map();
         const problems = await this.problemWorker.problems();
+        this.problems = new Map();
         if (problems.length === 0) {
             alert("No problems available");
             throw new Error("No problems available");
@@ -33,8 +33,19 @@ class PEuler {
                 this.maxProblemId = problem.id;
             }
         }
-        this.currProblemId = this.minProblemId;
 
+        // initialize current problem id
+        this.currProblemId = localStorage.getItem("currProblemId");
+        if (this.currProblemId !== null) {
+            this.currProblemId = parseInt(this.currProblemId);
+            if (!this.problems.has(this.currProblemId)) {
+                this.currProblemId = this.minProblemId;
+            }
+        } else {
+            this.currProblemId = this.minProblemId;
+        }
+        localStorage.setItem("currProblemId", this.currProblemId.toString());
+        
         // the first problem id in the page shown in the picker (this and 99 next problems == 100 problems per page)
         this.currPickerProblemId = Math.floor((this.currProblemId - 1) / 100) * 100 + 1;
 
@@ -44,12 +55,6 @@ class PEuler {
         // initialize benchmark data
         this.benchmarkRunning = false;
         this.benchmarkSample = new Sample();
-
-        // initialize problem choice id,
-        // used to ignore queued jobs after a problem switch
-        // this can only change if the problem id changed, so it is enough to check this
-        // (it is not necessary to check the inequality of the problem ids)
-        this.problemChoiceId = 0;
 
         // add event listeners for the problem picker arrows
         document.getElementById("problem-picker-left-arrow").addEventListener("click", async () => {
@@ -103,8 +108,9 @@ class PEuler {
     async pickerProblemClick(clickedId) {
         await this.initialized;
         if (this.problems.has(clickedId) && clickedId !== this.currProblemId) {
-            this.problemChoiceId++;
+            this.problemWorker.clear();
             this.currProblemId = clickedId;
+            localStorage.setItem("currProblemId", this.currProblemId.toString());
             this.currProblemSolution = null;
             this.benchmarkRunning = false;
             this.benchmarkSample.clear();
@@ -117,48 +123,51 @@ class PEuler {
     
     async solveButtonClick() {
         await this.initialized;
+        
         if (this.currProblemSolution === null) {
-            let problem_choice_id = this.problemChoiceId;
             this.currProblemSolution = "pending";
-            await this.updateInfoSolution();
+            this.updateInfoSolution().then(() => {});
+        }
+        
+        if (this.currProblemSolution === "pending") {
             this.problemWorker.solve(this.currProblemId).then((solution) => {
-                if (problem_choice_id === this.problemChoiceId) {
-                    this.currProblemSolution = solution;
-                    this.updateInfoSolution();
-                }
-            });
+                this.currProblemSolution = solution;
+                this.updateInfoSolution();
+            }).catch(() => {});
         }
     }
     
     async benchmarkButtonClick() {
         await this.initialized;
+        
         if (!this.benchmarkRunning) {
-            let problem_choice_id = this.problemChoiceId;
             this.benchmarkRunning = true;
+            
             document.getElementById("benchmark-btn").innerText = "Stop";
             document.getElementById("benchmark-loader").style.display = "inline-block";
+            
             if (this.currProblemSolution === null) {
                 this.currProblemSolution = "pending";
-                await this.updateInfoSolution();
+                this.updateInfoSolution().then(() => {});
             }
-            while (this.benchmarkRunning && problem_choice_id === this.problemChoiceId) {
-                let bench = await this.problemWorker.benchmark(this.currProblemId);
-                if (this.currProblemSolution === "pending" && problem_choice_id === this.problemChoiceId) {
-                    this.currProblemSolution = bench.result;
-                    await this.updateInfoSolution();
-                }
-                if (!this.benchmarkRunning || problem_choice_id !== this.problemChoiceId) {
+            
+            while (this.benchmarkRunning) {
+                try {
+                    let bench = await this.problemWorker.benchmark(this.currProblemId);
+                    if (this.currProblemSolution === "pending") {
+                        this.currProblemSolution = bench.result;
+                        this.updateInfoSolution().then(() => {});
+                    }
+                    if (this.benchmarkRunning) {
+                        this.benchmarkSample.push(bench.duration);
+                        this.updateInfoBenchmark().then(() => {});
+                    }
+                } catch (e) {
                     break;
                 }
-                this.benchmarkSample.push(bench.duration);
-                await this.updateInfoBenchmark();
             }
-            if (this.currProblemSolution === "pending" && problem_choice_id === this.problemChoiceId) {
-                let solution = await this.problemWorker.solve(this.currProblemId);
-                if (this.currProblemSolution === "pending" && problem_choice_id === this.problemChoiceId) {
-                    this.currProblemSolution = solution;
-                    await this.updateInfoSolution();
-                }
+            if (this.currProblemSolution === "pending") {
+                this.solveButtonClick().then(() => {});
             }
         } else {
             this.benchmarkRunning = false;
@@ -231,8 +240,7 @@ class PEuler {
         document.getElementById("problem-info-link").href = "https://projecteuler.net/problem=" + this.currProblemId;
         document.getElementById("problem-info-link").title = `Problem ${this.currProblemId} on projecteuler.net`;
         document.querySelector("#problem-info-link>img").alt = `Link to Problem ${this.currProblemId} on projecteuler.net`;
-        await this.updateInfoSolution();
-        return this.updateInfoBenchmark();
+        return Promise.all([this.updateInfoSolution(), this.updateInfoBenchmark()]);
     }
     
     async updateInfoSolution() {
@@ -309,50 +317,64 @@ class PEuler {
 
 class ProblemWorker {
     constructor() {
-        this.initialized = this.init();
+        this.init();
     }
 
-    async init() {
+    init() {
         this.worker = new Worker("./scripts/worker.js", { type: "module" });
-        this.lastJob = new Promise((resolve) => { resolve(); }); // initially resolved promise
-        return new Promise((resolve, reject) => {
+        this.lastJob = new Promise((resolve, reject) => {
+            this.currJobReject = reject;
+            
             this.worker.onmessage = (e) => {
-                if (e.data === "[Worker] Ready!") {
+                this.currJobReject = null;
+                if (e.data === "ready") {
                     resolve();
                 } else {
-                    console.error("[Worker] Error: " + e.data);
                     reject(new Error("Worker initialization failed"));
                 }
             };
             this.worker.onerror = (e) => {
-                console.error("[Worker] Error: " + e.message);
+                this.currJobReject = null;
                 reject(e);
             };
         });
     }
+
+    clear() {
+        this.worker.terminate();
+        if (this.currJobReject !== null) {
+            this.currJobReject(new Error("Job cancelled due to worker reset"));
+            this.currJobReject = null;
+        }
+        this.init();
+    }
     
-    async problems() {
+    problems() {
         return this.sendJob({ workType: "problems" });
     }
 
-    async solve(problemId) {
+    solve(problemId) {
         return this.sendJob({ workType: "solve", id: problemId });
     }
     
-    async benchmark(problemId) {
+    benchmark(problemId) {
         return this.sendJob({ workType: "benchmark", id: problemId });
     }
     
-    async sendJob(msg) {
-        await this.initialized;
+    sendJob(msg) {
         this.lastJob = this.lastJob.then(() => {
             return new Promise((resolve, reject) => {
-                this.worker.onmessage = function(e) {
+                this.currJobReject = reject;
+                
+                this.worker.onmessage = (e) => {
+                    this.currJobReject = null;
                     resolve(e.data);
                 };
-                this.worker.onerror = function(e) {
+                this.worker.onerror = (e) => {
+                    this.currJobReject = null;
                     reject(e.message);
                 };
+                
                 this.worker.postMessage(msg);
             });
         });

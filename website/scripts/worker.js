@@ -15,8 +15,8 @@ onmessage = (e) => {
             postMessage(peuler.benchmark(e.data.id));
             break;
         default:
-            throw new Error("[Worker] Unknown work type: " + e.data.workType);
+            throw new Error("Unknown work type: " + e.data.workType);
     }
 };
 
-postMessage("[Worker] Ready!");
+postMessage("ready");

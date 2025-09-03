@@ -13,30 +13,105 @@ body {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    column-gap: 1.5em;
-    row-gap: 1.5em;
     padding: 1.5em;
     justify-content: space-evenly;
     align-content: space-between;
     align-items: center;
 }
-
-
-
+@media screen and (max-width: 470px) {
+    body {
+        font-size: 14px;
+    }
+}
+@media screen and (max-width: 410px) {
+    body {
+        font-size: 12px;
+    }
+}
+@media screen and (max-width: 355px) {
+    body {
+        font-size: 10px;
+    }
+}
+@media screen and (max-width: 300px) {
+    body {
+        font-size: 8px;
+    }
+}
 
 
 header {
     flex: 1 0 100%;
-    min-height: 10vh;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
 }
-h1 {
-    margin: 0.5em;
+header>h1 {
+    margin: 0.25em 0 0.5em 0;
     font-size: 5em;
     font-family: Courier New, monospace;
     text-align: center;
 }
+header>h4 {
+    color: #7c4f33;
+    margin: 0;
+    font-size: 1em;
+    font-family: Roboto, sans-serif;
+    font-weight: normal;
+    font-style: italic;
+    text-align: center;
+}
+header>h4>a {
+    color: #7c4f33;
+    text-decoration: underline;
+}
 footer {
     flex: 1 0 100%;
+}
+footer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
+    column-gap: 2em;
+    row-gap: 2em;
+}
+@media screen and (max-width: 650px) {
+    footer {
+        flex-wrap: wrap;
+    }
+}
+footer>div>h3 {
+    font-family: Courier New, monospace;
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 0.5em;
+}
+@media screen and (max-width: 470px) {
+    footer>div>h3 {
+        font-size: 17px;
+    }
+}
+footer>div>div {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    row-gap: 0.5em;
+    column-gap: 1em;
+}
+section {
+    flex: 1 0 100%;
+    margin: 3.5em 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-content: center;
+    align-items: center;
+    row-gap: 2em;
+    column-gap: 2em;
 }
 
 
@@ -72,7 +147,9 @@ footer {
     margin: 0;
 }
 .problem-picker-cell {
+    min-width: 2.5em;
     width: 2.5em;
+    min-height: 2.5em;
     height: 2.5em;
     border: 2px solid #444444;
 }

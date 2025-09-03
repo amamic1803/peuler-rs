@@ -11,181 +11,202 @@
   <body>
     <header>
       <h1>peuler</h1>
+      <h4>The solver for problems from <a href="https://projecteuler.net">Project Euler</a></h4>
     </header>
-    <div id="problem-picker">
-      <table>
-        <thead>
-        <tr>
-          <th colspan="1">
-            <div>
-              <img id="problem-picker-left-arrow" src="images/left-arrow-grey.svg" alt="Disabled left arrow">
-            </div>
-          </th>
-          <th colspan="8" id="problem-picker-title">Problems</th>
-          <th colspan="1">
-            <div>
-              <img id="problem-picker-right-arrow" src="images/right-arrow-grey.svg" alt="Disabled right arrow">
-            </div>
-          </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-          <td class="problem-picker-cell unavailable-problem"><p>1</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>2</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>3</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>4</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>5</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>6</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>7</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>8</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>9</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>10</p></td>
-        </tr>
-        <tr>
-          <td class="problem-picker-cell unavailable-problem"><p>11</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>12</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>13</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>14</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>15</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>16</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>17</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>18</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>19</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>20</p></td>
-        </tr>
-        <tr>
-          <td class="problem-picker-cell unavailable-problem"><p>21</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>22</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>23</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>24</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>25</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>26</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>27</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>28</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>29</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>30</p></td>
-        </tr>
-        <tr>
-          <td class="problem-picker-cell unavailable-problem"><p>31</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>32</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>33</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>34</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>35</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>36</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>37</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>38</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>39</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>40</p></td>
-        </tr>
-        <tr>
-          <td class="problem-picker-cell unavailable-problem"><p>41</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>42</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>43</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>44</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>45</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>46</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>47</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>48</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>49</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>50</p></td>
-        </tr>
-        <tr>
-          <td class="problem-picker-cell unavailable-problem"><p>51</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>52</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>53</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>54</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>55</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>56</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>57</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>58</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>59</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>60</p></td>
-        </tr>
-        <tr>
-          <td class="problem-picker-cell unavailable-problem"><p>61</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>62</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>63</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>64</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>65</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>66</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>67</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>68</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>69</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>70</p></td>
-        </tr>
-        <tr>
-          <td class="problem-picker-cell unavailable-problem"><p>71</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>72</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>73</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>74</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>75</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>76</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>77</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>78</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>79</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>80</p></td>
-        </tr>
-        <tr>
-          <td class="problem-picker-cell unavailable-problem"><p>81</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>82</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>83</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>84</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>85</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>86</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>87</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>88</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>89</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>90</p></td>
-        </tr>
-        <tr>
-          <td class="problem-picker-cell unavailable-problem"><p>91</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>92</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>93</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>94</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>95</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>96</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>97</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>98</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>99</p></td>
-          <td class="problem-picker-cell unavailable-problem"><p>100</p></td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-    <div id="problem-info">
-      <h2>
-        Problem
-        <a id="problem-info-link" title="" href="" target="_blank" rel="noopener noreferrer">
-          <img src="images/link.svg" alt="">
-        </a>
-      </h2>
-      <label id="problem-info-id-label" class="problem-info-label1" for="problem-info-id">ID:</label>
-      <code id="problem-info-id"></code>
-      <label id="problem-info-title-label" class="problem-info-label1" for="problem-info-title">Title:</label>
-      <code id="problem-info-title"></code>
-      <label id="problem-info-solution-label" class="problem-info-label1" for="problem-info-solution">Solution:</label>
-      <div id="solution-container">
-        <code id="problem-info-solution"></code>
-        <button id="solve-btn" class="problem-info-button">Solve</button>
-        <div id="solve-loader"><div class="loader"></div></div>
+    <section>
+      <div id="problem-picker">
+        <table>
+          <thead>
+          <tr>
+            <th colspan="1">
+              <div>
+                <img id="problem-picker-left-arrow" src="images/left-arrow-grey.svg" alt="Disabled left arrow">
+              </div>
+            </th>
+            <th colspan="8" id="problem-picker-title">Problems</th>
+            <th colspan="1">
+              <div>
+                <img id="problem-picker-right-arrow" src="images/right-arrow-grey.svg" alt="Disabled right arrow">
+              </div>
+            </th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td class="problem-picker-cell unavailable-problem"><p>1</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>2</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>3</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>4</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>5</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>6</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>7</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>8</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>9</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>10</p></td>
+          </tr>
+          <tr>
+            <td class="problem-picker-cell unavailable-problem"><p>11</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>12</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>13</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>14</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>15</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>16</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>17</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>18</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>19</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>20</p></td>
+          </tr>
+          <tr>
+            <td class="problem-picker-cell unavailable-problem"><p>21</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>22</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>23</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>24</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>25</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>26</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>27</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>28</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>29</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>30</p></td>
+          </tr>
+          <tr>
+            <td class="problem-picker-cell unavailable-problem"><p>31</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>32</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>33</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>34</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>35</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>36</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>37</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>38</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>39</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>40</p></td>
+          </tr>
+          <tr>
+            <td class="problem-picker-cell unavailable-problem"><p>41</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>42</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>43</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>44</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>45</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>46</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>47</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>48</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>49</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>50</p></td>
+          </tr>
+          <tr>
+            <td class="problem-picker-cell unavailable-problem"><p>51</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>52</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>53</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>54</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>55</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>56</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>57</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>58</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>59</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>60</p></td>
+          </tr>
+          <tr>
+            <td class="problem-picker-cell unavailable-problem"><p>61</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>62</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>63</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>64</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>65</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>66</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>67</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>68</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>69</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>70</p></td>
+          </tr>
+          <tr>
+            <td class="problem-picker-cell unavailable-problem"><p>71</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>72</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>73</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>74</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>75</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>76</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>77</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>78</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>79</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>80</p></td>
+          </tr>
+          <tr>
+            <td class="problem-picker-cell unavailable-problem"><p>81</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>82</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>83</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>84</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>85</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>86</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>87</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>88</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>89</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>90</p></td>
+          </tr>
+          <tr>
+            <td class="problem-picker-cell unavailable-problem"><p>91</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>92</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>93</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>94</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>95</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>96</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>97</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>98</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>99</p></td>
+            <td class="problem-picker-cell unavailable-problem"><p>100</p></td>
+          </tr>
+          </tbody>
+        </table>
       </div>
-      <label id="problem-info-benchmark-label" class="problem-info-label1">Benchmark:</label>
-      <label id="problem-info-benchmark-iterations-label" class="problem-info-label2" for="problem-info-benchmark-iterations">iterations:</label>
-      <code id="problem-info-benchmark-iterations"></code>
-      <label id="problem-info-benchmark-mean-label" class="problem-info-label2" for="problem-info-benchmark-mean">mean:</label>
-      <code id="problem-info-benchmark-mean"></code>
-      <label id="problem-info-benchmark-stddev-label" class="problem-info-label2" for="problem-info-benchmark-stddev">stddev:</label>
-      <code id="problem-info-benchmark-stddev"></code>
-      <div id="benchmark-btns">
-        <button id="benchmark-btn" class="problem-info-button">Benchmark</button>
-        <div id="benchmark-loader"><div class="loader"></div></div>
-        <button id="reset-btn" class="problem-info-button">Reset</button>
+      <div id="problem-info">
+        <h2>
+          Problem
+          <a id="problem-info-link" title="" href="" target="_blank" rel="noopener noreferrer">
+            <img src="images/link.svg" alt="">
+          </a>
+        </h2>
+        <label id="problem-info-id-label" class="problem-info-label1" for="problem-info-id">ID:</label>
+        <code id="problem-info-id"></code>
+        <label id="problem-info-title-label" class="problem-info-label1" for="problem-info-title">Title:</label>
+        <code id="problem-info-title"></code>
+        <label id="problem-info-solution-label" class="problem-info-label1" for="problem-info-solution">Solution:</label>
+        <div id="solution-container">
+          <code id="problem-info-solution"></code>
+          <button id="solve-btn" class="problem-info-button">Solve</button>
+          <div id="solve-loader"><div class="loader"></div></div>
+        </div>
+        <label id="problem-info-benchmark-label" class="problem-info-label1">Benchmark:</label>
+        <label id="problem-info-benchmark-iterations-label" class="problem-info-label2" for="problem-info-benchmark-iterations">iterations:</label>
+        <code id="problem-info-benchmark-iterations"></code>
+        <label id="problem-info-benchmark-mean-label" class="problem-info-label2" for="problem-info-benchmark-mean">mean:</label>
+        <code id="problem-info-benchmark-mean"></code>
+        <label id="problem-info-benchmark-stddev-label" class="problem-info-label2" for="problem-info-benchmark-stddev">stddev:</label>
+        <code id="problem-info-benchmark-stddev"></code>
+        <div id="benchmark-btns">
+          <button id="benchmark-btn" class="problem-info-button">Benchmark</button>
+          <div id="benchmark-loader"><div class="loader"></div></div>
+          <button id="reset-btn" class="problem-info-button">Reset</button>
+        </div>
       </div>
-    </div>
+    </section>
     <footer>
-      <p>cratesio pmath</p>
-      <p>cratesio peuler</p>
+      <div>
+        <h3>peuler</h3>
+        <div>
+          <a href="https://github.com/amamic1803/peuler-rs/tree/main/peuler"><img alt="GitHub Repository Static Badge" src="https://img.shields.io/badge/GitHub-peuler-blue?logo=github"></a>
+          <a href="https://crates.io/crates/peuler"><img alt="Crates.io Version" src="https://img.shields.io/crates/v/peuler?logo=rust"></a>
+          <a href="https://docs.rs/peuler"><img alt="docs.rs" src="https://img.shields.io/docsrs/peuler?logo=docs.rs&label=docs.rs"></a>
+          <a href="https://github.com/amamic1803/peuler-rs/actions/workflows/test.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/amamic1803/peuler-rs/test.yml"></a>
+          <a href="https://github.com/amamic1803/peuler-rs/blob/main/LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/amamic1803/peuler-rs"></a>
+        </div>
+      </div>
+      <div>
+        <h3>pmath</h3>
+        <div>
+          <a href="https://github.com/amamic1803/peuler-rs/tree/main/pmath"><img alt="GitHub Repository Static Badge" src="https://img.shields.io/badge/GitHub-pmath-blue?logo=github"></a>
+          <a href="https://crates.io/crates/pmath"><img alt="Crates.io Version" src="https://img.shields.io/crates/v/pmath?logo=rust"></a>
+          <a href="https://docs.rs/pmath"><img alt="docs.rs" src="https://img.shields.io/docsrs/pmath?logo=docs.rs&label=docs.rs"></a>
+          <a href="https://github.com/amamic1803/peuler-rs/actions/workflows/test.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/amamic1803/peuler-rs/test.yml"></a>
+          <a href="https://github.com/amamic1803/peuler-rs/blob/main/LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/amamic1803/peuler-rs"></a>
+        </div>
+      </div>
     </footer>
   </body>
 </html>
