@@ -18,22 +18,22 @@ body {
     align-content: space-between;
     align-items: center;
 }
-@media screen and (max-width: 470px) {
+@media (max-width: 470px) {
     body {
         font-size: 14px;
     }
 }
-@media screen and (max-width: 410px) {
+@media (max-width: 410px) {
     body {
         font-size: 12px;
     }
 }
-@media screen and (max-width: 355px) {
+@media (max-width: 355px) {
     body {
         font-size: 10px;
     }
 }
-@media screen and (max-width: 300px) {
+@media (max-width: 300px) {
     body {
         font-size: 8px;
     }
@@ -76,7 +76,7 @@ footer {
     column-gap: 2em;
     row-gap: 2em;
 }
-@media screen and (max-width: 650px) {
+@media (max-width: 650px) {
     footer {
         flex-wrap: wrap;
     }
@@ -87,7 +87,7 @@ footer>div>h3 {
     text-align: center;
     margin-bottom: 0.5em;
 }
-@media screen and (max-width: 470px) {
+@media (max-width: 470px) {
     footer>div>h3 {
         font-size: 17px;
     }
@@ -228,7 +228,6 @@ section {
     font-family: Courier New, monospace;
     font-weight: bold;
     font-size: 1.25em;
-    margin: 0.75em 0.75em 0.75em 0;
 }
 .problem-info-label2 {
     font-family: Courier New, monospace;
@@ -248,6 +247,12 @@ section {
     border-radius: 5px;
     padding: 0.5em;
     user-select: text;
+    width: fit-content;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+#problem-info code, .problem-info-button {
+    margin: 0.5em 0 0.5em 0.75em;
 }
 #problem-info-id-label {
     display: inline-block;
@@ -332,14 +337,19 @@ section {
     display: none;
 }
 .problem-info-button {
-    border-top: 2px solid #fbb300;
-    border-left: 2px solid #fbb300;
-    border-right: 2px solid #7c4f33;
-    border-bottom: 2px solid #7c4f33;
-}
-.problem-info-button:hover {
-    transition-duration: 0.2s;
     border-color: #fbb300;
+}
+@media (hover: hover) {
+    .problem-info-button {
+        border-top: 2px solid #fbb300;
+        border-left: 2px solid #fbb300;
+        border-right: 2px solid #7c4f33;
+        border-bottom: 2px solid #7c4f33;
+    }
+    .problem-info-button:hover {
+        transition-duration: 0.2s;
+        border-color: #fbb300;
+    }
 }
 .problem-info-button:active {
     transition-duration: 0.1s;
