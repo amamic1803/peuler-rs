@@ -228,12 +228,13 @@ section {
     font-family: Courier New, monospace;
     font-weight: bold;
     font-size: 1.25em;
+    margin-right: 0.75em;
 }
 .problem-info-label2 {
     font-family: Courier New, monospace;
     font-weight: bold;
     font-size: 1em;
-    margin: 0.75em 0.5em 0.75em 0;
+    margin-right: 0.75em;
 }
 .problem-info-label2::before {
     content: "• ";
@@ -247,12 +248,9 @@ section {
     border-radius: 5px;
     padding: 0.5em;
     user-select: text;
-    width: fit-content;
-    white-space: pre-wrap;
-    word-break: break-word;
 }
 #problem-info code, .problem-info-button {
-    margin: 0.5em 0 0.5em 0.75em;
+    margin: 0.5em 0;
 }
 #problem-info-id-label {
     display: inline-block;
@@ -291,6 +289,7 @@ section {
     cursor: pointer;
 }
 #solve-loader {
+    margin: 1em 0;
     display: none;
 }
 #solution-container {
@@ -337,7 +336,7 @@ section {
     display: none;
 }
 .problem-info-button {
-    border-color: #fbb300;
+    border: 2px solid #fbb300;
 }
 @media (hover: hover) {
     .problem-info-button {
