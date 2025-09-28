@@ -291,3 +291,8 @@ where
 pub fn reverse<T: PrimInt + ConstZero + ConstOne>(n: T, radix: u8) -> T {
     digits_to_int(digits(n, radix).rev(), radix)
 }
+
+/// Lowercase character representations of hexadecimal digits.
+pub const HEX_DIGITS: [char; 16] = [
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
+];

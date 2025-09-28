@@ -2,6 +2,7 @@
 
 pub mod digits;
 pub mod factors;
+pub mod geometry;
 pub mod linalg;
 pub mod primes;
 pub mod probability;
@@ -18,7 +19,7 @@ use factors::distinct_prime_factors;
 use malachite::Integer;
 use malachite::base::num::basic::traits::{One, Zero};
 use malachite::rational::Rational;
-use num_traits::{ConstOne, ConstZero, PrimInt, ToPrimitive};
+use num_traits::{ConstOne, ConstZero, Euclid, PrimInt, Signed, ToPrimitive};
 use primes::sieve_of_eratosthenes;
 
 #[cfg_attr(doc, katexit::katexit)]
@@ -639,6 +640,65 @@ where
     result
 }
 
+#[cfg_attr(doc, katexit::katexit)]
+/// The greatest common divisor and coefficients of Bézout's identity of two integers.
+///
+/// Bézout's identity states that for any non-negative integers $a$ and $b$,
+/// there exist integers $x$ and $y$ such that:
+/// $$
+///     ax + by = \\text{gcd}(a, b)
+/// $$
+///
+/// Calculated using the extended Euclidean algorithm.
+/// # Arguments
+/// * $a$ - The first integer.
+/// * $b$ - The second integer.
+/// # Returns
+/// * $\\text{gcd}(a, b)$ - The greatest common divisor.
+/// * $x$ - The coefficient of $a$ in Bézout's identity.
+/// * $y$ - The coefficient of $b$ in Bézout's identity.
+/// # Panics
+/// * If either of the integers is negative.
+/// # Example
+/// ```
+/// use pmath::gcd_extended;
+///
+/// assert_eq!(gcd_extended(12, 18), (6, -1, 1));  // 12 * -1 + 18 * 1 = 6
+/// assert_eq!(gcd_extended(0, 0), (0, 1, 0));     // 0 * 1 + 0 * 0 = 0
+/// assert_eq!(gcd_extended(0, 5), (5, 0, 1));     // 0 * 0 + 5 * 1 = 5
+/// ```
+pub fn gcd_extended<T>(a: T, b: T) -> (T, T, T)
+where
+    T: PrimInt + ConstZero + ConstOne + Signed,
+{
+    if a < T::ZERO || b < T::ZERO {
+        panic!("Cannot calculate GCD of negative numbers.");
+    }
+
+    let mut r0 = a;
+    let mut r1 = b;
+    let mut switch = false;
+    if r0 < r1 {
+        (r0, r1) = (r1, r0);
+        switch = true;
+    }
+    let mut s0 = T::ONE;
+    let mut s1 = T::ZERO;
+    let mut t0 = T::ZERO;
+    let mut t1 = T::ONE;
+
+    while r1 > T::ZERO {
+        let q = r0 / r1;
+        (r0, r1) = (r1, r0 - q * r1);
+        (s0, s1) = (s1, s0 - q * s1);
+        (t0, t1) = (t1, t0 - q * t1);
+    }
+    if switch {
+        (s0, t0) = (t0, s0);
+    }
+    (r0, s0, t0)
+}
+
 /// The least common multiple of two integers.
 ///
 /// If either of the integers is `0`, the result is `0`.
@@ -822,4 +882,150 @@ where
     }
 
     phi_values
+}
+
+#[cfg_attr(doc, katexit::katexit)]
+/// Congruence relation.
+///
+/// A congruence relation is an equation that states that two integers
+/// are congruent modulo a third integer.
+/// Two integers $x$ and $y$ are said to be congruent modulo $n$
+/// if they have the same remainder $a$ when divided by $n$.
+/// This is written as:
+/// $$ x \equiv a \pmod n \\\\
+///    y \equiv a \pmod n
+/// $$
+/// # Example
+/// ```
+/// use pmath::CongruenceRelation;
+///
+/// let c1 = CongruenceRelation::new(3, 5); // 3 === 3 (mod 5)
+/// let c2 = CongruenceRelation::new(8, 5); // 8 === 3 (mod 5)
+/// assert_eq!(*c1.a(), 3);
+/// assert_eq!(*c1.n(), 5);
+/// assert_eq!(*c2.a(), 3);
+/// assert_eq!(*c2.n(), 5);
+/// assert_eq!(c1, c2);
+/// ```
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+pub struct CongruenceRelation<T> {
+    a: T,
+    n: T,
+}
+impl<T> CongruenceRelation<T>
+where
+    T: PartialOrd + Euclid + ConstZero,
+{
+    /// Create a new [CongruenceRelation].
+    /// # Arguments
+    /// * `a` - The remainder.
+    /// * `n` - The modulus (must be positive).
+    /// # Panics
+    /// * If `n` is not positive.
+    pub fn new(a: T, n: T) -> Self {
+        if n <= T::ZERO {
+            panic!("Modulus must be positive.");
+        }
+        Self { a: a.rem_euclid(&n), n }
+    }
+
+    /// Get the remainder of the congruence relation.
+    ///
+    /// This might not be the same as the $a$ provided to [CongruenceRelation::new]
+    /// as it is reduced modulo $n$.
+    /// # Returns
+    /// * The remainder.
+    pub fn a(&self) -> &T {
+        &self.a
+    }
+
+    /// Get the modulus of the congruence relation.
+    /// # Returns
+    /// * The modulus.
+    pub fn n(&self) -> &T {
+        &self.n
+    }
+}
+
+/// Solve a system of linear congruences.
+///
+/// Uses the Chinese remainder theorem.
+/// If a solution exists, it is unique modulo the least common multiple of the moduli.
+///
+/// The moduli do not need to be coprime, but if they are not, a solution might not exist.
+/// # Arguments
+/// * `congruences` - An iterable of [CongruenceRelation]s representing
+///   the system of linear congruences.
+/// # Returns
+/// * [Some] with the solution if it exists,
+///   or [None] if no solution exists or no congruences were provided.
+/// # Panics
+/// * If any of the moduli are negative.
+/// # Example
+/// ```
+/// use pmath::{system_of_linear_congruences, CongruenceRelation};
+///
+/// let congruences = [
+///    CongruenceRelation::new(9, 10),
+///    CongruenceRelation::new(5, 6),
+/// ];
+/// assert_eq!(system_of_linear_congruences(congruences), Some(29));
+///
+/// let congruences = [
+///    CongruenceRelation::new(7i64, 19),
+///    CongruenceRelation::new(6, 17),
+///    CongruenceRelation::new(11, 13),
+///    CongruenceRelation::new(2, 7),
+///    CongruenceRelation::new(2, 5),
+///    CongruenceRelation::new(1, 3),
+///    CongruenceRelation::new(4, 11),
+/// ];
+/// assert_eq!(system_of_linear_congruences(congruences), Some(3_903_937));
+/// ```
+pub fn system_of_linear_congruences<T, U, V>(congruences: U) -> Option<T>
+where
+    U: IntoIterator<Item = V>,
+    V: Borrow<CongruenceRelation<T>>,
+    T: Copy + PrimInt + ConstOne + ConstZero + Euclid + PartialOrd + Signed
+{
+    let mut congruences = congruences
+        .into_iter()
+        .map(|val| *val.borrow());
+
+    let mut a;
+    let mut n;
+    match congruences.next() {
+        Some(congruence) => {
+            a = *congruence.a();
+            n = *congruence.n();
+        },
+        None => return None, // no congruences provided
+    }
+
+    for congruence in congruences {
+        let mut a1 = a;
+        let a2 = *congruence.a();
+        let mut n1 = n;
+        let n2 = *congruence.n();
+        let gcd = gcd(n1, n2);
+
+        // a1 % gcd != a2 % gcd
+        // this would imply that the solution x has to have 2 different remainders
+        // when divided by gcd, so no solution exists
+        if (a2 - a1).rem_euclid(&gcd) != T::ZERO {
+            return None;
+        }
+
+        // reduce the problem
+        n1 = n1 / gcd;
+        a1 = a1.rem_euclid(&n1);
+
+        let (_, m1, m2) = gcd_extended(n1, n2);
+
+        let new_n = n1 * n2;
+        a = (a1 * n2 * m2 + a2 * n1 * m1).rem_euclid(&new_n);
+        n = new_n;
+    }
+
+    Some(a)
 }

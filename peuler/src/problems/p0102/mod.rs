@@ -7,7 +7,7 @@ problem!(Problem0102, 102, "Triangle Containment");
 impl Solution for Problem0102 {
     fn solve(&self) -> String {
         const INPUT: &str = include_str!("0102_triangles.txt");
-        let triangles: Vec<[Point<2>; 3]> = INPUT
+        let triangles: Vec<[Point<f64, 2>; 3]> = INPUT
             .trim()
             .lines()
             .map(|line| {
