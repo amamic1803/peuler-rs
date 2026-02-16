@@ -66,7 +66,7 @@ impl Solution for Problem0091 {
         // the number of right triangles when GRID_SIZE is even can be calculated by subtracting GRID_SIZE / 2
         // from the number of right triangles when GRID_SIZE is odd
         let mut n3 = (GRID_SIZE / 2) * ((GRID_SIZE / 2) + 1); // num of triangles when GRID_SIZE is odd
-        if GRID_SIZE % 2 == 0 {
+        if GRID_SIZE.is_multiple_of(2) {
             n3 -= GRID_SIZE / 2; // subtract GRID_SIZE / 2 if GRID_SIZE is even
         }
         n3 *= 2; // multiply by 2 to get the total number of right triangles with right angle at diagonal (above and below)

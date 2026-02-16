@@ -34,7 +34,7 @@ impl Solution for Problem0012 {
         while d_t1 * d_t2 <= 500 {
             n += 1;
             d_t1 = d_t2;
-            if n % 2 == 0 {
+            if n.is_multiple_of(2) {
                 d_t2 = divisors(n + 1).count() as i32;
             } else {
                 d_t2 = divisors(n.div_ceil(2)).count() as i32;

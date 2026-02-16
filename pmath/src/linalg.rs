@@ -393,7 +393,7 @@ impl<const N: usize> Vector<N> {
     pub fn normalize(&self) -> Self {
         let magnitude = self.magnitude();
         let mut new_vector = Self { coords: self.coords };
-        new_vector = new_vector / magnitude;
+        new_vector /= magnitude;
         new_vector
     }
 }

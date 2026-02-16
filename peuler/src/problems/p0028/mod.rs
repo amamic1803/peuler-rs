@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::sequences::{OddNaturalNumbersSeq, OddNaturalNumbersSquaredSeq, Sequence};
+use pmath::sequences::{OddNatNumSeq, OddNatNumSqSeq, Sequence};
 
 problem!(Problem0028, 28, "Number Spiral Diagonals");
 
@@ -21,10 +21,10 @@ impl Solution for Problem0028 {
         // note that these formulas are valid only for odd numbers, but that is ok because spiral size is always odd
 
         let result = 1 + 4
-            * (OddNaturalNumbersSquaredSeq::<u64>::new()
+            * (OddNatNumSqSeq::<u64>::new()
                 .sum_next_n((SPIRAL_SIZE / 2 + 1) as usize)
                 - 1)
-            - 6 * (OddNaturalNumbersSeq::<u64>::new().sum_next_n((SPIRAL_SIZE / 2 + 1) as usize)
+            - 6 * (OddNatNumSeq::<u64>::new().sum_next_n((SPIRAL_SIZE / 2 + 1) as usize)
                 - 1)
             + 6 * (SPIRAL_SIZE / 2);
 

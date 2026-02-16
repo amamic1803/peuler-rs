@@ -20,7 +20,7 @@ impl Solution for Problem0071 {
         // so we want b to be the largest possible value, and also 3b - 1 to be divisible by 7
 
         let mut b = MAX;
-        while (C * b - 1) % D != 0 {
+        while !(C * b - 1).is_multiple_of(D) {
             b -= 1;
         }
 
