@@ -11,9 +11,9 @@ keywords = ["algorithms", "mathematics", "wasm", "math", "project-euler"]
 categories = ["algorithms", "mathematics", "wasm"]
 
 [dependencies]
-clap = { version = "4.5.46", features = ["cargo"], optional = true }
+clap = { version = "4.5.58", features = ["cargo"], optional = true }
 itertools = "0.14.0"
-malachite = "0.6.1"
+malachite = "0.9.1"
 pmath = { path = "../pmath", version = "0.2.0" }
 
 [target.wasm32-unknown-unknown.dependencies]

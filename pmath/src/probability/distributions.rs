@@ -2,6 +2,7 @@
 
 use num_traits::{ConstOne, PrimInt, ToPrimitive};
 use rand::Rng;
+use rand::RngExt;
 use rand::distr::Distribution as RandDistribution;
 use rand::distr::uniform::SampleUniform;
 use std::borrow::Borrow;
