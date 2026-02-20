@@ -1013,8 +1013,8 @@ mod tests {
 
         let mut seq = NewSeq::new();
 
-        assert_eq!(seq.sum_next_n(0), 0);    // no numbers to sum, should return 0
-        assert_eq!(seq.sum_next_n(5), 15);   // 1 + 2 + 3 + 4 + 5 = 15
+        assert_eq!(seq.sum_next_n(0), 0); // no numbers to sum, should return 0
+        assert_eq!(seq.sum_next_n(5), 15); // 1 + 2 + 3 + 4 + 5 = 15
         assert_eq!(seq.sum_next_n(25), 450); // 6 + 7 + ... + 30 = 450
     }
 
@@ -1101,13 +1101,16 @@ mod tests {
 
         let start = 6;
         let mut seq = CollatzSeq::new(start);
-        assert_eq!(seq.sum_next_n(5), COLLATZ_SEQ_EXAMPLE.into_iter().take(5).sum::<u32>());
+        assert_eq!(
+            seq.sum_next_n(5),
+            COLLATZ_SEQ_EXAMPLE.into_iter().take(5).sum::<u32>()
+        );
     }
 
     const FIBONACCI_SEQ_EXAMPLE: [i32; 40] = [
-        0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181,
-        6765, 10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811, 514229, 832040,
-        1346269, 2178309, 3524578, 5702887, 9227465, 14930352, 24157817, 39088169, 63245986,
+        0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765,
+        10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811, 514229, 832040, 1346269,
+        2178309, 3524578, 5702887, 9227465, 14930352, 24157817, 39088169, 63245986,
     ];
 
     #[test]
@@ -1117,53 +1120,100 @@ mod tests {
         // unsigned types
         assert_eq!(
             FibonacciSeq::<u8>::new().take(10).collect::<Vec<_>>(),
-            FIBONACCI_SEQ_EXAMPLE.into_iter().take(10).map(|val| val as u8).collect::<Vec<_>>()
+            FIBONACCI_SEQ_EXAMPLE
+                .into_iter()
+                .take(10)
+                .map(|val| val as u8)
+                .collect::<Vec<_>>()
         );
         assert_eq!(
             FibonacciSeq::<u16>::new().take(10).collect::<Vec<_>>(),
-            FIBONACCI_SEQ_EXAMPLE.into_iter().take(10).map(|val| val as u16).collect::<Vec<_>>()
+            FIBONACCI_SEQ_EXAMPLE
+                .into_iter()
+                .take(10)
+                .map(|val| val as u16)
+                .collect::<Vec<_>>()
         );
         assert_eq!(
             FibonacciSeq::<u32>::new().take(10).collect::<Vec<_>>(),
-            FIBONACCI_SEQ_EXAMPLE.into_iter().take(10).map(|val| val as u32).collect::<Vec<_>>()
+            FIBONACCI_SEQ_EXAMPLE
+                .into_iter()
+                .take(10)
+                .map(|val| val as u32)
+                .collect::<Vec<_>>()
         );
         assert_eq!(
             FibonacciSeq::<u64>::new().take(10).collect::<Vec<_>>(),
-            FIBONACCI_SEQ_EXAMPLE.into_iter().take(10).map(|val| val as u64).collect::<Vec<_>>()
+            FIBONACCI_SEQ_EXAMPLE
+                .into_iter()
+                .take(10)
+                .map(|val| val as u64)
+                .collect::<Vec<_>>()
         );
         assert_eq!(
             FibonacciSeq::<u128>::new().take(10).collect::<Vec<_>>(),
-            FIBONACCI_SEQ_EXAMPLE.into_iter().take(10).map(|val| val as u128).collect::<Vec<_>>()
+            FIBONACCI_SEQ_EXAMPLE
+                .into_iter()
+                .take(10)
+                .map(|val| val as u128)
+                .collect::<Vec<_>>()
         );
         assert_eq!(
             FibonacciSeq::<usize>::new().take(10).collect::<Vec<_>>(),
-            FIBONACCI_SEQ_EXAMPLE.into_iter().take(10).map(|val| val as usize).collect::<Vec<_>>()
+            FIBONACCI_SEQ_EXAMPLE
+                .into_iter()
+                .take(10)
+                .map(|val| val as usize)
+                .collect::<Vec<_>>()
         );
 
         // signed types
         assert_eq!(
             FibonacciSeq::<i8>::new().take(10).collect::<Vec<_>>(),
-            FIBONACCI_SEQ_EXAMPLE.into_iter().take(10).map(|val| val as i8).collect::<Vec<_>>()
+            FIBONACCI_SEQ_EXAMPLE
+                .into_iter()
+                .take(10)
+                .map(|val| val as i8)
+                .collect::<Vec<_>>()
         );
         assert_eq!(
             FibonacciSeq::<i16>::new().take(10).collect::<Vec<_>>(),
-            FIBONACCI_SEQ_EXAMPLE.into_iter().take(10).map(|val| val as i16).collect::<Vec<_>>()
+            FIBONACCI_SEQ_EXAMPLE
+                .into_iter()
+                .take(10)
+                .map(|val| val as i16)
+                .collect::<Vec<_>>()
         );
         assert_eq!(
             FibonacciSeq::<i32>::new().take(10).collect::<Vec<_>>(),
-            FIBONACCI_SEQ_EXAMPLE.into_iter().take(10).collect::<Vec<_>>()
+            FIBONACCI_SEQ_EXAMPLE
+                .into_iter()
+                .take(10)
+                .collect::<Vec<_>>()
         );
         assert_eq!(
             FibonacciSeq::<i64>::new().take(10).collect::<Vec<_>>(),
-            FIBONACCI_SEQ_EXAMPLE.into_iter().take(10).map(|val| val as i64).collect::<Vec<_>>()
+            FIBONACCI_SEQ_EXAMPLE
+                .into_iter()
+                .take(10)
+                .map(|val| val as i64)
+                .collect::<Vec<_>>()
         );
         assert_eq!(
             FibonacciSeq::<i128>::new().take(10).collect::<Vec<_>>(),
-            FIBONACCI_SEQ_EXAMPLE.into_iter().take(10).map(|val| val as i128).collect::<Vec<_>>()
+            FIBONACCI_SEQ_EXAMPLE
+                .into_iter()
+                .take(10)
+                .map(|val| val as i128)
+                .collect::<Vec<_>>()
         );
         assert_eq!(
             FibonacciSeq::<isize>::new().take(10).collect::<Vec<_>>(),
-            FIBONACCI_SEQ_EXAMPLE.into_iter().take(10).map(|val| val as isize).collect::<Vec<_>>()
+            FIBONACCI_SEQ_EXAMPLE
+                .into_iter()
+                .take(10)
+                .map(|val| val as isize)
+                .collect::<Vec<_>>()
         );
     }
 
@@ -1174,7 +1224,11 @@ mod tests {
         for n in 0..=FIBONACCI_SEQ_EXAMPLE.len() {
             assert_eq!(
                 FibonacciSeq::new().take(n).collect::<Vec<i32>>(),
-                FIBONACCI_SEQ_EXAMPLE.iter().take(n).cloned().collect::<Vec<i32>>()
+                FIBONACCI_SEQ_EXAMPLE
+                    .iter()
+                    .take(n)
+                    .cloned()
+                    .collect::<Vec<i32>>()
             );
         }
     }
@@ -1184,10 +1238,7 @@ mod tests {
         //! Test the [FibonacciSeq::nth] method for various values of `n`.
 
         for (i, value) in FIBONACCI_SEQ_EXAMPLE.into_iter().enumerate() {
-            assert_eq!(
-                FibonacciSeq::<i32>::new().nth(i).unwrap(),
-                value
-            )
+            assert_eq!(FibonacciSeq::<i32>::new().nth(i).unwrap(), value)
         }
     }
 
@@ -1198,7 +1249,10 @@ mod tests {
         let mut seq = FibonacciSeq::<i32>::new();
         assert_eq!(seq.sum_next_n(0), 0);
         assert_eq!(seq.sum_next_n(1), 0);
-        assert_eq!(seq.sum_next_n(FIBONACCI_SEQ_EXAMPLE.len() - 1), FIBONACCI_SEQ_EXAMPLE.iter().sum::<i32>());
+        assert_eq!(
+            seq.sum_next_n(FIBONACCI_SEQ_EXAMPLE.len() - 1),
+            FIBONACCI_SEQ_EXAMPLE.iter().sum::<i32>()
+        );
     }
 
     #[test]
@@ -1263,7 +1317,10 @@ mod tests {
         //! Test that the [NatNumSeq] generates the correct sequence.
 
         let seq = NatNumSeq::<u32>::new();
-        assert_eq!(seq.take(10).collect::<Vec<u32>>(), vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        assert_eq!(
+            seq.take(10).collect::<Vec<u32>>(),
+            vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        );
     }
 
     #[test]
@@ -1353,7 +1410,10 @@ mod tests {
         //! Test that the [NatNumW0Seq] generates the correct sequence.
 
         let seq = NatNumW0Seq::<u32>::new();
-        assert_eq!(seq.take(11).collect::<Vec<u32>>(), vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        assert_eq!(
+            seq.take(11).collect::<Vec<u32>>(),
+            vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        );
     }
 
     #[test]
@@ -1443,7 +1503,10 @@ mod tests {
         //! Test that the [OddNatNumSeq] generates the correct sequence.
 
         let seq = OddNatNumSeq::<u32>::new();
-        assert_eq!(seq.take(10).collect::<Vec<u32>>(), vec![1, 3, 5, 7, 9, 11, 13, 15, 17, 19]);
+        assert_eq!(
+            seq.take(10).collect::<Vec<u32>>(),
+            vec![1, 3, 5, 7, 9, 11, 13, 15, 17, 19]
+        );
     }
 
     #[test]
@@ -1451,7 +1514,10 @@ mod tests {
         //! Test the [OddNatNumSeq::nth] method for various values of `n`.
 
         for n in 0..100 {
-            assert_eq!(OddNatNumSeq::<i32>::new().nth(n).unwrap(), (n * 2 + 1) as i32);
+            assert_eq!(
+                OddNatNumSeq::<i32>::new().nth(n).unwrap(),
+                (n * 2 + 1) as i32
+            );
         }
     }
 
@@ -1533,7 +1599,10 @@ mod tests {
         //! Test that the [EvenNatNumSeq] generates the correct sequence.
 
         let seq = EvenNatNumSeq::<u32>::new();
-        assert_eq!(seq.take(10).collect::<Vec<u32>>(), vec![2, 4, 6, 8, 10, 12, 14, 16, 18, 20]);
+        assert_eq!(
+            seq.take(10).collect::<Vec<u32>>(),
+            vec![2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+        );
     }
 
     #[test]
@@ -1541,7 +1610,10 @@ mod tests {
         //! Test the [EvenNatNumSeq::nth] method for various values of `n`.
 
         for n in 0..100 {
-            assert_eq!(EvenNatNumSeq::<i32>::new().nth(n).unwrap(), ((n + 1) * 2) as i32);
+            assert_eq!(
+                EvenNatNumSeq::<i32>::new().nth(n).unwrap(),
+                ((n + 1) * 2) as i32
+            );
         }
     }
 
@@ -1623,7 +1695,10 @@ mod tests {
         //! Test that the [EvenNatNumW0Seq] generates the correct sequence.
 
         let seq = EvenNatNumW0Seq::<u32>::new();
-        assert_eq!(seq.take(11).collect::<Vec<u32>>(), vec![0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]);
+        assert_eq!(
+            seq.take(11).collect::<Vec<u32>>(),
+            vec![0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+        );
     }
 
     #[test]
@@ -1631,7 +1706,10 @@ mod tests {
         //! Test the [EvenNatNumW0Seq::nth] method for various values of `n`.
 
         for n in 0..100 {
-            assert_eq!(EvenNatNumW0Seq::<i32>::new().nth(n).unwrap(), (n * 2) as i32);
+            assert_eq!(
+                EvenNatNumW0Seq::<i32>::new().nth(n).unwrap(),
+                (n * 2) as i32
+            );
         }
     }
 
@@ -1642,7 +1720,10 @@ mod tests {
         let mut seq = EvenNatNumW0Seq::<u32>::new();
         assert_eq!(seq.sum_next_n(0), 0);
         assert_eq!(seq.sum_next_n(1), 0);
-        assert_eq!(seq.sum_next_n(10), 2 + 4 + 6 + 8 + 10 + 12 + 14 + 16 + 18 + 20);
+        assert_eq!(
+            seq.sum_next_n(10),
+            2 + 4 + 6 + 8 + 10 + 12 + 14 + 16 + 18 + 20
+        );
 
         let mut sum = 0;
         for n in 1..=100 {
@@ -1713,7 +1794,10 @@ mod tests {
         //! Test that the [NatNumSqSeq] generates the correct sequence.
 
         let seq = NatNumSqSeq::<u32>::new();
-        assert_eq!(seq.take(10).collect::<Vec<u32>>(), vec![1, 4, 9, 16, 25, 36, 49, 64, 81, 100]);
+        assert_eq!(
+            seq.take(10).collect::<Vec<u32>>(),
+            vec![1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+        );
     }
 
     #[test]
@@ -1721,7 +1805,10 @@ mod tests {
         //! Test the [NatNumSqSeq::nth] method for various values of `n`.
 
         for n in 0..100 {
-            assert_eq!(NatNumSqSeq::<i32>::new().nth(n).unwrap(), (n + 1).pow(2) as i32);
+            assert_eq!(
+                NatNumSqSeq::<i32>::new().nth(n).unwrap(),
+                (n + 1).pow(2) as i32
+            );
         }
     }
 
@@ -1803,7 +1890,10 @@ mod tests {
         //! Test that the [NatNumW0SqSeq] generates the correct sequence.
 
         let seq = NatNumW0SqSeq::<u32>::new();
-        assert_eq!(seq.take(11).collect::<Vec<u32>>(), vec![0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100]);
+        assert_eq!(
+            seq.take(11).collect::<Vec<u32>>(),
+            vec![0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+        );
     }
 
     #[test]
@@ -1822,7 +1912,10 @@ mod tests {
         let mut seq = NatNumW0SqSeq::<u32>::new();
         assert_eq!(seq.sum_next_n(0), 0);
         assert_eq!(seq.sum_next_n(1), 0);
-        assert_eq!(seq.sum_next_n(10), 1 + 4 + 9 + 16 + 25 + 36 + 49 + 64 + 81 + 100);
+        assert_eq!(
+            seq.sum_next_n(10),
+            1 + 4 + 9 + 16 + 25 + 36 + 49 + 64 + 81 + 100
+        );
 
         let mut sum = 0;
         for n in 1..=100 {
@@ -1854,11 +1947,17 @@ mod tests {
         );
         assert_eq!(
             OddNatNumSqSeq::<u128>::new().take(10).collect::<Vec<_>>(),
-            (1u128..=19).step_by(2).map(|n| n.pow(2)).collect::<Vec<_>>()
+            (1u128..=19)
+                .step_by(2)
+                .map(|n| n.pow(2))
+                .collect::<Vec<_>>()
         );
         assert_eq!(
             OddNatNumSqSeq::<usize>::new().take(10).collect::<Vec<_>>(),
-            (1usize..=19).step_by(2).map(|n| n.pow(2)).collect::<Vec<_>>()
+            (1usize..=19)
+                .step_by(2)
+                .map(|n| n.pow(2))
+                .collect::<Vec<_>>()
         );
 
         // signed types
@@ -1880,11 +1979,17 @@ mod tests {
         );
         assert_eq!(
             OddNatNumSqSeq::<i128>::new().take(10).collect::<Vec<_>>(),
-            (1i128..=19).step_by(2).map(|n| n.pow(2)).collect::<Vec<_>>()
+            (1i128..=19)
+                .step_by(2)
+                .map(|n| n.pow(2))
+                .collect::<Vec<_>>()
         );
         assert_eq!(
             OddNatNumSqSeq::<isize>::new().take(10).collect::<Vec<_>>(),
-            (1isize..=19).step_by(2).map(|n| n.pow(2)).collect::<Vec<_>>()
+            (1isize..=19)
+                .step_by(2)
+                .map(|n| n.pow(2))
+                .collect::<Vec<_>>()
         );
     }
 
@@ -1893,7 +1998,10 @@ mod tests {
         //! Test that the [OddNatNumSqSeq] generates the correct sequence.
 
         let seq = OddNatNumSqSeq::<u32>::new();
-        assert_eq!(seq.take(10).collect::<Vec<u32>>(), vec![1, 9, 25, 49, 81, 121, 169, 225, 289, 361]);
+        assert_eq!(
+            seq.take(10).collect::<Vec<u32>>(),
+            vec![1, 9, 25, 49, 81, 121, 169, 225, 289, 361]
+        );
     }
 
     #[test]
@@ -1901,7 +2009,10 @@ mod tests {
         //! Test the [OddNatNumSqSeq::nth] method for various values of `n`.
 
         for n in 0..100 {
-            assert_eq!(OddNatNumSqSeq::<i32>::new().nth(n).unwrap(), (n * 2 + 1).pow(2) as i32);
+            assert_eq!(
+                OddNatNumSqSeq::<i32>::new().nth(n).unwrap(),
+                (n * 2 + 1).pow(2) as i32
+            );
         }
     }
 
@@ -1912,7 +2023,10 @@ mod tests {
         let mut seq = OddNatNumSqSeq::<u32>::new();
         assert_eq!(seq.sum_next_n(0), 0);
         assert_eq!(seq.sum_next_n(1), 1);
-        assert_eq!(seq.sum_next_n(9), 9 + 25 + 49 + 81 + 121 + 169 + 225 + 289 + 361);
+        assert_eq!(
+            seq.sum_next_n(9),
+            9 + 25 + 49 + 81 + 121 + 169 + 225 + 289 + 361
+        );
 
         let mut sum = 0;
         for n in 1..=100 {
@@ -1944,11 +2058,17 @@ mod tests {
         );
         assert_eq!(
             EvenNatNumSqSeq::<u128>::new().take(10).collect::<Vec<_>>(),
-            (2u128..=20).step_by(2).map(|n| n.pow(2)).collect::<Vec<_>>()
+            (2u128..=20)
+                .step_by(2)
+                .map(|n| n.pow(2))
+                .collect::<Vec<_>>()
         );
         assert_eq!(
             EvenNatNumSqSeq::<usize>::new().take(10).collect::<Vec<_>>(),
-            (2usize..=20).step_by(2).map(|n| n.pow(2)).collect::<Vec<_>>()
+            (2usize..=20)
+                .step_by(2)
+                .map(|n| n.pow(2))
+                .collect::<Vec<_>>()
         );
 
         // signed types
@@ -1970,11 +2090,17 @@ mod tests {
         );
         assert_eq!(
             EvenNatNumSqSeq::<i128>::new().take(10).collect::<Vec<_>>(),
-            (2i128..=20).step_by(2).map(|n| n.pow(2)).collect::<Vec<_>>()
+            (2i128..=20)
+                .step_by(2)
+                .map(|n| n.pow(2))
+                .collect::<Vec<_>>()
         );
         assert_eq!(
             EvenNatNumSqSeq::<isize>::new().take(10).collect::<Vec<_>>(),
-            (2isize..=20).step_by(2).map(|n| n.pow(2)).collect::<Vec<_>>()
+            (2isize..=20)
+                .step_by(2)
+                .map(|n| n.pow(2))
+                .collect::<Vec<_>>()
         );
     }
 
@@ -1983,7 +2109,10 @@ mod tests {
         //! Test that the [EvenNatNumSqSeq] generates the correct sequence.
 
         let seq = EvenNatNumSqSeq::<u32>::new();
-        assert_eq!(seq.take(10).collect::<Vec<u32>>(), vec![4, 16, 36, 64, 100, 144, 196, 256, 324, 400]);
+        assert_eq!(
+            seq.take(10).collect::<Vec<u32>>(),
+            vec![4, 16, 36, 64, 100, 144, 196, 256, 324, 400]
+        );
     }
 
     #[test]
@@ -1991,7 +2120,10 @@ mod tests {
         //! Test the [EvenNatNumSqSeq::nth] method for various values of `n`.
 
         for n in 0..100 {
-            assert_eq!(EvenNatNumSqSeq::<i32>::new().nth(n).unwrap(), ((n + 1) * 2).pow(2) as i32);
+            assert_eq!(
+                EvenNatNumSqSeq::<i32>::new().nth(n).unwrap(),
+                ((n + 1) * 2).pow(2) as i32
+            );
         }
     }
 
@@ -2002,7 +2134,10 @@ mod tests {
         let mut seq = EvenNatNumSqSeq::<u32>::new();
         assert_eq!(seq.sum_next_n(0), 0);
         assert_eq!(seq.sum_next_n(1), 4);
-        assert_eq!(seq.sum_next_n(9), 16 + 36 + 64 + 100 + 144 + 196 + 256 + 324 + 400);
+        assert_eq!(
+            seq.sum_next_n(9),
+            16 + 36 + 64 + 100 + 144 + 196 + 256 + 324 + 400
+        );
 
         let mut sum = 0;
         for n in 1..=100 {
@@ -2033,12 +2168,22 @@ mod tests {
             (0u64..=20).step_by(2).map(|n| n.pow(2)).collect::<Vec<_>>()
         );
         assert_eq!(
-            EvenNatNumW0SqSeq::<u128>::new().take(11).collect::<Vec<_>>(),
-            (0u128..=20).step_by(2).map(|n| n.pow(2)).collect::<Vec<_>>()
+            EvenNatNumW0SqSeq::<u128>::new()
+                .take(11)
+                .collect::<Vec<_>>(),
+            (0u128..=20)
+                .step_by(2)
+                .map(|n| n.pow(2))
+                .collect::<Vec<_>>()
         );
         assert_eq!(
-            EvenNatNumW0SqSeq::<usize>::new().take(11).collect::<Vec<_>>(),
-            (0usize..=20).step_by(2).map(|n| n.pow(2)).collect::<Vec<_>>()
+            EvenNatNumW0SqSeq::<usize>::new()
+                .take(11)
+                .collect::<Vec<_>>(),
+            (0usize..=20)
+                .step_by(2)
+                .map(|n| n.pow(2))
+                .collect::<Vec<_>>()
         );
 
         // signed types
@@ -2059,12 +2204,22 @@ mod tests {
             (0i64..=20).step_by(2).map(|n| n.pow(2)).collect::<Vec<_>>()
         );
         assert_eq!(
-            EvenNatNumW0SqSeq::<i128>::new().take(11).collect::<Vec<_>>(),
-            (0i128..=20).step_by(2).map(|n| n.pow(2)).collect::<Vec<_>>()
+            EvenNatNumW0SqSeq::<i128>::new()
+                .take(11)
+                .collect::<Vec<_>>(),
+            (0i128..=20)
+                .step_by(2)
+                .map(|n| n.pow(2))
+                .collect::<Vec<_>>()
         );
         assert_eq!(
-            EvenNatNumW0SqSeq::<isize>::new().take(11).collect::<Vec<_>>(),
-            (0isize..=20).step_by(2).map(|n| n.pow(2)).collect::<Vec<_>>()
+            EvenNatNumW0SqSeq::<isize>::new()
+                .take(11)
+                .collect::<Vec<_>>(),
+            (0isize..=20)
+                .step_by(2)
+                .map(|n| n.pow(2))
+                .collect::<Vec<_>>()
         );
     }
 
@@ -2073,7 +2228,10 @@ mod tests {
         //! Test that the [EvenNatNumW0SqSeq] generates the correct sequence.
 
         let seq = EvenNatNumW0SqSeq::<u32>::new();
-        assert_eq!(seq.take(11).collect::<Vec<u32>>(), vec![0, 4, 16, 36, 64, 100, 144, 196, 256, 324, 400]);
+        assert_eq!(
+            seq.take(11).collect::<Vec<u32>>(),
+            vec![0, 4, 16, 36, 64, 100, 144, 196, 256, 324, 400]
+        );
     }
 
     #[test]
@@ -2081,7 +2239,10 @@ mod tests {
         //! Test the [EvenNatNumW0SqSeq::nth] method for various values of `n`.
 
         for n in 0..100 {
-            assert_eq!(EvenNatNumW0SqSeq::<i32>::new().nth(n).unwrap(), (n * 2).pow(2) as i32);
+            assert_eq!(
+                EvenNatNumW0SqSeq::<i32>::new().nth(n).unwrap(),
+                (n * 2).pow(2) as i32
+            );
         }
     }
 
@@ -2092,7 +2253,10 @@ mod tests {
         let mut seq = EvenNatNumW0SqSeq::<u32>::new();
         assert_eq!(seq.sum_next_n(0), 0);
         assert_eq!(seq.sum_next_n(1), 0);
-        assert_eq!(seq.sum_next_n(10), 4 + 16 + 36 + 64 + 100 + 144 + 196 + 256 + 324 + 400);
+        assert_eq!(
+            seq.sum_next_n(10),
+            4 + 16 + 36 + 64 + 100 + 144 + 196 + 256 + 324 + 400
+        );
 
         let mut sum = 0;
         for n in 1..=100 {

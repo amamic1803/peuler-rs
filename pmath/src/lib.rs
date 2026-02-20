@@ -926,7 +926,10 @@ where
         if n <= T::ZERO {
             panic!("Modulus must be positive.");
         }
-        Self { a: a.rem_euclid(&n), n }
+        Self {
+            a: a.rem_euclid(&n),
+            n,
+        }
     }
 
     /// Get the remainder of the congruence relation.
@@ -986,11 +989,9 @@ pub fn system_of_linear_congruences<T, U, V>(congruences: U) -> Option<T>
 where
     U: IntoIterator<Item = V>,
     V: Borrow<CongruenceRelation<T>>,
-    T: Copy + PrimInt + ConstOne + ConstZero + Euclid + PartialOrd + Signed
+    T: Copy + PrimInt + ConstOne + ConstZero + Euclid + PartialOrd + Signed,
 {
-    let mut congruences = congruences
-        .into_iter()
-        .map(|val| *val.borrow());
+    let mut congruences = congruences.into_iter().map(|val| *val.borrow());
 
     let mut a;
     let mut n;
@@ -998,7 +999,7 @@ where
         Some(congruence) => {
             a = *congruence.a();
             n = *congruence.n();
-        },
+        }
         None => return None, // no congruences provided
     }
 

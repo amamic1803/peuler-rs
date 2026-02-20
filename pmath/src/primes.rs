@@ -247,8 +247,8 @@ mod tests {
     use super::*;
 
     const PRIMES_TO_100: [i32; 25] = [
-        2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41,
-        43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97
+        2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89,
+        97,
     ];
 
     #[test]
@@ -324,7 +324,8 @@ mod tests {
                 prime_count += 1;
             }
             let approx = pcf(x);
-            assert!(approx < prime_count as f64,
+            assert!(
+                approx < prime_count as f64,
                 "pcf({x}) = {approx} should be < exact pi(x) = {prime_count}"
             );
         }
@@ -382,13 +383,13 @@ mod tests {
         //! Test that [apcf] is an overestimate for n >= 4 by comparing to the exact inverse prime
         //! count for integers up to 25
 
-         for n in 4..=25 {
-             let exact = PRIMES_TO_100[n as usize - 1] as f64;
-             let approx = apcf(n);
-             assert!(
-                 approx > exact,
-                 "apcf({n}) = {approx} should be > smallest m with pi(m) = {n}, which is {exact}"
-             );
+        for n in 4..=25 {
+            let exact = PRIMES_TO_100[n as usize - 1] as f64;
+            let approx = apcf(n);
+            assert!(
+                approx > exact,
+                "apcf({n}) = {approx} should be > smallest m with pi(m) = {n}, which is {exact}"
+            );
         }
     }
 
@@ -536,7 +537,9 @@ mod tests {
         for n in 2..=100 {
             let (is_p, div) = is_prime(n);
             let expected_is_p = PRIMES_TO_100.contains(&n);
-            let expected_div = if expected_is_p { 1 } else {
+            let expected_div = if expected_is_p {
+                1
+            } else {
                 // find smallest divisor > 1
                 (2..=n).find(|d| n % d == 0).unwrap()
             };
@@ -575,7 +578,10 @@ mod tests {
 
         assert_eq!(sieve_of_eratosthenes(-10i32), Vec::<i32>::new());
         assert_eq!(sieve_of_eratosthenes(-1i64), Vec::<i64>::new());
-        assert_eq!(sieve_of_eratosthenes(-1000000000000i128), Vec::<i128>::new());
+        assert_eq!(
+            sieve_of_eratosthenes(-1000000000000i128),
+            Vec::<i128>::new()
+        );
     }
 
     #[test]
@@ -588,7 +594,8 @@ mod tests {
                 .into_iter()
                 .filter(|&p| p <= n)
                 .collect::<Vec<_>>();
-            assert_eq!(actual, expected,
+            assert_eq!(
+                actual, expected,
                 "sieve_of_eratosthenes({n}) = {actual:?}, but expected {expected:?}"
             );
         }

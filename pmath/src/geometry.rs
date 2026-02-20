@@ -1,6 +1,6 @@
-use std::borrow::Borrow;
-use num_traits::{ConstOne, FromPrimitive, PrimInt, ToPrimitive};
 use crate::linalg::{Matrix, Point as linalgPoint, Vector};
+use num_traits::{ConstOne, FromPrimitive, PrimInt, ToPrimitive};
+use std::borrow::Borrow;
 
 pub type Point<T, const N: usize> = linalgPoint<T, N>;
 
@@ -44,14 +44,16 @@ impl<T: Copy + ToPrimitive> Polygon<T> {
     pub fn perimeter(&self) -> f64 {
         let mut perimeter = 0.0;
         for i in 0..self.points.len() {
-            perimeter += Vector::from_points(self.points[i], self.points[(i + 1) % self.points.len()]).magnitude();
+            perimeter +=
+                Vector::from_points(self.points[i], self.points[(i + 1) % self.points.len()])
+                    .magnitude();
         }
         perimeter
     }
 }
 impl<T> Polygon<T>
 where
-    T: Copy + PrimInt + ConstOne + FromPrimitive
+    T: Copy + PrimInt + ConstOne + FromPrimitive,
 {
     /// Calculate the number of boundary points of the polygon.
     ///
@@ -71,8 +73,16 @@ where
 
             let p1 = self.points[i].coords();
             let p2 = self.points[(i + 1) % self.points.len()].coords();
-            let diff0 = if p1[0] > p2[0] { p1[0] - p2[0] } else { p2[0] - p1[0] };
-            let diff1 = if p1[1] > p2[1] { p1[1] - p2[1] } else { p2[1] - p1[1] };
+            let diff0 = if p1[0] > p2[0] {
+                p1[0] - p2[0]
+            } else {
+                p2[0] - p1[0]
+            };
+            let diff1 = if p1[1] > p2[1] {
+                p1[1] - p2[1]
+            } else {
+                p2[1] - p1[1]
+            };
             points_count = points_count + diff0 + diff1 - T::ONE;
         }
 
@@ -93,7 +103,15 @@ where
         // b = boundary points
         // i = area - b/2 + 1
 
-        T::from_f64((area - (boundary_points.to_f64().expect("The number of boundary points must be convertible to f64")) / 2.0 + 1.0).round())
-            .expect("The number of interior points must be convertible to T")
+        T::from_f64(
+            (area
+                - (boundary_points
+                    .to_f64()
+                    .expect("The number of boundary points must be convertible to f64"))
+                    / 2.0
+                + 1.0)
+                .round(),
+        )
+        .expect("The number of interior points must be convertible to T")
     }
 }

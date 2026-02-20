@@ -7,8 +7,8 @@ impl Solution for Problem0040 {
     fn solve(&self) -> String {
         POSITIONS
             .into_iter()
-            .map(|pos| get_digit(pos) as i32)
-            .product::<i32>()
+            .map(get_digit)
+            .product::<u64>()
             .to_string()
     }
 }
@@ -20,7 +20,7 @@ const POSITIONS: [u64; 7] = [1, 10, 100, 1_000, 10_000, 100_000, 1_000_000];
 /// * `pos` - The position of the digit to calculate.
 /// # Returns
 /// * The digit at the given position.
-fn get_digit(pos: u64) -> u8 {
+fn get_digit(pos: u64) -> u64 {
     // there are 9 single digit numbers, 90 two digit numbers, 900 three digit numbers, etc.
     // 9 * n * 10^(n-1) is the number of digits in all numbers with n digits
     // iterate and sum until the sum is greater than the position

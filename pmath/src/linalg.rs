@@ -2,7 +2,9 @@
 
 use itertools::izip;
 use num_traits::ToPrimitive;
-use std::ops::{Add, AddAssign, Deref, DerefMut, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use std::ops::{
+    Add, AddAssign, Deref, DerefMut, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign,
+};
 
 /// A point in an N-dimensional space.
 ///
@@ -68,7 +70,7 @@ impl<T, const N: usize> DerefMut for Point<T, N> {
 }
 impl<T, const N: usize> Add<Self> for Point<T, N>
 where
-    T: for<'a> AddAssign<&'a T>
+    T: for<'a> AddAssign<&'a T>,
 {
     type Output = Self;
 
@@ -80,16 +82,15 @@ where
 }
 impl<T, const N: usize> AddAssign<Self> for Point<T, N>
 where
-    T: for<'a> AddAssign<&'a T>
+    T: for<'a> AddAssign<&'a T>,
 {
     fn add_assign(&mut self, other: Self) {
-        izip!(self.coords.iter_mut(), other.coords.iter())
-            .for_each(|(coord, y)| *coord += y);
+        izip!(self.coords.iter_mut(), other.coords.iter()).for_each(|(coord, y)| *coord += y);
     }
 }
 impl<T, const N: usize> Sub<Self> for Point<T, N>
 where
-    T: for<'a> SubAssign<&'a T>
+    T: for<'a> SubAssign<&'a T>,
 {
     type Output = Self;
 
@@ -101,16 +102,15 @@ where
 }
 impl<T, const N: usize> SubAssign<Self> for Point<T, N>
 where
-    T: for<'a> SubAssign<&'a T>
+    T: for<'a> SubAssign<&'a T>,
 {
     fn sub_assign(&mut self, other: Self) {
-        izip!(self.coords.iter_mut(), other.coords.iter())
-            .for_each(|(coord, y)| *coord -= y);
+        izip!(self.coords.iter_mut(), other.coords.iter()).for_each(|(coord, y)| *coord -= y);
     }
 }
 impl<T, const N: usize> Mul<Self> for Point<T, N>
 where
-    T: for<'a> MulAssign<&'a T>
+    T: for<'a> MulAssign<&'a T>,
 {
     type Output = Self;
 
@@ -122,16 +122,15 @@ where
 }
 impl<T, const N: usize> MulAssign<Self> for Point<T, N>
 where
-    T: for<'a> MulAssign<&'a T>
+    T: for<'a> MulAssign<&'a T>,
 {
     fn mul_assign(&mut self, rhs: Self) {
-        izip!(self.coords.iter_mut(), rhs.coords.iter())
-            .for_each(|(coord, y)| *coord *= y);
+        izip!(self.coords.iter_mut(), rhs.coords.iter()).for_each(|(coord, y)| *coord *= y);
     }
 }
 impl<T, const N: usize> Div<Self> for Point<T, N>
 where
-    T: for<'a> DivAssign<&'a T>
+    T: for<'a> DivAssign<&'a T>,
 {
     type Output = Self;
 
@@ -143,16 +142,15 @@ where
 }
 impl<T, const N: usize> DivAssign<Self> for Point<T, N>
 where
-    T: for<'a> DivAssign<&'a T>
+    T: for<'a> DivAssign<&'a T>,
 {
     fn div_assign(&mut self, rhs: Self) {
-        izip!(self.coords.iter_mut(), rhs.coords.iter())
-            .for_each(|(coord, y)| *coord /= y);
+        izip!(self.coords.iter_mut(), rhs.coords.iter()).for_each(|(coord, y)| *coord /= y);
     }
 }
 impl<T, const N: usize> Neg for Point<T, N>
 where
-    T: Neg<Output = T> + Copy
+    T: Neg<Output = T> + Copy,
 {
     type Output = Self;
 
@@ -165,7 +163,7 @@ where
 }
 impl<T, const N: usize> Mul<T> for Point<T, N>
 where
-    T: for<'a> MulAssign<&'a T>
+    T: for<'a> MulAssign<&'a T>,
 {
     type Output = Self;
 
@@ -177,17 +175,15 @@ where
 }
 impl<T, const N: usize> MulAssign<T> for Point<T, N>
 where
-    T: for<'a> MulAssign<&'a T>
+    T: for<'a> MulAssign<&'a T>,
 {
     fn mul_assign(&mut self, rhs: T) {
-        self.coords
-            .iter_mut()
-            .for_each(|coord| *coord *= &rhs);
+        self.coords.iter_mut().for_each(|coord| *coord *= &rhs);
     }
 }
 impl<T, const N: usize> Div<T> for Point<T, N>
 where
-    T: for<'a> DivAssign<&'a T>
+    T: for<'a> DivAssign<&'a T>,
 {
     type Output = Self;
 
@@ -199,12 +195,10 @@ where
 }
 impl<T, const N: usize> DivAssign<T> for Point<T, N>
 where
-    T: for<'a> DivAssign<&'a T>
+    T: for<'a> DivAssign<&'a T>,
 {
     fn div_assign(&mut self, rhs: T) {
-        self.coords
-            .iter_mut()
-            .for_each(|coord| *coord /= &rhs);
+        self.coords.iter_mut().for_each(|coord| *coord /= &rhs);
     }
 }
 macro_rules! impl_mul_scalar_by_point {
@@ -220,9 +214,7 @@ macro_rules! impl_mul_scalar_by_point {
     };
 }
 impl_mul_scalar_by_point!(
-    i8, i16, i32, i64, i128, isize,
-    u8, u16, u32, u64, u128, usize,
-    f32, f64
+    i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize, f32, f64
 );
 
 /// A vector in an N-dimensional space.
@@ -306,7 +298,10 @@ impl<const N: usize> Vector<N> {
     /// let vector = Vector::from_points(point1, point2);
     /// assert_eq!(*vector.coords(), [3.0, 3.0, 3.0]);
     /// ```
-    pub fn from_points<T: ToPrimitive, U: ToPrimitive>(point1: Point<T, N>, point2: Point<U, N>) -> Self {
+    pub fn from_points<T: ToPrimitive, U: ToPrimitive>(
+        point1: Point<T, N>,
+        point2: Point<U, N>,
+    ) -> Self {
         let mut coords = [0.0; N];
         izip!(
             coords.iter_mut(),
@@ -314,8 +309,12 @@ impl<const N: usize> Vector<N> {
             point2.coords().iter()
         )
         .for_each(|(coord, x, y)| {
-            let x = x.to_f64().expect("Point coordinates must be convertible to f64.");
-            let y = y.to_f64().expect("Point coordinates must be convertible to f64.");
+            let x = x
+                .to_f64()
+                .expect("Point coordinates must be convertible to f64.");
+            let y = y
+                .to_f64()
+                .expect("Point coordinates must be convertible to f64.");
             *coord = y - x
         });
         Self { coords }
@@ -392,7 +391,9 @@ impl<const N: usize> Vector<N> {
     /// ```
     pub fn normalize(&self) -> Self {
         let magnitude = self.magnitude();
-        let mut new_vector = Self { coords: self.coords };
+        let mut new_vector = Self {
+            coords: self.coords,
+        };
         new_vector /= magnitude;
         new_vector
     }
@@ -443,8 +444,7 @@ impl<const N: usize> Add<Self> for Vector<N> {
 }
 impl<const N: usize> AddAssign<Self> for Vector<N> {
     fn add_assign(&mut self, other: Self) {
-        izip!(self.coords.iter_mut(), other.coords.iter())
-            .for_each(|(coord, y)| *coord += y);
+        izip!(self.coords.iter_mut(), other.coords.iter()).for_each(|(coord, y)| *coord += y);
     }
 }
 impl<const N: usize> Sub<Self> for Vector<N> {
@@ -458,8 +458,7 @@ impl<const N: usize> Sub<Self> for Vector<N> {
 }
 impl<const N: usize> SubAssign<Self> for Vector<N> {
     fn sub_assign(&mut self, other: Self) {
-        izip!(self.coords.iter_mut(), other.coords.iter())
-            .for_each(|(coord, y)| *coord -= y);
+        izip!(self.coords.iter_mut(), other.coords.iter()).for_each(|(coord, y)| *coord -= y);
     }
 }
 impl<const N: usize> Mul<Self> for Vector<N> {
@@ -473,8 +472,7 @@ impl<const N: usize> Mul<Self> for Vector<N> {
 }
 impl<const N: usize> MulAssign<Self> for Vector<N> {
     fn mul_assign(&mut self, rhs: Self) {
-        izip!(self.coords.iter_mut(), rhs.coords.iter())
-            .for_each(|(coord, y)| *coord *= y);
+        izip!(self.coords.iter_mut(), rhs.coords.iter()).for_each(|(coord, y)| *coord *= y);
     }
 }
 impl<const N: usize> Div<Self> for Vector<N> {
@@ -488,8 +486,7 @@ impl<const N: usize> Div<Self> for Vector<N> {
 }
 impl<const N: usize> DivAssign<Self> for Vector<N> {
     fn div_assign(&mut self, rhs: Self) {
-        izip!(self.coords.iter_mut(), rhs.coords.iter())
-            .for_each(|(coord, y)| *coord /= y);
+        izip!(self.coords.iter_mut(), rhs.coords.iter()).for_each(|(coord, y)| *coord /= y);
     }
 }
 impl<const N: usize> Neg for Vector<N> {
@@ -512,9 +509,7 @@ impl<const N: usize, T: ToPrimitive> Mul<T> for Vector<N> {
 impl<const N: usize, T: ToPrimitive> MulAssign<T> for Vector<N> {
     fn mul_assign(&mut self, rhs: T) {
         let rhs = rhs.to_f64().expect("Scalar must be convertible to f64.");
-        self.coords
-            .iter_mut()
-            .for_each(|coord| *coord *= rhs);
+        self.coords.iter_mut().for_each(|coord| *coord *= rhs);
     }
 }
 impl<const N: usize, T: ToPrimitive> Div<T> for Vector<N> {
@@ -529,9 +524,7 @@ impl<const N: usize, T: ToPrimitive> Div<T> for Vector<N> {
 impl<const N: usize, T: ToPrimitive> DivAssign<T> for Vector<N> {
     fn div_assign(&mut self, rhs: T) {
         let rhs = rhs.to_f64().expect("Scalar must be convertible to f64.");
-        self.coords
-            .iter_mut()
-            .for_each(|coord| *coord /= rhs);
+        self.coords.iter_mut().for_each(|coord| *coord /= rhs);
     }
 }
 macro_rules! impl_mul_scalar_by_vector {
@@ -547,9 +540,7 @@ macro_rules! impl_mul_scalar_by_vector {
     };
 }
 impl_mul_scalar_by_vector!(
-    i8, i16, i32, i64, i128, isize,
-    u8, u16, u32, u64, u128, usize,
-    f32, f64
+    i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize, f32, f64
 );
 
 /// A matrix with N rows and M columns.
@@ -587,7 +578,12 @@ impl<const N: usize, const M: usize> Matrix<N, M> {
     /// # Panics
     /// * If the data cannot be converted to [f64].
     pub fn new<T: ToPrimitive>(data: [[T; M]; N]) -> Self {
-        let data = data.map(|row| row.map(|x| x.to_f64().expect("Matrix elements must be convertible to f64.")));
+        let data = data.map(|row| {
+            row.map(|x| {
+                x.to_f64()
+                    .expect("Matrix elements must be convertible to f64.")
+            })
+        });
         Self { data }
     }
 
@@ -611,7 +607,12 @@ impl<const N: usize, const M: usize> Matrix<N, M> {
     /// # Panics
     /// * If the data cannot be converted to [f64].
     pub fn set_data<T: ToPrimitive>(&mut self, data: [[T; M]; N]) {
-        self.data = data.map(|row| row.map(|x| x.to_f64().expect("Matrix elements must be convertible to f64.")));
+        self.data = data.map(|row| {
+            row.map(|x| {
+                x.to_f64()
+                    .expect("Matrix elements must be convertible to f64.")
+            })
+        });
     }
 
     /// Perform matrix multiplication.
@@ -652,8 +653,8 @@ impl<const N: usize, const M: usize> Matrix<N, M> {
     /// # Returns
     /// * The number of row swaps performed while performing the elimination.
     pub fn gaussian_elimination(&mut self) -> usize {
-        let mut r = 0;  // current row
-        let mut c = 0;  // current column
+        let mut r = 0; // current row
+        let mut c = 0; // current column
         let mut row_swaps = 0;
 
         while r < N && c < M {
@@ -707,7 +708,8 @@ impl<const N: usize, const M: usize> Matrix<N, M> {
                     break;
                 }
             }
-            if pivot == usize::MAX {  // no pivot in this row
+            if pivot == usize::MAX {
+                // no pivot in this row
                 continue;
             }
             if self.data[i][pivot] != 1.0 {
@@ -914,9 +916,7 @@ macro_rules! impl_mul_scalar_by_matrix {
     }
 }
 impl_mul_scalar_by_matrix!(
-    i8, i16, i32, i64, i128, isize,
-    u8, u16, u32, u64, u128, usize,
-    f32, f64
+    i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize, f32, f64
 );
 
 impl<const N: usize, const M: usize> Mul<Vector<M>> for Matrix<N, M> {
@@ -936,7 +936,12 @@ impl<const N: usize, const M: usize> Mul<Matrix<N, M>> for Vector<N> {
     fn mul(self, rhs: Matrix<N, M>) -> Self::Output {
         let mut coords = [0.0; M];
         for j in 0..M {
-            coords[j] = self.coords.iter().zip(rhs.data.iter().map(|row| row[j])).map(|(a, b)| a * b).sum();
+            coords[j] = self
+                .coords
+                .iter()
+                .zip(rhs.data.iter().map(|row| row[j]))
+                .map(|(a, b)| a * b)
+                .sum();
         }
         Self::Output { coords }
     }

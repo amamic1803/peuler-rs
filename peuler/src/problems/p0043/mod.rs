@@ -17,7 +17,7 @@ impl Solution for Problem0043 {
 }
 
 /// The digits that can be used in each position.
-static DIGITS: LazyLock<HashMap<u8, Vec<u8>>> = LazyLock::new(|| {
+static DIGITS: LazyLock<HashMap<u64, Vec<u64>>> = LazyLock::new(|| {
     let mut digits = HashMap::with_capacity(10);
     digits.insert(1, vec![1, 2, 3, 4, 5, 6, 7, 8, 9]);
     digits.insert(2, vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
@@ -33,7 +33,7 @@ static DIGITS: LazyLock<HashMap<u8, Vec<u8>>> = LazyLock::new(|| {
 });
 
 /// Recursively search for all pandigital numbers with the given properties.
-fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
+fn recursive_search(working: &mut Vec<u64>, sum: &mut u64, depth: u64) {
     // if depth is 1, just use every digit for that position
     // (there is no need to check if the digit is already used since it is the first digit)
     // first property needs to be checked at d4, so for 2 and 3
@@ -65,8 +65,8 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
                     working.push(*i);
-                    let value: i32 = digits_to_int(working[2..5].iter().rev(), 10);
-                    if value % 3 == 0 {
+                    let value: u64 = digits_to_int(working[2..5].iter().rev(), 10);
+                    if value.is_multiple_of(3) {
                         recursive_search(working, sum, depth + 1);
                     }
                     working.pop();
@@ -77,8 +77,8 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
                     working.push(*i);
-                    let value: i32 = digits_to_int(working[4..7].iter().rev(), 10);
-                    if value % 7 == 0 {
+                    let value: u64 = digits_to_int(working[4..7].iter().rev(), 10);
+                    if value.is_multiple_of(7) {
                         recursive_search(working, sum, depth + 1);
                     }
                     working.pop();
@@ -89,8 +89,8 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
                     working.push(*i);
-                    let value: i32 = digits_to_int(working[5..8].iter().rev(), 10);
-                    if value % 11 == 0 {
+                    let value: u64 = digits_to_int(working[5..8].iter().rev(), 10);
+                    if value.is_multiple_of(11) {
                         recursive_search(working, sum, depth + 1);
                     }
                     working.pop();
@@ -101,8 +101,8 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
                     working.push(*i);
-                    let value: i32 = digits_to_int(working[6..9].iter().rev(), 10);
-                    if value % 13 == 0 {
+                    let value: u64 = digits_to_int(working[6..9].iter().rev(), 10);
+                    if value.is_multiple_of(13) {
                         recursive_search(working, sum, depth + 1);
                     }
                     working.pop();
@@ -113,8 +113,8 @@ fn recursive_search(working: &mut Vec<u8>, sum: &mut u64, depth: u8) {
             for i in DIGITS.get(&depth).unwrap() {
                 if !working.contains(i) {
                     working.push(*i);
-                    let value: i32 = digits_to_int(working[7..10].iter().rev(), 10);
-                    if value % 17 == 0 {
+                    let value: u64 = digits_to_int(working[7..10].iter().rev(), 10);
+                    if value.is_multiple_of(17) {
                         recursive_search(working, sum, depth + 1);
                     }
                     working.pop();

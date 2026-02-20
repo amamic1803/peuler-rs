@@ -21,11 +21,8 @@ impl Solution for Problem0028 {
         // note that these formulas are valid only for odd numbers, but that is ok because spiral size is always odd
 
         let result = 1 + 4
-            * (OddNatNumSqSeq::<u64>::new()
-                .sum_next_n((SPIRAL_SIZE / 2 + 1) as usize)
-                - 1)
-            - 6 * (OddNatNumSeq::<u64>::new().sum_next_n((SPIRAL_SIZE / 2 + 1) as usize)
-                - 1)
+            * (OddNatNumSqSeq::<u64>::new().sum_next_n((SPIRAL_SIZE / 2 + 1) as usize) - 1)
+            - 6 * (OddNatNumSeq::<u64>::new().sum_next_n((SPIRAL_SIZE / 2 + 1) as usize) - 1)
             + 6 * (SPIRAL_SIZE / 2);
 
         result.to_string()

@@ -28,12 +28,13 @@ impl Solution for Problem0037 {
             // first element will be iterator over FIRST_DIGIT
             // middle elements (if any) will be iterator over MIDDLE_DIGIT
             // last element will be iterator over LAST_DIGIT
+            let mapping_fn = |v: &u8| *v as u64;
             let mut iterables = Vec::with_capacity(n_len);
-            iterables.push(FIRST_DIGIT.iter().copied());
+            iterables.push(FIRST_DIGIT.iter().map(mapping_fn));
             for _ in 0..(n_len - 2) {
-                iterables.push(MIDDLE_DIGIT.iter().copied());
+                iterables.push(MIDDLE_DIGIT.iter().map(mapping_fn));
             }
-            iterables.push(LAST_DIGIT.iter().copied());
+            iterables.push(LAST_DIGIT.iter().map(mapping_fn));
 
             // iterate over cartesian product of these iterators over digits (they make numbers)
             for i in iterables.into_iter().multi_cartesian_product() {
