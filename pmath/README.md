@@ -26,6 +26,18 @@ assert!(is_prime(29).0);
 ```
 
 
+## Performance
+The goal is to provide efficient, but reasonably simple and readable implementations.
+Many algorithms are textbook implementations, with some optimizations where appropriate.
+
+
+## Floating-point type
+While many functions in this crate are generic over numeric types,
+some use floating-point arithmetic, either internally or as a part of their interface.
+In such cases, the `f64` type is used since most targets have hardware support for it,
+and the precision it provides is often needed over `f32` for mathematical computations.
+
+
 ## No-std support
 There is currently no support for `no-std` environments.
 

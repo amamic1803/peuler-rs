@@ -94,7 +94,7 @@ impl Sample {
     }
 
     pub fn stddev(&self) -> Option<f64> {
-        self.inner.sample_stddev()
+        self.inner.stddev()
     }
 }
 impl Default for Sample {

@@ -192,9 +192,11 @@ pub fn distinct_prime_factors<T: PrimInt + ConstZero + ConstOne>(n: T) -> Distin
     DistinctPrimeFactors::new(n)
 }
 
+#[cfg_attr(doc, katexit::katexit)]
 /// An iterator over the divisors of an integer.
 ///
 /// Divisors are yielded in arbitrary order.
+/// The methods for length and summation are optimized to run in $O(1)$ time.
 /// # Example
 /// ```
 /// use pmath::factors::Divisors;
@@ -217,24 +219,6 @@ pub fn distinct_prime_factors<T: PrimInt + ConstZero + ConstOne>(n: T) -> Distin
 /// assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1, 2]);
 /// iter = Divisors::new(2);
 /// assert_eq!(iter.sum::<i32>(), 3);
-///
-/// iter = Divisors::new(500);
-/// assert_eq!(iter.len(), 12);
-/// assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1, 2, 4, 5, 10, 20, 25, 50, 100, 125, 250, 500]);
-/// iter = Divisors::new(500);
-/// assert_eq!(iter.sum::<i32>(), 1092);
-///
-/// iter = Divisors::new(1);
-/// assert_eq!(iter.len(), 1);
-/// assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1]);
-/// iter = Divisors::new(1);
-/// assert_eq!(iter.sum::<i32>(), 1);
-///
-/// iter = Divisors::new(0);
-/// assert_eq!(iter.len(), 0);
-/// assert!(iter.collect::<Vec<_>>().is_empty());
-/// iter = Divisors::new(0);
-/// assert_eq!(iter.sum::<i32>(), 0);
 /// ```
 #[derive(Clone, Eq, PartialEq, Hash)]
 pub struct Divisors<T> {
@@ -373,10 +357,12 @@ impl<T: PrimInt + ConstOne + Sum<T>> Iterator for Divisors<T> {
 }
 impl<T: PrimInt + ConstOne + Sum<T>> ExactSizeIterator for Divisors<T> {}
 
+#[cfg_attr(doc, katexit::katexit)]
 /// An iterator over the proper divisors of an integer.
 ///
 /// Proper divisors are all divisors of an integer except the integer itself.
 /// They are yielded in arbitrary order.
+/// The methods for length and summation are optimized to run in $O(1)$ time.
 /// # Example
 /// ```
 /// use pmath::factors::ProperDivisors;
@@ -399,24 +385,6 @@ impl<T: PrimInt + ConstOne + Sum<T>> ExactSizeIterator for Divisors<T> {}
 /// assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1]);
 /// iter = ProperDivisors::new(2);
 /// assert_eq!(iter.sum::<i32>(), 1);
-///
-/// iter = ProperDivisors::new(500);
-/// assert_eq!(iter.len(), 11);
-/// assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1, 2, 4, 5, 10, 20, 25, 50, 100, 125, 250]);
-/// iter = ProperDivisors::new(500);
-/// assert_eq!(iter.sum::<i32>(), 592);
-///
-/// iter = ProperDivisors::new(1);
-/// assert_eq!(iter.len(), 0);
-/// assert!(iter.sorted().collect::<Vec<_>>().is_empty());
-/// iter = ProperDivisors::new(1);
-/// assert_eq!(iter.sum::<i32>(), 0);
-///
-/// iter = ProperDivisors::new(0);
-/// assert_eq!(iter.len(), 0);
-/// assert!(iter.collect::<Vec<_>>().is_empty());
-/// iter = ProperDivisors::new(0);
-/// assert_eq!(iter.sum::<i32>(), 0);
 /// ```
 #[derive(Clone, Eq, PartialEq, Hash)]
 pub struct ProperDivisors<T> {
@@ -646,4 +614,978 @@ where
         }
     }
     divisors
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::primes::is_prime;
+    use itertools::Itertools;
+
+    // PrimeFactors tests
+
+    #[test]
+    fn prime_factors_primitive_types() {
+        //! Test that the [PrimeFactors] works with different primitive integer types.
+
+        // unsigned types
+        assert_eq!(PrimeFactors::new(12u8).collect::<Vec<_>>(), vec![2, 2, 3]);
+        assert_eq!(PrimeFactors::new(12u16).collect::<Vec<_>>(), vec![2, 2, 3]);
+        assert_eq!(PrimeFactors::new(12u32).collect::<Vec<_>>(), vec![2, 2, 3]);
+        assert_eq!(PrimeFactors::new(12u64).collect::<Vec<_>>(), vec![2, 2, 3]);
+        assert_eq!(PrimeFactors::new(12u128).collect::<Vec<_>>(), vec![2, 2, 3]);
+        assert_eq!(
+            PrimeFactors::new(12usize).collect::<Vec<_>>(),
+            vec![2, 2, 3]
+        );
+
+        // signed types
+        assert_eq!(PrimeFactors::new(12i8).collect::<Vec<_>>(), vec![2, 2, 3]);
+        assert_eq!(PrimeFactors::new(12i16).collect::<Vec<_>>(), vec![2, 2, 3]);
+        assert_eq!(PrimeFactors::new(12i32).collect::<Vec<_>>(), vec![2, 2, 3]);
+        assert_eq!(PrimeFactors::new(12i64).collect::<Vec<_>>(), vec![2, 2, 3]);
+        assert_eq!(PrimeFactors::new(12i128).collect::<Vec<_>>(), vec![2, 2, 3]);
+        assert_eq!(
+            PrimeFactors::new(12isize).collect::<Vec<_>>(),
+            vec![2, 2, 3]
+        );
+    }
+
+    #[test]
+    fn prime_factors_new() {
+        //! Test that the [PrimeFactors::new] correctly initializes the iterator.
+
+        let mut iter = PrimeFactors::new(12);
+        assert_eq!(iter.collect::<Vec<_>>(), vec![2, 2, 3]);
+
+        iter = PrimeFactors::new(28);
+        assert_eq!(iter.collect::<Vec<_>>(), vec![2, 2, 7]);
+
+        iter = PrimeFactors::new(2);
+        assert_eq!(iter.collect::<Vec<_>>(), vec![2]);
+
+        iter = PrimeFactors::new(500);
+        assert_eq!(iter.collect::<Vec<_>>(), vec![2, 2, 5, 5, 5]);
+    }
+
+    #[test]
+    #[should_panic]
+    fn prime_factors_new_negative() {
+        //! Test that the [PrimeFactors::new] panics when given a negative integer.
+
+        PrimeFactors::new(-1);
+    }
+
+    #[test]
+    fn prime_factors_verify() {
+        //! Test that the [PrimeFactors] returns the correct prime factors.
+
+        assert_eq!(PrimeFactors::new(0i8).collect::<Vec<_>>(), Vec::<i8>::new());
+        assert_eq!(PrimeFactors::new(1i8).collect::<Vec<_>>(), Vec::<i8>::new());
+
+        for n in 2..=1000 {
+            assert_eq!(
+                PrimeFactors::new(n)
+                    .filter(|f| is_prime(*f).0)
+                    .product::<i32>(),
+                n
+            );
+        }
+    }
+
+    // prime_factors tests
+    // - only tests API, since the functionality is already tested in [PrimeFactors::new]
+
+    #[test]
+    fn prime_factors_function() {
+        //! Test that the [prime_factors] function correctly creates a [PrimeFactors] iterator.
+
+        assert_eq!(
+            prime_factors(10).collect::<Vec<_>>(),
+            PrimeFactors::new(10).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn prime_factors_function_negative() {
+        //! Test that the [prime_factors] function panics when given a negative integer.
+
+        prime_factors(-1);
+    }
+
+    // DistinctPrimeFactors tests
+
+    #[test]
+    fn distinct_prime_factors_primitive_types() {
+        //! Test that the [DistinctPrimeFactors] works with different primitive integer types.
+
+        // unsigned types
+        assert_eq!(
+            DistinctPrimeFactors::new(12u8).collect::<Vec<_>>(),
+            vec![(2, 2), (3, 1)]
+        );
+        assert_eq!(
+            DistinctPrimeFactors::new(12u16).collect::<Vec<_>>(),
+            vec![(2, 2), (3, 1)]
+        );
+        assert_eq!(
+            DistinctPrimeFactors::new(12u32).collect::<Vec<_>>(),
+            vec![(2, 2), (3, 1)]
+        );
+        assert_eq!(
+            DistinctPrimeFactors::new(12u64).collect::<Vec<_>>(),
+            vec![(2, 2), (3, 1)]
+        );
+        assert_eq!(
+            DistinctPrimeFactors::new(12u128).collect::<Vec<_>>(),
+            vec![(2, 2), (3, 1)]
+        );
+        assert_eq!(
+            DistinctPrimeFactors::new(12usize).collect::<Vec<_>>(),
+            vec![(2, 2), (3, 1)]
+        );
+
+        // signed types
+        assert_eq!(
+            DistinctPrimeFactors::new(12i8).collect::<Vec<_>>(),
+            vec![(2, 2), (3, 1)]
+        );
+        assert_eq!(
+            DistinctPrimeFactors::new(12i16).collect::<Vec<_>>(),
+            vec![(2, 2), (3, 1)]
+        );
+        assert_eq!(
+            DistinctPrimeFactors::new(12i32).collect::<Vec<_>>(),
+            vec![(2, 2), (3, 1)]
+        );
+        assert_eq!(
+            DistinctPrimeFactors::new(12i64).collect::<Vec<_>>(),
+            vec![(2, 2), (3, 1)]
+        );
+        assert_eq!(
+            DistinctPrimeFactors::new(12i128).collect::<Vec<_>>(),
+            vec![(2, 2), (3, 1)]
+        );
+        assert_eq!(
+            DistinctPrimeFactors::new(12isize).collect::<Vec<_>>(),
+            vec![(2, 2), (3, 1)]
+        );
+    }
+
+    #[test]
+    fn distinct_prime_factors_new() {
+        //! Test that the [DistinctPrimeFactors::new] correctly initializes the iterator.
+
+        let mut iter = DistinctPrimeFactors::new(12);
+        assert_eq!(iter.collect::<Vec<_>>(), vec![(2, 2), (3, 1)]);
+
+        iter = DistinctPrimeFactors::new(28);
+        assert_eq!(iter.collect::<Vec<_>>(), vec![(2, 2), (7, 1)]);
+
+        iter = DistinctPrimeFactors::new(2);
+        assert_eq!(iter.collect::<Vec<_>>(), vec![(2, 1)]);
+
+        iter = DistinctPrimeFactors::new(500);
+        assert_eq!(iter.collect::<Vec<_>>(), vec![(2, 2), (5, 3)]);
+    }
+
+    #[test]
+    #[should_panic]
+    fn distinct_prime_factors_new_negative() {
+        //! Test that the [DistinctPrimeFactors::new] panics when given a negative integer.
+
+        DistinctPrimeFactors::new(-1);
+    }
+
+    #[test]
+    fn distinct_prime_factors_verify() {
+        //! Test that the [DistinctPrimeFactors] returns the correct distinct prime factors and their multiplicities.
+
+        assert_eq!(
+            DistinctPrimeFactors::new(0i8).collect::<Vec<_>>(),
+            Vec::<(i8, usize)>::new()
+        );
+        assert_eq!(
+            DistinctPrimeFactors::new(1i8).collect::<Vec<_>>(),
+            Vec::<(i8, usize)>::new()
+        );
+
+        for n in 2..=1000 {
+            assert_eq!(
+                DistinctPrimeFactors::new(n)
+                    .filter(|(v, _)| is_prime(*v).0)
+                    .map(|(v, m)| v.pow(m as u32))
+                    .product::<i32>(),
+                n
+            );
+        }
+    }
+
+    // distinct_prime_factors tests
+    // - only tests API, since the functionality is already tested in [DistinctPrimeFactors::new]
+
+    #[test]
+    fn distinct_prime_factors_function() {
+        //! Test that the [distinct_prime_factors] function correctly creates a [DistinctPrimeFactors] iterator.
+
+        assert_eq!(
+            distinct_prime_factors(10).collect::<Vec<_>>(),
+            DistinctPrimeFactors::new(10).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn distinct_prime_factors_function_negative() {
+        //! Test that the [distinct_prime_factors] function panics when given a negative integer.
+
+        distinct_prime_factors(-1);
+    }
+
+    // Divisors tests
+
+    #[test]
+    fn divisors_primitive_types() {
+        //! Test that the [Divisors] works with different primitive integer types.
+
+        // unsigned types
+        assert_eq!(
+            Divisors::new(12u8).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6, 12]
+        );
+        assert_eq!(
+            Divisors::new(12u16).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6, 12]
+        );
+        assert_eq!(
+            Divisors::new(12u32).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6, 12]
+        );
+        assert_eq!(
+            Divisors::new(12u64).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6, 12]
+        );
+        assert_eq!(
+            Divisors::new(12u128).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6, 12]
+        );
+        assert_eq!(
+            Divisors::new(12usize).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6, 12]
+        );
+
+        // signed types
+        assert_eq!(
+            Divisors::new(12i8).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6, 12]
+        );
+        assert_eq!(
+            Divisors::new(12i16).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6, 12]
+        );
+        assert_eq!(
+            Divisors::new(12i32).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6, 12]
+        );
+        assert_eq!(
+            Divisors::new(12i64).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6, 12]
+        );
+        assert_eq!(
+            Divisors::new(12i128).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6, 12]
+        );
+        assert_eq!(
+            Divisors::new(12isize).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6, 12]
+        );
+    }
+
+    #[test]
+    fn divisors_new() {
+        //! Test that the [Divisors::new] correctly initializes the iterator.
+
+        let mut iter = Divisors::new(12);
+        assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1, 2, 3, 4, 6, 12]);
+        iter = Divisors::new(28);
+        assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1, 2, 4, 7, 14, 28]);
+    }
+
+    #[test]
+    #[should_panic]
+    fn divisors_new_negative() {
+        //! Test that the [Divisors::new] panics when given a negative integer.
+
+        Divisors::new(-1);
+    }
+
+    #[test]
+    fn divisors_size() {
+        //! Test that the [Divisors] correctly calculates the size of the iterator.
+
+        let iter = Divisors::new(12);
+        assert_eq!(iter.len(), 6);
+        assert_eq!(iter.size_hint(), (6, Some(6)));
+        assert_eq!(iter.count(), 6);
+
+        let iter = Divisors::new(28);
+        assert_eq!(iter.len(), 6);
+        assert_eq!(iter.size_hint(), (6, Some(6)));
+        assert_eq!(iter.count(), 6);
+
+        let iter = Divisors::new(2);
+        assert_eq!(iter.len(), 2);
+        assert_eq!(iter.size_hint(), (2, Some(2)));
+        assert_eq!(iter.count(), 2);
+
+        let iter = Divisors::new(500);
+        assert_eq!(iter.len(), 12);
+        assert_eq!(iter.size_hint(), (12, Some(12)));
+        assert_eq!(iter.count(), 12);
+
+        let iter = Divisors::new(1);
+        assert_eq!(iter.len(), 1);
+        assert_eq!(iter.size_hint(), (1, Some(1)));
+        assert_eq!(iter.count(), 1);
+
+        let iter = Divisors::new(0);
+        assert_eq!(iter.len(), 0);
+        assert_eq!(iter.size_hint(), (0, Some(0)));
+        assert_eq!(iter.count(), 0);
+
+        let mut iter = Divisors::new(12);
+        iter.next().unwrap();
+        assert_eq!(iter.len(), 5);
+        assert_eq!(iter.size_hint(), (5, Some(5)));
+        assert_eq!(iter.count(), 5);
+    }
+
+    #[test]
+    fn divisors_sum() {
+        //! Test that the [Divisors] correctly calculates the sum of the divisors.
+
+        for n in 0..=1000 {
+            let divisors_sum: i32 = Divisors::new(n).sum();
+            let expected_sum: i32 = (1..=n).filter(|d| n % d == 0).sum();
+            assert_eq!(divisors_sum, expected_sum);
+        }
+
+        let iter = Divisors::new(12);
+        assert_eq!(iter.sum::<i32>(), 28);
+        let mut iter = Divisors::new(12).sorted();
+        iter.next().unwrap();
+        assert_eq!(iter.sum::<i32>(), 27);
+    }
+
+    #[test]
+    fn divisors_verify() {
+        //! Test that the [Divisors] returns the correct divisors.
+
+        for n in 0..=1000 {
+            let divisors = Divisors::new(n).sorted().collect::<Vec<_>>();
+            let expected_divisors = (1..=n).filter(|d| n % d == 0).collect::<Vec<_>>();
+            assert_eq!(divisors, expected_divisors);
+        }
+    }
+
+    // divisors function tests
+    // - only tests API, since the functionality is already tested in [Divisors::new]
+
+    #[test]
+    fn divisors_function() {
+        //! Test that the [divisors] function correctly creates a [Divisors] iterator.
+
+        assert_eq!(
+            divisors(12).sorted().collect::<Vec<_>>(),
+            Divisors::new(12).sorted().collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn divisors_function_negative() {
+        //! Test that the [divisors] function panics when given a negative integer.
+
+        divisors(-1);
+    }
+
+    // ProperDivisors tests
+
+    #[test]
+    fn proper_divisors_primitive_types() {
+        //! Test that the [ProperDivisors] works with different primitive integer types.
+
+        // unsigned types
+        assert_eq!(
+            ProperDivisors::new(12u8).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6]
+        );
+        assert_eq!(
+            ProperDivisors::new(12u16).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6]
+        );
+        assert_eq!(
+            ProperDivisors::new(12u32).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6]
+        );
+        assert_eq!(
+            ProperDivisors::new(12u64).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6]
+        );
+        assert_eq!(
+            ProperDivisors::new(12u128).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6]
+        );
+        assert_eq!(
+            ProperDivisors::new(12usize).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6]
+        );
+
+        // signed types
+        assert_eq!(
+            ProperDivisors::new(12i8).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6]
+        );
+        assert_eq!(
+            ProperDivisors::new(12i16).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6]
+        );
+        assert_eq!(
+            ProperDivisors::new(12i32).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6]
+        );
+        assert_eq!(
+            ProperDivisors::new(12i64).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6]
+        );
+        assert_eq!(
+            ProperDivisors::new(12i128).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6]
+        );
+        assert_eq!(
+            ProperDivisors::new(12isize).sorted().collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 6]
+        );
+    }
+
+    #[test]
+    fn proper_divisors_new() {
+        //! Test that the [ProperDivisors::new] correctly initializes the iterator.
+
+        let mut iter = ProperDivisors::new(12);
+        assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1, 2, 3, 4, 6]);
+        iter = ProperDivisors::new(28);
+        assert_eq!(iter.sorted().collect::<Vec<_>>(), vec![1, 2, 4, 7, 14]);
+    }
+
+    #[test]
+    #[should_panic]
+    fn proper_divisors_new_negative() {
+        //! Test that the [ProperDivisors::new] panics when given a negative integer.
+
+        ProperDivisors::new(-1);
+    }
+
+    #[test]
+    fn proper_divisors_size() {
+        //! Test that the [ProperDivisors] correctly calculates the size of the iterator.
+
+        let iter = ProperDivisors::new(12);
+        assert_eq!(iter.len(), 5);
+        assert_eq!(iter.size_hint(), (5, Some(5)));
+        assert_eq!(iter.count(), 5);
+
+        let iter = ProperDivisors::new(28);
+        assert_eq!(iter.len(), 5);
+        assert_eq!(iter.size_hint(), (5, Some(5)));
+        assert_eq!(iter.count(), 5);
+
+        let iter = ProperDivisors::new(2);
+        assert_eq!(iter.len(), 1);
+        assert_eq!(iter.size_hint(), (1, Some(1)));
+        assert_eq!(iter.count(), 1);
+
+        let iter = ProperDivisors::new(500);
+        assert_eq!(iter.len(), 11);
+        assert_eq!(iter.size_hint(), (11, Some(11)));
+        assert_eq!(iter.count(), 11);
+
+        let iter = ProperDivisors::new(1);
+        assert_eq!(iter.len(), 0);
+        assert_eq!(iter.size_hint(), (0, Some(0)));
+        assert_eq!(iter.count(), 0);
+
+        let mut iter = ProperDivisors::new(12);
+        iter.next().unwrap();
+        assert_eq!(iter.len(), 4);
+        assert_eq!(iter.size_hint(), (4, Some(4)));
+        assert_eq!(iter.count(), 4);
+    }
+
+    #[test]
+    fn proper_divisors_sum() {
+        //! Test that the [ProperDivisors] correctly calculates the sum of the proper divisors.
+
+        for n in 0..=1000 {
+            let divisors_sum: i32 = ProperDivisors::new(n).sum();
+            let expected_sum: i32 = (1..n).filter(|d| n % d == 0).sum();
+            assert_eq!(divisors_sum, expected_sum);
+        }
+    }
+
+    #[test]
+    fn proper_divisors_verify() {
+        //! Test that the [ProperDivisors] returns the correct proper divisors.
+
+        for n in 0..=1000 {
+            let divisors = ProperDivisors::new(n).sorted().collect::<Vec<_>>();
+            let expected_divisors = (1..n).filter(|d| n % d == 0).collect::<Vec<_>>();
+            assert_eq!(divisors, expected_divisors);
+        }
+    }
+
+    // proper_divisors function tests
+    // - only tests API, since the functionality is already tested in [ProperDivisors::new]
+
+    #[test]
+    fn proper_divisors_function() {
+        //! Test that the [proper_divisors] function correctly creates a [ProperDivisors] iterator.
+
+        assert_eq!(
+            proper_divisors(12).sorted().collect::<Vec<_>>(),
+            ProperDivisors::new(12).sorted().collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn proper_divisors_function_negative() {
+        //! Test that the [proper_divisors] function panics when given a negative integer.
+
+        proper_divisors(-1);
+    }
+
+    // num_of_divisors_0_to_n tests
+
+    #[test]
+    fn num_of_divisors_0_to_n_primitive_types() {
+        //! Test that the [num_of_divisors_0_to_n] works with different primitive integer types.
+
+        // unsigned types
+        assert_eq!(
+            num_of_divisors_0_to_n(10u8),
+            vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]
+        );
+        assert_eq!(
+            num_of_divisors_0_to_n(10u16),
+            vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]
+        );
+        assert_eq!(
+            num_of_divisors_0_to_n(10u32),
+            vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]
+        );
+        assert_eq!(
+            num_of_divisors_0_to_n(10u64),
+            vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]
+        );
+        assert_eq!(
+            num_of_divisors_0_to_n(10u128),
+            vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]
+        );
+        assert_eq!(
+            num_of_divisors_0_to_n(10usize),
+            vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]
+        );
+
+        // signed types
+        assert_eq!(
+            num_of_divisors_0_to_n(10i8),
+            vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]
+        );
+        assert_eq!(
+            num_of_divisors_0_to_n(10i16),
+            vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]
+        );
+        assert_eq!(
+            num_of_divisors_0_to_n(10i32),
+            vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]
+        );
+        assert_eq!(
+            num_of_divisors_0_to_n(10i64),
+            vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]
+        );
+        assert_eq!(
+            num_of_divisors_0_to_n(10i128),
+            vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]
+        );
+        assert_eq!(
+            num_of_divisors_0_to_n(10isize),
+            vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn num_of_divisors_0_to_n_negative() {
+        //! Test that the [num_of_divisors_0_to_n] panics when given a negative integer.
+
+        num_of_divisors_0_to_n(-1);
+    }
+
+    #[test]
+    #[should_panic]
+    fn num_of_divisors_0_to_n_non_convertible() {
+        //! Test that the [num_of_divisors_0_to_n] panics when given an integer that cannot be converted to [usize].
+
+        if size_of::<usize>() < 128 {
+            num_of_divisors_0_to_n(u128::MAX);
+        } else {
+            panic!("usize == u128, cannot test non-convertible case.");
+        }
+    }
+
+    #[test]
+    fn num_of_divisors_0_to_n_verify() {
+        //! Test that the [num_of_divisors_0_to_n] returns the correct numbers of divisors.
+
+        assert_eq!(num_of_divisors_0_to_n(0), vec![0]);
+        assert_eq!(num_of_divisors_0_to_n(1), vec![0, 1]);
+        assert_eq!(num_of_divisors_0_to_n(2), vec![0, 1, 2]);
+        assert_eq!(num_of_divisors_0_to_n(3), vec![0, 1, 2, 2]);
+        assert_eq!(num_of_divisors_0_to_n(4), vec![0, 1, 2, 2, 3]);
+        assert_eq!(num_of_divisors_0_to_n(5), vec![0, 1, 2, 2, 3, 2]);
+        assert_eq!(num_of_divisors_0_to_n(6), vec![0, 1, 2, 2, 3, 2, 4]);
+        assert_eq!(num_of_divisors_0_to_n(7), vec![0, 1, 2, 2, 3, 2, 4, 2]);
+        assert_eq!(num_of_divisors_0_to_n(8), vec![0, 1, 2, 2, 3, 2, 4, 2, 4]);
+        assert_eq!(
+            num_of_divisors_0_to_n(9),
+            vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3]
+        );
+        assert_eq!(
+            num_of_divisors_0_to_n(10),
+            vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]
+        );
+    }
+
+    // num_of_proper_divisors_0_to_n tests
+
+    #[test]
+    fn num_of_proper_divisors_0_to_n_primitive_types() {
+        //! Test that the [num_of_proper_divisors_0_to_n] works with different primitive integer types.
+
+        // unsigned types
+        assert_eq!(
+            num_of_proper_divisors_0_to_n(10u8),
+            vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]
+        );
+        assert_eq!(
+            num_of_proper_divisors_0_to_n(10u16),
+            vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]
+        );
+        assert_eq!(
+            num_of_proper_divisors_0_to_n(10u32),
+            vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]
+        );
+        assert_eq!(
+            num_of_proper_divisors_0_to_n(10u64),
+            vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]
+        );
+        assert_eq!(
+            num_of_proper_divisors_0_to_n(10u128),
+            vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]
+        );
+        assert_eq!(
+            num_of_proper_divisors_0_to_n(10usize),
+            vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]
+        );
+
+        // signed types
+        assert_eq!(
+            num_of_proper_divisors_0_to_n(10i8),
+            vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]
+        );
+        assert_eq!(
+            num_of_proper_divisors_0_to_n(10i16),
+            vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]
+        );
+        assert_eq!(
+            num_of_proper_divisors_0_to_n(10i32),
+            vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]
+        );
+        assert_eq!(
+            num_of_proper_divisors_0_to_n(10i64),
+            vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]
+        );
+        assert_eq!(
+            num_of_proper_divisors_0_to_n(10i128),
+            vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]
+        );
+        assert_eq!(
+            num_of_proper_divisors_0_to_n(10isize),
+            vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn num_of_proper_divisors_0_to_n_negative() {
+        //! Test that the [num_of_proper_divisors_0_to_n] panics when given a negative integer.
+
+        num_of_proper_divisors_0_to_n(-1);
+    }
+
+    #[test]
+    #[should_panic]
+    fn num_of_proper_divisors_0_to_n_non_convertible() {
+        //! Test that the [num_of_proper_divisors_0_to_n] panics when given an integer
+        //! that cannot be converted to [usize].
+
+        if size_of::<usize>() < 128 {
+            num_of_proper_divisors_0_to_n(u128::MAX);
+        } else {
+            panic!("usize == u128, cannot test non-convertible case.");
+        }
+    }
+
+    #[test]
+    fn num_of_proper_divisors_0_to_n_verify() {
+        //! Test that the [num_of_proper_divisors_0_to_n] returns the correct numbers of proper divisors.
+
+        assert_eq!(num_of_proper_divisors_0_to_n(0), vec![0]);
+        assert_eq!(num_of_proper_divisors_0_to_n(1), vec![0, 0]);
+        assert_eq!(num_of_proper_divisors_0_to_n(2), vec![0, 0, 1]);
+        assert_eq!(num_of_proper_divisors_0_to_n(3), vec![0, 0, 1, 1]);
+        assert_eq!(num_of_proper_divisors_0_to_n(4), vec![0, 0, 1, 1, 2]);
+        assert_eq!(num_of_proper_divisors_0_to_n(5), vec![0, 0, 1, 1, 2, 1]);
+        assert_eq!(num_of_proper_divisors_0_to_n(6), vec![0, 0, 1, 1, 2, 1, 3]);
+        assert_eq!(
+            num_of_proper_divisors_0_to_n(7),
+            vec![0, 0, 1, 1, 2, 1, 3, 1]
+        );
+        assert_eq!(
+            num_of_proper_divisors_0_to_n(8),
+            vec![0, 0, 1, 1, 2, 1, 3, 1, 3]
+        );
+        assert_eq!(
+            num_of_proper_divisors_0_to_n(9),
+            vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2]
+        );
+        assert_eq!(
+            num_of_proper_divisors_0_to_n(10),
+            vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]
+        );
+    }
+
+    // sum_of_divisors_0_to_n tests
+
+    #[test]
+    fn sum_of_divisors_0_to_n_primitive_types() {
+        //! Test that the [sum_of_divisors_0_to_n] works with different primitive integer types.
+
+        // unsigned types
+        assert_eq!(
+            sum_of_divisors_0_to_n(10u8),
+            vec![0, 1, 3, 4, 7, 6, 12, 8, 15, 13, 18]
+        );
+        assert_eq!(
+            sum_of_divisors_0_to_n(10u16),
+            vec![0, 1, 3, 4, 7, 6, 12, 8, 15, 13, 18]
+        );
+        assert_eq!(
+            sum_of_divisors_0_to_n(10u32),
+            vec![0, 1, 3, 4, 7, 6, 12, 8, 15, 13, 18]
+        );
+        assert_eq!(
+            sum_of_divisors_0_to_n(10u64),
+            vec![0, 1, 3, 4, 7, 6, 12, 8, 15, 13, 18]
+        );
+        assert_eq!(
+            sum_of_divisors_0_to_n(10u128),
+            vec![0, 1, 3, 4, 7, 6, 12, 8, 15, 13, 18]
+        );
+        assert_eq!(
+            sum_of_divisors_0_to_n(10usize),
+            vec![0, 1, 3, 4, 7, 6, 12, 8, 15, 13, 18]
+        );
+
+        // signed types
+        assert_eq!(
+            sum_of_divisors_0_to_n(10i8),
+            vec![0, 1, 3, 4, 7, 6, 12, 8, 15, 13, 18]
+        );
+        assert_eq!(
+            sum_of_divisors_0_to_n(10i16),
+            vec![0, 1, 3, 4, 7, 6, 12, 8, 15, 13, 18]
+        );
+        assert_eq!(
+            sum_of_divisors_0_to_n(10i32),
+            vec![0, 1, 3, 4, 7, 6, 12, 8, 15, 13, 18]
+        );
+        assert_eq!(
+            sum_of_divisors_0_to_n(10i64),
+            vec![0, 1, 3, 4, 7, 6, 12, 8, 15, 13, 18]
+        );
+        assert_eq!(
+            sum_of_divisors_0_to_n(10i128),
+            vec![0, 1, 3, 4, 7, 6, 12, 8, 15, 13, 18]
+        );
+        assert_eq!(
+            sum_of_divisors_0_to_n(10isize),
+            vec![0, 1, 3, 4, 7, 6, 12, 8, 15, 13, 18]
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn sum_of_divisors_0_to_n_negative() {
+        //! Test that the [sum_of_divisors_0_to_n] panics when given a negative integer.
+
+        sum_of_divisors_0_to_n(-1);
+    }
+
+    #[test]
+    #[should_panic]
+    fn sum_of_divisors_0_to_n_non_convertible() {
+        //! Test that the [sum_of_divisors_0_to_n] panics when given an integer
+        //! that cannot be converted to [usize].
+
+        if size_of::<usize>() < 128 {
+            sum_of_divisors_0_to_n(u128::MAX);
+        } else {
+            panic!("usize == u128, cannot test non-convertible case.");
+        }
+    }
+
+    #[test]
+    fn sum_of_divisors_0_to_n_verify() {
+        //! Test that the [sum_of_divisors_0_to_n] returns the correct sums of divisors.
+
+        assert_eq!(sum_of_divisors_0_to_n(0), vec![0]);
+        assert_eq!(sum_of_divisors_0_to_n(1), vec![0, 1]);
+        assert_eq!(sum_of_divisors_0_to_n(2), vec![0, 1, 3]);
+        assert_eq!(sum_of_divisors_0_to_n(3), vec![0, 1, 3, 4]);
+        assert_eq!(sum_of_divisors_0_to_n(4), vec![0, 1, 3, 4, 7]);
+        assert_eq!(sum_of_divisors_0_to_n(5), vec![0, 1, 3, 4, 7, 6]);
+        assert_eq!(sum_of_divisors_0_to_n(6), vec![0, 1, 3, 4, 7, 6, 12]);
+        assert_eq!(sum_of_divisors_0_to_n(7), vec![0, 1, 3, 4, 7, 6, 12, 8]);
+        assert_eq!(sum_of_divisors_0_to_n(8), vec![0, 1, 3, 4, 7, 6, 12, 8, 15]);
+        assert_eq!(
+            sum_of_divisors_0_to_n(9),
+            vec![0, 1, 3, 4, 7, 6, 12, 8, 15, 13]
+        );
+        assert_eq!(
+            sum_of_divisors_0_to_n(10),
+            vec![0, 1, 3, 4, 7, 6, 12, 8, 15, 13, 18]
+        );
+    }
+
+    // sum_of_proper_divisors_0_to_n tests
+
+    #[test]
+    fn sum_of_proper_divisors_0_to_n_primitive_types() {
+        //! Test that the [sum_of_proper_divisors_0_to_n] works with different primitive integer types.
+
+        // unsigned types
+        assert_eq!(
+            sum_of_proper_divisors_0_to_n(10u8),
+            vec![0, 0, 1, 1, 3, 1, 6, 1, 7, 4, 8]
+        );
+        assert_eq!(
+            sum_of_proper_divisors_0_to_n(10u16),
+            vec![0, 0, 1, 1, 3, 1, 6, 1, 7, 4, 8]
+        );
+        assert_eq!(
+            sum_of_proper_divisors_0_to_n(10u32),
+            vec![0, 0, 1, 1, 3, 1, 6, 1, 7, 4, 8]
+        );
+        assert_eq!(
+            sum_of_proper_divisors_0_to_n(10u64),
+            vec![0, 0, 1, 1, 3, 1, 6, 1, 7, 4, 8]
+        );
+        assert_eq!(
+            sum_of_proper_divisors_0_to_n(10u128),
+            vec![0, 0, 1, 1, 3, 1, 6, 1, 7, 4, 8]
+        );
+        assert_eq!(
+            sum_of_proper_divisors_0_to_n(10usize),
+            vec![0, 0, 1, 1, 3, 1, 6, 1, 7, 4, 8]
+        );
+
+        // signed types
+        assert_eq!(
+            sum_of_proper_divisors_0_to_n(10i8),
+            vec![0, 0, 1, 1, 3, 1, 6, 1, 7, 4, 8]
+        );
+        assert_eq!(
+            sum_of_proper_divisors_0_to_n(10i16),
+            vec![0, 0, 1, 1, 3, 1, 6, 1, 7, 4, 8]
+        );
+        assert_eq!(
+            sum_of_proper_divisors_0_to_n(10i32),
+            vec![0, 0, 1, 1, 3, 1, 6, 1, 7, 4, 8]
+        );
+        assert_eq!(
+            sum_of_proper_divisors_0_to_n(10i64),
+            vec![0, 0, 1, 1, 3, 1, 6, 1, 7, 4, 8]
+        );
+        assert_eq!(
+            sum_of_proper_divisors_0_to_n(10i128),
+            vec![0, 0, 1, 1, 3, 1, 6, 1, 7, 4, 8]
+        );
+        assert_eq!(
+            sum_of_proper_divisors_0_to_n(10isize),
+            vec![0, 0, 1, 1, 3, 1, 6, 1, 7, 4, 8]
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn sum_of_proper_divisors_0_to_n_negative() {
+        //! Test that the [sum_of_proper_divisors_0_to_n] panics when given a negative integer.
+
+        sum_of_proper_divisors_0_to_n(-1);
+    }
+
+    #[test]
+    #[should_panic]
+    fn sum_of_proper_divisors_0_to_n_non_convertible() {
+        //! Test that the [sum_of_proper_divisors_0_to_n] panics when given an integer
+        //! that cannot be converted to [usize].
+
+        if size_of::<usize>() < 128 {
+            sum_of_proper_divisors_0_to_n(u128::MAX);
+        } else {
+            panic!("usize == u128, cannot test non-convertible case.");
+        }
+    }
+
+    #[test]
+    fn sum_of_proper_divisors_0_to_n_verify() {
+        //! Test that the [sum_of_proper_divisors_0_to_n] returns the correct sums of proper divisors.
+
+        assert_eq!(sum_of_proper_divisors_0_to_n(0), vec![0]);
+        assert_eq!(sum_of_proper_divisors_0_to_n(1), vec![0, 0]);
+        assert_eq!(sum_of_proper_divisors_0_to_n(2), vec![0, 0, 1]);
+        assert_eq!(sum_of_proper_divisors_0_to_n(3), vec![0, 0, 1, 1]);
+        assert_eq!(sum_of_proper_divisors_0_to_n(4), vec![0, 0, 1, 1, 3]);
+        assert_eq!(sum_of_proper_divisors_0_to_n(5), vec![0, 0, 1, 1, 3, 1]);
+        assert_eq!(sum_of_proper_divisors_0_to_n(6), vec![0, 0, 1, 1, 3, 1, 6]);
+        assert_eq!(
+            sum_of_proper_divisors_0_to_n(7),
+            vec![0, 0, 1, 1, 3, 1, 6, 1]
+        );
+        assert_eq!(
+            sum_of_proper_divisors_0_to_n(8),
+            vec![0, 0, 1, 1, 3, 1, 6, 1, 7]
+        );
+        assert_eq!(
+            sum_of_proper_divisors_0_to_n(9),
+            vec![0, 0, 1, 1, 3, 1, 6, 1, 7, 4]
+        );
+        assert_eq!(
+            sum_of_proper_divisors_0_to_n(10),
+            vec![0, 0, 1, 1, 3, 1, 6, 1, 7, 4, 8]
+        );
+    }
 }
