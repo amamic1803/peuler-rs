@@ -104,7 +104,7 @@ fn main() -> ExitCode {
                     sample.push(elapsed.as_nanos());
                 }
                 let mut mean = sample.mean().unwrap();
-                let mut stddev = sample.sample_stddev().unwrap();
+                let mut stddev = sample.stddev().unwrap();
                 let mut unit = "ns";
                 if mean > 1000.0 {
                     mean /= 1000.0;
@@ -148,7 +148,7 @@ fn main() -> ExitCode {
                         sample.push(elapsed.as_nanos());
                     }
                     let mut mean = sample.mean().unwrap();
-                    let mut stddev = sample.sample_stddev().unwrap();
+                    let mut stddev = sample.stddev().unwrap();
                     let mut unit = "ns";
                     if mean > 1000.0 {
                         mean /= 1000.0;

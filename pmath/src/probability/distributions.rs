@@ -91,6 +91,8 @@ pub trait DiscreteDistribution<T>: Distribution<T> {
     /// * `x` - The value at which to evaluate the PMF.
     /// # Returns
     /// * The value of the PMF at `x`.
+    /// # Panics
+    /// * If `x` cannot be converted to [f64].
     fn pmf(&self, x: T) -> f64;
 }
 
@@ -122,7 +124,9 @@ pub trait ContinuousDistribution<T>: Distribution<T> {
 /// are equally likely.
 /// # Example
 /// ```
-/// use pmath::probability::distributions::{ContinuousUniform, Distribution, ContinuousDistribution};
+/// use pmath::probability::distributions::{
+///     ContinuousUniform, Distribution, ContinuousDistribution
+/// };
 ///
 /// let dist = ContinuousUniform::new(0.0, 1.0);
 /// assert!((dist.cdf(0.5) - 0.5).abs() < 1e-10);
@@ -145,7 +149,7 @@ impl ContinuousUniform {
     /// # Panics
     /// * If `a` cannot be converted to [f64].
     /// * If `b` cannot be converted to [f64].
-    /// * If `a` is greater than `b`.
+    /// * If `a` is greater than or equal to `b`.
     pub fn new<T, U>(a: T, b: U) -> Self
     where
         T: ToPrimitive,
@@ -153,7 +157,7 @@ impl ContinuousUniform {
     {
         let a = a.to_f64().expect("a cannot be converted to f64");
         let b = b.to_f64().expect("b cannot be converted to f64");
-        if a > b {
+        if a >= b {
             panic!("a must be less than or equal to b.");
         }
         Self { a, b }
@@ -221,7 +225,9 @@ impl ContinuousDistribution<f64> for ContinuousUniform {
 /// $$
 /// # Example
 /// ```
-/// use pmath::probability::distributions::{DiscreteUniform, Distribution, DiscreteDistribution};
+/// use pmath::probability::distributions::{
+///     DiscreteUniform, Distribution, DiscreteDistribution
+/// };
 ///
 /// let dist = DiscreteUniform::new(1, 3);
 /// assert!((dist.cdf(2) - 2.0 / 3.0).abs() < 1e-10);
@@ -232,7 +238,9 @@ impl ContinuousDistribution<f64> for ContinuousUniform {
 /// ```
 pub struct DiscreteUniform<T> {
     a: T,
+    a_float: f64,
     b: T,
+    b_float: f64,
 }
 impl<T> DiscreteUniform<T>
 where
@@ -246,11 +254,20 @@ where
     /// * A new [DiscreteUniform] distribution.
     /// # Panics
     /// * If `a` is greater than `b`.
+    /// * If `a` cannot be converted to [f64].
+    /// * If `b` cannot be converted to [f64].
     pub fn new(a: T, b: T) -> Self {
         if a > b {
             panic!("a must be less than or equal to b.");
         }
-        Self { a, b }
+        let a_float = a.to_f64().expect("a cannot be converted to f64");
+        let b_float = b.to_f64().expect("b cannot be converted to f64");
+        Self {
+            a,
+            a_float,
+            b,
+            b_float,
+        }
     }
 
     /// Get the minimum value of the distribution.
@@ -272,33 +289,33 @@ where
     T: SampleUniform + ConstOne + PrimInt,
 {
     fn cdf<U: ToPrimitive>(&self, x: U) -> f64 {
-        let x = T::from(x.to_f64().expect("x cannot be converted to f64").floor())
-            .expect("x cannot be converted to T");
-        if x < self.a {
+        let x = x.to_f64().expect("x cannot be converted to f64").floor();
+        if x < self.a_float {
             0.0
-        } else if x >= self.b {
+        } else if x >= self.b_float {
             1.0
         } else {
-            (x - self.a + T::ONE).to_f64().unwrap() * self.pmf(self.a)
+            (x - self.a_float + 1.0) * self.pmf(self.a)
         }
     }
 
     fn mean(&self) -> Option<f64> {
-        Some((self.a.to_f64().unwrap() + self.b.to_f64().unwrap()) / 2.0)
+        Some((self.a_float + self.b_float) / 2.0)
     }
 
     fn variance(&self) -> Option<f64> {
         let prob = self.pmf(self.a);
         let mean = self.mean().unwrap();
         let mut result = 0.0;
-        let mut v = self.a;
+        let mut v = self.a_float;
         loop {
-            result += v.to_f64().unwrap().powi(2) * prob;
-            v = v + T::ONE;
-            if v > self.b {
+            result += v.powi(2);
+            v += 1.0;
+            if v > self.b_float {
                 break;
             }
         }
+        result *= prob;
         Some(result - mean.powi(2))
     }
 }
@@ -318,7 +335,7 @@ where
         if x < self.a || x > self.b {
             0.0
         } else {
-            1.0 / (self.b.to_f64().unwrap() - self.a.to_f64().unwrap() + 1.0)
+            1.0 / (self.b_float - self.a_float + 1.0)
         }
     }
 }
@@ -337,7 +354,9 @@ where
 /// $$
 /// # Example
 /// ```
-/// use pmath::probability::distributions::{CustomDiscreteFinite, Distribution, DiscreteDistribution};
+/// use pmath::probability::distributions::{
+///     CustomDiscreteFinite, Distribution, DiscreteDistribution
+/// };
 ///
 /// let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
 /// assert!((dist.cdf(1) - 0.25).abs() < 1e-10);
@@ -356,7 +375,7 @@ pub struct CustomDiscreteFinite<T> {
 }
 impl<T> CustomDiscreteFinite<T>
 where
-    T: Hash + Eq + Copy + PartialOrd,
+    T: Ord + Hash + Copy + ToPrimitive,
 {
     /// Create a new custom discrete finite distribution.
     /// # Arguments
@@ -366,8 +385,8 @@ where
     /// # Panics
     /// * If any probability is negative.
     /// * If the sum of all probabilities is `0`.
+    /// * If any value cannot be converted to [f64].
     /// * If any probability cannot be converted to [f64].
-    /// * If values of type `T` cannot be compared (needed for sorting).
     /// # Notes
     /// * The probabilities are normalized to sum to `1`, so the input probabilities
     ///   don't have to sum to `1`.
@@ -383,6 +402,7 @@ where
         let mut total_weight = 0.0;
 
         for (val, prob) in items.into_iter().map(|i| *i.borrow()) {
+            val.to_f64().expect("Value cannot be converted to f64");
             let prob = prob
                 .to_f64()
                 .expect("Probability cannot be converted to f64");
@@ -402,8 +422,7 @@ where
         }
 
         // sort items_vec by value
-        items_vec
-            .sort_unstable_by(|a, b| a.0.partial_cmp(&b.0).expect("Values cannot be compared"));
+        items_vec.sort_unstable_by(|a, b| a.0.cmp(&b.0));
 
         // update items_map with new indices after sorting,
         // normalize probabilities and calculate cumulative probabilities
@@ -507,82 +526,659 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::statistics::Sample;
     use assert_float_eq::assert_float_absolute_eq;
     use rand::rng;
 
-    mod continuous_uniform {
-        use super::*;
+    // continuous uniform distribution tests
 
-        #[test]
-        fn main() {
-            let dist = ContinuousUniform::new(0.0, 1.0);
-            assert_float_absolute_eq!(dist.cdf(0.5), 0.5, 1e-10);
-            assert_float_absolute_eq!(dist.pdf(0.5), 1.0, 1e-10);
-            assert_float_absolute_eq!(dist.mean().unwrap(), 0.5, 1e-10);
-            assert_float_absolute_eq!(dist.variance().unwrap(), 1.0 / 12.0, 1e-10);
-            assert_float_absolute_eq!(dist.stddev().unwrap(), (1.0 / 12.0f64).sqrt(), 1e-10);
-        }
+    #[test]
+    fn continuous_uniform_new() {
+        //! Test that [ContinuousUniform::new] creates a new distribution with the correct parameters.
 
-        #[test]
-        fn samples() {
-            let dist = ContinuousUniform::new(0.0, 1.0);
-            for sample in dist.sample_iter(rng()).take(1_000_000) {
-                if !(0.0..=1.0).contains(&sample) {
-                    panic!("Sample {sample} not in [0, 1]");
-                }
-            }
-        }
+        let dist = ContinuousUniform::new(0.0, 1.0);
+        assert_float_absolute_eq!(dist.a(), 0.0);
+        assert_float_absolute_eq!(dist.b(), 1.0);
     }
 
-    mod discrete_uniform {
-        use super::*;
+    #[test]
+    #[should_panic]
+    fn continuous_uniform_new_a_ge_b() {
+        //! Test that [ContinuousUniform::new] panics when `a` is greater than or equal to `b`.
 
-        #[test]
-        fn main() {
-            let dist = DiscreteUniform::new(1, 3);
-            assert_float_absolute_eq!(dist.cdf(2), 2.0 / 3.0, 1e-10);
-            assert_float_absolute_eq!(dist.pmf(2), 1.0 / 3.0, 1e-10);
-            assert_float_absolute_eq!(dist.mean().unwrap(), 2.0, 1e-10);
-            assert_float_absolute_eq!(dist.variance().unwrap(), 2.0 / 3.0, 1e-10);
-            assert_float_absolute_eq!(dist.stddev().unwrap(), (2.0 / 3.0f64).sqrt(), 1e-10);
-        }
-
-        #[test]
-        fn samples() {
-            let dist = DiscreteUniform::new(1, 3);
-            for sample in dist.sample_iter(rng()).take(1_000_000) {
-                if ![1, 2, 3].contains(&sample) {
-                    panic!("Sample {sample} not in [1, 2, 3]");
-                }
-            }
-        }
+        ContinuousUniform::new(1.0, 0.9);
     }
 
-    mod custom_discrete_finite {
-        use super::*;
+    #[test]
+    fn continuous_uniform_primitive_types() {
+        //! Test that [ContinuousUniform::new] works with primitive types that can be converted to [f64].
 
-        #[test]
-        fn main() {
-            let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
-            assert_float_absolute_eq!(dist.cdf(1), 0.25, 1e-10);
-            assert_float_absolute_eq!(dist.cdf(2), 0.75, 1e-10);
-            assert_float_absolute_eq!(dist.cdf(3), 1.0, 1e-10);
-            assert_float_absolute_eq!(dist.pmf(1), 0.25, 1e-10);
-            assert_float_absolute_eq!(dist.pmf(2), 0.5, 1e-10);
-            assert_float_absolute_eq!(dist.pmf(3), 0.25, 1e-10);
-            assert_float_absolute_eq!(dist.mean().unwrap(), 2.0, 1e-10);
-            assert_float_absolute_eq!(dist.variance().unwrap(), 0.5, 1e-10);
-            assert_float_absolute_eq!(dist.stddev().unwrap(), 0.5f64.sqrt(), 1e-10);
-        }
+        let dist = ContinuousUniform::new(0u8, 1i8);
+        assert_float_absolute_eq!(dist.a(), 0.0);
+        assert_float_absolute_eq!(dist.b(), 1.0);
 
-        #[test]
-        fn samples() {
-            let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
-            for sample in dist.sample_iter(rng()).take(1_000_000) {
-                if ![1, 2, 3].contains(&sample) {
-                    panic!("Sample {sample} not in [1, 2, 3]");
-                }
-            }
+        let dist = ContinuousUniform::new(0i16, 1u16);
+        assert_float_absolute_eq!(dist.a(), 0.0);
+        assert_float_absolute_eq!(dist.b(), 1.0);
+
+        let dist = ContinuousUniform::new(0u32, 1i32);
+        assert_float_absolute_eq!(dist.a(), 0.0);
+        assert_float_absolute_eq!(dist.b(), 1.0);
+
+        let dist = ContinuousUniform::new(0i64, 1u64);
+        assert_float_absolute_eq!(dist.a(), 0.0);
+        assert_float_absolute_eq!(dist.b(), 1.0);
+
+        let dist = ContinuousUniform::new(0u128, 1i128);
+        assert_float_absolute_eq!(dist.a(), 0.0);
+        assert_float_absolute_eq!(dist.b(), 1.0);
+
+        let dist = ContinuousUniform::new(0isize, 1usize);
+        assert_float_absolute_eq!(dist.a(), 0.0);
+        assert_float_absolute_eq!(dist.b(), 1.0);
+
+        let dist = ContinuousUniform::new(0.0f32, 1.0f64);
+        assert_float_absolute_eq!(dist.a(), 0.0);
+        assert_float_absolute_eq!(dist.b(), 1.0);
+    }
+
+    #[test]
+    fn continuous_uniform_cdf() {
+        //! Test that [ContinuousUniform::cdf] returns the correct value.
+
+        let dist = ContinuousUniform::new(0.0, 1.0);
+        assert_float_absolute_eq!(dist.cdf(0.5), 0.5);
+
+        let dist = ContinuousUniform::new(-1.0, 1.0);
+        assert_float_absolute_eq!(dist.cdf(0.0), 0.5);
+
+        let dist = ContinuousUniform::new(0.0, 2.0);
+        assert_float_absolute_eq!(dist.cdf(1.0), 0.5);
+
+        let dist = ContinuousUniform::new(-10.0, 10.0);
+        assert_float_absolute_eq!(dist.cdf(0.0), 0.5);
+
+        let dist = ContinuousUniform::new(0.0, 1.0);
+        assert_float_absolute_eq!(dist.cdf(-0.5), 0.0);
+        assert_float_absolute_eq!(dist.cdf(1.5), 1.0);
+        assert_float_absolute_eq!(dist.cdf(0.0), 0.0);
+        assert_float_absolute_eq!(dist.cdf(1.0), 1.0);
+    }
+
+    #[test]
+    fn continuous_uniform_mean() {
+        //! Test that [ContinuousUniform::mean] returns the correct value.
+
+        let dist = ContinuousUniform::new(0.0, 1.0);
+        assert_float_absolute_eq!(dist.mean().unwrap(), 0.5);
+
+        let dist = ContinuousUniform::new(-1.0, 1.0);
+        assert_float_absolute_eq!(dist.mean().unwrap(), 0.0);
+
+        let dist = ContinuousUniform::new(0.0, 2.0);
+        assert_float_absolute_eq!(dist.mean().unwrap(), 1.0);
+
+        let dist = ContinuousUniform::new(-10.0, 10.0);
+        assert_float_absolute_eq!(dist.mean().unwrap(), 0.0);
+    }
+
+    #[test]
+    fn continuous_uniform_variance() {
+        //! Test that [ContinuousUniform::variance] returns the correct value.
+
+        let dist = ContinuousUniform::new(0.0, 1.0);
+        assert_float_absolute_eq!(dist.variance().unwrap(), 1.0 / 12.0);
+
+        let dist = ContinuousUniform::new(-1.0, 1.0);
+        assert_float_absolute_eq!(dist.variance().unwrap(), 1.0 / 3.0);
+
+        let dist = ContinuousUniform::new(0.0, 2.0);
+        assert_float_absolute_eq!(dist.variance().unwrap(), 1.0 / 3.0);
+
+        let dist = ContinuousUniform::new(-10.0, 10.0);
+        assert_float_absolute_eq!(dist.variance().unwrap(), 400.0 / 12.0);
+    }
+
+    #[test]
+    fn continuous_uniform_stddev() {
+        //! Test that [ContinuousUniform::stddev] returns the correct value.
+
+        let dist = ContinuousUniform::new(0.0, 1.0);
+        assert_float_absolute_eq!(dist.stddev().unwrap(), (1.0 / 12.0f64).sqrt());
+
+        let dist = ContinuousUniform::new(-1.0, 1.0);
+        assert_float_absolute_eq!(dist.stddev().unwrap(), (1.0 / 3.0f64).sqrt());
+
+        let dist = ContinuousUniform::new(0.0, 2.0);
+        assert_float_absolute_eq!(dist.stddev().unwrap(), (1.0 / 3.0f64).sqrt());
+
+        let dist = ContinuousUniform::new(-10.0, 10.0);
+        assert_float_absolute_eq!(dist.stddev().unwrap(), (400.0 / 12.0f64).sqrt());
+    }
+
+    #[test]
+    fn continuous_uniform_pdf() {
+        //! Test that [ContinuousUniform::pdf] returns the correct value.
+
+        let dist = ContinuousUniform::new(0.0, 1.0);
+        assert_float_absolute_eq!(dist.pdf(0.5), 1.0);
+        assert_float_absolute_eq!(dist.pdf(-0.5), 0.0);
+        assert_float_absolute_eq!(dist.pdf(1.5), 0.0);
+        assert_float_absolute_eq!(dist.pdf(0.0), 1.0);
+        assert_float_absolute_eq!(dist.pdf(1.0), 1.0);
+
+        let dist = ContinuousUniform::new(-1.0, 1.0);
+        assert_float_absolute_eq!(dist.pdf(0.0), 0.5);
+        assert_float_absolute_eq!(dist.pdf(-1.5), 0.0);
+        assert_float_absolute_eq!(dist.pdf(1.5), 0.0);
+        assert_float_absolute_eq!(dist.pdf(-1.0), 0.5);
+        assert_float_absolute_eq!(dist.pdf(1.0), 0.5);
+    }
+
+    #[test]
+    fn continuous_uniform_sample() {
+        //! Test that sampling from [ContinuousUniform] is consistent with the distribution's properties.
+
+        let dist = ContinuousUniform::new(0.0, 1.0);
+        let sample = Sample::from_values(dist.sample_iter(rng()).take(1_000_000));
+        for value in sample.iter() {
+            assert!((0.0..=1.0).contains(value), "Sample {value} not in [0, 1]");
         }
+        let mean = sample.mean().unwrap();
+        let variance = sample.variance().unwrap();
+        assert_float_absolute_eq!(mean, 0.5, 0.05);
+        assert_float_absolute_eq!(variance, 1.0 / 12.0, 0.05);
+    }
+
+    // discrete uniform distribution tests
+
+    #[test]
+    fn discrete_uniform_new() {
+        //! Test that [DiscreteUniform::new] creates a new distribution with the correct parameters.
+
+        let dist = DiscreteUniform::new(1, 3);
+        assert_eq!(dist.a(), 1);
+        assert_eq!(dist.b(), 3);
+    }
+
+    #[test]
+    #[should_panic]
+    fn discrete_uniform_new_a_gt_b() {
+        //! Test that [DiscreteUniform::new] panics when `a` is greater than `b`.
+
+        DiscreteUniform::new(2, 1);
+    }
+
+    #[test]
+    fn discrete_uniform_primitive_types() {
+        //! Test that [DiscreteUniform::new] works with primitive types that can be converted to [f64].
+
+        // unsigned types
+        let dist = DiscreteUniform::new(0u8, 5);
+        assert_eq!(dist.a(), 0);
+        assert_eq!(dist.b(), 5);
+        let dist = DiscreteUniform::new(0u16, 5);
+        assert_eq!(dist.a(), 0);
+        assert_eq!(dist.b(), 5);
+        let dist = DiscreteUniform::new(0u32, 5);
+        assert_eq!(dist.a(), 0);
+        assert_eq!(dist.b(), 5);
+        let dist = DiscreteUniform::new(0u64, 5);
+        assert_eq!(dist.a(), 0);
+        assert_eq!(dist.b(), 5);
+        let dist = DiscreteUniform::new(0u128, 5);
+        assert_eq!(dist.a(), 0);
+        assert_eq!(dist.b(), 5);
+        let dist = DiscreteUniform::new(0usize, 5);
+        assert_eq!(dist.a(), 0);
+        assert_eq!(dist.b(), 5);
+
+        // signed types
+        let dist = DiscreteUniform::new(0i8, 5);
+        assert_eq!(dist.a(), 0);
+        assert_eq!(dist.b(), 5);
+        let dist = DiscreteUniform::new(0i16, 5);
+        assert_eq!(dist.a(), 0);
+        assert_eq!(dist.b(), 5);
+        let dist = DiscreteUniform::new(0i32, 5);
+        assert_eq!(dist.a(), 0);
+        assert_eq!(dist.b(), 5);
+        let dist = DiscreteUniform::new(0i64, 5);
+        assert_eq!(dist.a(), 0);
+        assert_eq!(dist.b(), 5);
+        let dist = DiscreteUniform::new(0i128, 5);
+        assert_eq!(dist.a(), 0);
+        assert_eq!(dist.b(), 5);
+        let dist = DiscreteUniform::new(0isize, 5);
+        assert_eq!(dist.a(), 0);
+        assert_eq!(dist.b(), 5);
+    }
+
+    #[test]
+    fn discrete_uniform_cdf() {
+        //! Test that [DiscreteUniform::cdf] returns the correct value.
+
+        let dist = DiscreteUniform::new(1, 3);
+        assert_float_absolute_eq!(dist.cdf(0), 0.0);
+        assert_float_absolute_eq!(dist.cdf(1), 1.0 / 3.0);
+        assert_float_absolute_eq!(dist.cdf(2), 2.0 / 3.0);
+        assert_float_absolute_eq!(dist.cdf(3), 1.0);
+        assert_float_absolute_eq!(dist.cdf(4), 1.0);
+
+        let dist = DiscreteUniform::new(-2, 2);
+        assert_float_absolute_eq!(dist.cdf(-3), 0.0);
+        assert_float_absolute_eq!(dist.cdf(-2), 1.0 / 5.0);
+        assert_float_absolute_eq!(dist.cdf(-1), 2.0 / 5.0);
+        assert_float_absolute_eq!(dist.cdf(0), 3.0 / 5.0);
+        assert_float_absolute_eq!(dist.cdf(1), 4.0 / 5.0);
+        assert_float_absolute_eq!(dist.cdf(2), 1.0);
+        assert_float_absolute_eq!(dist.cdf(3), 1.0);
+
+        let dist = DiscreteUniform::new(1, 1);
+        assert_float_absolute_eq!(dist.cdf(0), 0.0);
+        assert_float_absolute_eq!(dist.cdf(1), 1.0);
+        assert_float_absolute_eq!(dist.cdf(2), 1.0);
+    }
+
+    #[test]
+    fn discrete_uniform_mean() {
+        //! Test that [DiscreteUniform::mean] returns the correct value.
+
+        let dist = DiscreteUniform::new(1, 3);
+        assert_float_absolute_eq!(dist.mean().unwrap(), 2.0);
+
+        let dist = DiscreteUniform::new(-2, 2);
+        assert_float_absolute_eq!(dist.mean().unwrap(), 0.0);
+
+        let dist = DiscreteUniform::new(1, 1);
+        assert_float_absolute_eq!(dist.mean().unwrap(), 1.0);
+
+        let dist = DiscreteUniform::new(0, 3);
+        assert_float_absolute_eq!(dist.mean().unwrap(), 1.5);
+    }
+
+    #[test]
+    fn discrete_uniform_variance() {
+        //! Test that [DiscreteUniform::variance] returns the correct value.
+
+        let dist = DiscreteUniform::new(1, 3);
+        assert_float_absolute_eq!(dist.variance().unwrap(), 2.0 / 3.0);
+
+        let dist = DiscreteUniform::new(-2, 2);
+        assert_float_absolute_eq!(dist.variance().unwrap(), 2.0);
+
+        let dist = DiscreteUniform::new(1, 1);
+        assert_float_absolute_eq!(dist.variance().unwrap(), 0.0);
+
+        let dist = DiscreteUniform::new(0, 3);
+        assert_float_absolute_eq!(dist.variance().unwrap(), 5.0 / 4.0);
+    }
+
+    #[test]
+    fn discrete_uniform_stddev() {
+        //! Test that [DiscreteUniform::stddev] returns the correct value.
+
+        let dist = DiscreteUniform::new(1, 3);
+        assert_float_absolute_eq!(dist.stddev().unwrap(), (2.0 / 3.0f64).sqrt());
+        let dist = DiscreteUniform::new(-2, 2);
+        assert_float_absolute_eq!(dist.stddev().unwrap(), (2.0f64).sqrt());
+        let dist = DiscreteUniform::new(1, 1);
+        assert_float_absolute_eq!(dist.stddev().unwrap(), 0.0);
+        let dist = DiscreteUniform::new(0, 3);
+        assert_float_absolute_eq!(dist.stddev().unwrap(), (5.0 / 4.0f64).sqrt());
+    }
+
+    #[test]
+    fn discrete_uniform_pmf() {
+        //! Test that [DiscreteUniform::pmf] returns the correct value.
+
+        let dist = DiscreteUniform::new(1, 3);
+        assert_float_absolute_eq!(dist.pmf(0), 0.0);
+        assert_float_absolute_eq!(dist.pmf(1), 1.0 / 3.0);
+        assert_float_absolute_eq!(dist.pmf(2), 1.0 / 3.0);
+        assert_float_absolute_eq!(dist.pmf(3), 1.0 / 3.0);
+        assert_float_absolute_eq!(dist.pmf(4), 0.0);
+
+        let dist = DiscreteUniform::new(-2, 2);
+        assert_float_absolute_eq!(dist.pmf(-3), 0.0);
+        assert_float_absolute_eq!(dist.pmf(-2), 1.0 / 5.0);
+        assert_float_absolute_eq!(dist.pmf(-1), 1.0 / 5.0);
+        assert_float_absolute_eq!(dist.pmf(0), 1.0 / 5.0);
+        assert_float_absolute_eq!(dist.pmf(1), 1.0 / 5.0);
+        assert_float_absolute_eq!(dist.pmf(2), 1.0 / 5.0);
+        assert_float_absolute_eq!(dist.pmf(3), 0.0);
+
+        let dist = DiscreteUniform::new(1, 1);
+        assert_float_absolute_eq!(dist.pmf(0), 0.0);
+        assert_float_absolute_eq!(dist.pmf(1), 1.0);
+        assert_float_absolute_eq!(dist.pmf(2), 0.0);
+    }
+
+    #[test]
+    fn discrete_uniform_sample() {
+        //! Test that sampling from [DiscreteUniform] is consistent with the distribution's properties.
+
+        let dist = DiscreteUniform::new(1, 10);
+        let sample = Sample::from_values(dist.sample_iter(rng()).take(1_000_000));
+        for value in sample.iter() {
+            assert!((1..=10).contains(value), "Sample {value} not in 1..=10");
+        }
+        let mean = sample.mean().unwrap();
+        let variance = sample.variance().unwrap();
+        assert_float_absolute_eq!(mean, 5.5, 0.05);
+        assert_float_absolute_eq!(variance, 8.25, 0.05);
+    }
+
+    // custom discrete finite distribution tests
+
+    #[test]
+    fn custom_discrete_finite_new() {
+        //! Test that [CustomDiscreteFinite::new] creates a new distribution with the correct parameters.
+
+        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
+        let items: Vec<(i32, f64)> = dist.items().collect();
+        assert_eq!(items.len(), 3);
+        assert_eq!(items[0].0, 1);
+        assert_float_absolute_eq!(items[0].1, 0.25);
+        assert_eq!(items[1].0, 2);
+        assert_float_absolute_eq!(items[1].1, 0.5);
+        assert_eq!(items[2].0, 3);
+        assert_float_absolute_eq!(items[2].1, 0.25);
+    }
+
+    #[test]
+    #[should_panic]
+    fn custom_discrete_finite_new_negative_probability() {
+        //! Test that [CustomDiscreteFinite::new] panics when any probability is negative.
+
+        CustomDiscreteFinite::new([(1, 0.5), (2, -0.1)]);
+    }
+
+    #[test]
+    #[should_panic]
+    fn custom_discrete_finite_new_zero_total_weight() {
+        //! Test that [CustomDiscreteFinite::new] panics when the sum of all probabilities is zero.
+
+        CustomDiscreteFinite::new([(1, 0.0), (2, 0.0)]);
+    }
+
+    #[test]
+    fn custom_discrete_finite_new_non_normalized_probabilities() {
+        //! Test that [CustomDiscreteFinite::new] correctly normalizes probabilities that don't sum to 1.
+
+        let dist = CustomDiscreteFinite::new([(1, 1.0), (2, 2.0), (3, 1.0)]);
+        let items: Vec<(i32, f64)> = dist.items().collect();
+        assert_eq!(items.len(), 3);
+        assert_eq!(items[0].0, 1);
+        assert_float_absolute_eq!(items[0].1, 0.25);
+        assert_eq!(items[1].0, 2);
+        assert_float_absolute_eq!(items[1].1, 0.5);
+        assert_eq!(items[2].0, 3);
+        assert_float_absolute_eq!(items[2].1, 0.25);
+    }
+
+    #[test]
+    fn custom_discrete_finite_primitive_types() {
+        //! Test that [CustomDiscreteFinite::new] works with primitive types that can be converted to [f64].
+
+        // unsigned types
+
+        let dist = CustomDiscreteFinite::new([(1u8, 0.25), (2u8, 0.5), (3u8, 0.25)]);
+        let items: Vec<(u8, f64)> = dist.items().collect();
+        assert_eq!(items.len(), 3);
+        assert_eq!(items[0].0, 1);
+        assert_float_absolute_eq!(items[0].1, 0.25);
+        assert_eq!(items[1].0, 2);
+        assert_float_absolute_eq!(items[1].1, 0.5);
+        assert_eq!(items[2].0, 3);
+        assert_float_absolute_eq!(items[2].1, 0.25);
+        let dist = CustomDiscreteFinite::new([(1u16, 0.25), (2u16, 0.5), (3u16, 0.25)]);
+        let items: Vec<(u16, f64)> = dist.items().collect();
+        assert_eq!(items.len(), 3);
+        assert_eq!(items[0].0, 1);
+        assert_float_absolute_eq!(items[0].1, 0.25);
+        assert_eq!(items[1].0, 2);
+        assert_float_absolute_eq!(items[1].1, 0.5);
+        assert_eq!(items[2].0, 3);
+        assert_float_absolute_eq!(items[2].1, 0.25);
+        let dist = CustomDiscreteFinite::new([(1u32, 0.25), (2u32, 0.5), (3u32, 0.25)]);
+        let items: Vec<(u32, f64)> = dist.items().collect();
+        assert_eq!(items.len(), 3);
+        assert_eq!(items[0].0, 1);
+        assert_float_absolute_eq!(items[0].1, 0.25);
+        assert_eq!(items[1].0, 2);
+        assert_float_absolute_eq!(items[1].1, 0.5);
+        assert_eq!(items[2].0, 3);
+        assert_float_absolute_eq!(items[2].1, 0.25);
+        let dist = CustomDiscreteFinite::new([(1u64, 0.25), (2u64, 0.5), (3u64, 0.25)]);
+        let items: Vec<(u64, f64)> = dist.items().collect();
+        assert_eq!(items.len(), 3);
+        assert_eq!(items[0].0, 1);
+        assert_float_absolute_eq!(items[0].1, 0.25);
+        assert_eq!(items[1].0, 2);
+        assert_float_absolute_eq!(items[1].1, 0.5);
+        assert_eq!(items[2].0, 3);
+        assert_float_absolute_eq!(items[2].1, 0.25);
+        let dist = CustomDiscreteFinite::new([(1u128, 0.25), (2u128, 0.5), (3u128, 0.25)]);
+        let items: Vec<(u128, f64)> = dist.items().collect();
+        assert_eq!(items.len(), 3);
+        assert_eq!(items[0].0, 1);
+        assert_float_absolute_eq!(items[0].1, 0.25);
+        assert_eq!(items[1].0, 2);
+        assert_float_absolute_eq!(items[1].1, 0.5);
+        assert_eq!(items[2].0, 3);
+        assert_float_absolute_eq!(items[2].1, 0.25);
+        let dist = CustomDiscreteFinite::new([(1usize, 0.25), (2usize, 0.5), (3usize, 0.25)]);
+        let items: Vec<(usize, f64)> = dist.items().collect();
+        assert_eq!(items.len(), 3);
+        assert_eq!(items[0].0, 1);
+        assert_float_absolute_eq!(items[0].1, 0.25);
+        assert_eq!(items[1].0, 2);
+        assert_float_absolute_eq!(items[1].1, 0.5);
+        assert_eq!(items[2].0, 3);
+        assert_float_absolute_eq!(items[2].1, 0.25);
+
+        // signed types
+        let dist = CustomDiscreteFinite::new([(1i8, 0.25), (2i8, 0.5), (3i8, 0.25)]);
+        let items: Vec<(i8, f64)> = dist.items().collect();
+        assert_eq!(items.len(), 3);
+        assert_eq!(items[0].0, 1);
+        assert_float_absolute_eq!(items[0].1, 0.25);
+        assert_eq!(items[1].0, 2);
+        assert_float_absolute_eq!(items[1].1, 0.5);
+        assert_eq!(items[2].0, 3);
+        assert_float_absolute_eq!(items[2].1, 0.25);
+        let dist = CustomDiscreteFinite::new([(1i16, 0.25), (2i16, 0.5), (3i16, 0.25)]);
+        let items: Vec<(i16, f64)> = dist.items().collect();
+        assert_eq!(items.len(), 3);
+        assert_eq!(items[0].0, 1);
+        assert_float_absolute_eq!(items[0].1, 0.25);
+        assert_eq!(items[1].0, 2);
+        assert_float_absolute_eq!(items[1].1, 0.5);
+        assert_eq!(items[2].0, 3);
+        assert_float_absolute_eq!(items[2].1, 0.25);
+        let dist = CustomDiscreteFinite::new([(1i32, 0.25), (2i32, 0.5), (3i32, 0.25)]);
+        let items: Vec<(i32, f64)> = dist.items().collect();
+        assert_eq!(items.len(), 3);
+        assert_eq!(items[0].0, 1);
+        assert_float_absolute_eq!(items[0].1, 0.25);
+        assert_eq!(items[1].0, 2);
+        assert_float_absolute_eq!(items[1].1, 0.5);
+        assert_eq!(items[2].0, 3);
+        assert_float_absolute_eq!(items[2].1, 0.25);
+        let dist = CustomDiscreteFinite::new([(1i64, 0.25), (2i64, 0.5), (3i64, 0.25)]);
+        let items: Vec<(i64, f64)> = dist.items().collect();
+        assert_eq!(items.len(), 3);
+        assert_eq!(items[0].0, 1);
+        assert_float_absolute_eq!(items[0].1, 0.25);
+        assert_eq!(items[1].0, 2);
+        assert_float_absolute_eq!(items[1].1, 0.5);
+        assert_eq!(items[2].0, 3);
+        assert_float_absolute_eq!(items[2].1, 0.25);
+        let dist = CustomDiscreteFinite::new([(1i128, 0.25), (2i128, 0.5), (3i128, 0.25)]);
+        let items: Vec<(i128, f64)> = dist.items().collect();
+        assert_eq!(items.len(), 3);
+        assert_eq!(items[0].0, 1);
+        assert_float_absolute_eq!(items[0].1, 0.25);
+        assert_eq!(items[1].0, 2);
+        assert_float_absolute_eq!(items[1].1, 0.5);
+        assert_eq!(items[2].0, 3);
+        assert_float_absolute_eq!(items[2].1, 0.25);
+        let dist = CustomDiscreteFinite::new([(1isize, 0.25), (2isize, 0.5), (3isize, 0.25)]);
+        let items: Vec<(isize, f64)> = dist.items().collect();
+        assert_eq!(items.len(), 3);
+        assert_eq!(items[0].0, 1);
+        assert_float_absolute_eq!(items[0].1, 0.25);
+        assert_eq!(items[1].0, 2);
+        assert_float_absolute_eq!(items[1].1, 0.5);
+        assert_eq!(items[2].0, 3);
+        assert_float_absolute_eq!(items[2].1, 0.25);
+    }
+
+    #[test]
+    fn custom_discrete_finite_cdf() {
+        //! Test that [CustomDiscreteFinite::cdf] returns the correct value.
+
+        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
+        assert_float_absolute_eq!(dist.cdf(0), 0.0);
+        assert_float_absolute_eq!(dist.cdf(1), 0.25);
+        assert_float_absolute_eq!(dist.cdf(2), 0.75);
+        assert_float_absolute_eq!(dist.cdf(3), 1.0);
+        assert_float_absolute_eq!(dist.cdf(4), 1.0);
+
+        let dist = CustomDiscreteFinite::new([(1, 0.25), (3, 0.5), (5, 0.25)]);
+        assert_float_absolute_eq!(dist.cdf(0), 0.0);
+        assert_float_absolute_eq!(dist.cdf(1), 0.25);
+        assert_float_absolute_eq!(dist.cdf(2), 0.25);
+        assert_float_absolute_eq!(dist.cdf(3), 0.75);
+        assert_float_absolute_eq!(dist.cdf(4), 0.75);
+        assert_float_absolute_eq!(dist.cdf(5), 1.0);
+
+        let dist = CustomDiscreteFinite::new([(-1, 0.25), (0, 0.5), (1, 0.25)]);
+        assert_float_absolute_eq!(dist.cdf(-2), 0.0);
+        assert_float_absolute_eq!(dist.cdf(-1), 0.25);
+        assert_float_absolute_eq!(dist.cdf(0), 0.75);
+        assert_float_absolute_eq!(dist.cdf(1), 1.0);
+        assert_float_absolute_eq!(dist.cdf(2), 1.0);
+    }
+
+    #[test]
+    fn custom_discrete_finite_mean() {
+        //! Test that [CustomDiscreteFinite::mean] returns the correct value.
+
+        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
+        assert_float_absolute_eq!(dist.mean().unwrap(), 2.0);
+
+        let dist = CustomDiscreteFinite::new([(-1, 0.25), (0, 0.5), (1, 0.25)]);
+        assert_float_absolute_eq!(dist.mean().unwrap(), 0.0);
+
+        let dist = CustomDiscreteFinite::new([(1, 0.25), (3, 0.5), (5, 0.25)]);
+        assert_float_absolute_eq!(dist.mean().unwrap(), 3.0);
+
+        let dist = CustomDiscreteFinite::new([(1, 0.1), (2, 0.2), (3, 0.3), (4, 0.4)]);
+        assert_float_absolute_eq!(dist.mean().unwrap(), 3.0);
+
+        let dist = CustomDiscreteFinite::new([(1, 0.4), (2, 0.3), (3, 0.2), (4, 0.1)]);
+        assert_float_absolute_eq!(dist.mean().unwrap(), 2.0);
+
+        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.25), (3, 0.25), (4, 0.25)]);
+        assert_float_absolute_eq!(dist.mean().unwrap(), 2.5);
+    }
+
+    #[test]
+    fn custom_discrete_finite_variance() {
+        //! Test that [CustomDiscreteFinite::variance] returns the correct value.
+
+        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
+        assert_float_absolute_eq!(dist.variance().unwrap(), 0.5);
+
+        let dist = CustomDiscreteFinite::new([(-1, 0.25), (0, 0.5), (1, 0.25)]);
+        assert_float_absolute_eq!(dist.variance().unwrap(), 0.5);
+
+        let dist = CustomDiscreteFinite::new([(1, 0.25), (3, 0.5), (5, 0.25)]);
+        assert_float_absolute_eq!(dist.variance().unwrap(), 2.0);
+
+        let dist = CustomDiscreteFinite::new([(1, 0.1), (2, 0.2), (3, 0.3), (4, 0.4)]);
+        assert_float_absolute_eq!(dist.variance().unwrap(), 1.0);
+
+        let dist = CustomDiscreteFinite::new([(1, 0.4), (2, 0.3), (3, 0.2), (4, 0.1)]);
+        assert_float_absolute_eq!(dist.variance().unwrap(), 1.0);
+
+        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.25), (3, 0.25), (4, 0.25)]);
+        assert_float_absolute_eq!(dist.variance().unwrap(), 1.25);
+    }
+
+    #[test]
+    fn custom_discrete_finite_stddev() {
+        //! Test that [CustomDiscreteFinite::stddev] returns the correct value.
+
+        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
+        assert_float_absolute_eq!(dist.stddev().unwrap(), 0.5f64.sqrt());
+
+        let dist = CustomDiscreteFinite::new([(-1, 0.25), (0, 0.5), (1, 0.25)]);
+        assert_float_absolute_eq!(dist.stddev().unwrap(), 0.5f64.sqrt());
+
+        let dist = CustomDiscreteFinite::new([(1, 0.25), (3, 0.5), (5, 0.25)]);
+        assert_float_absolute_eq!(dist.stddev().unwrap(), 2.0f64.sqrt());
+
+        let dist = CustomDiscreteFinite::new([(1, 0.1), (2, 0.2), (3, 0.3), (4, 0.4)]);
+        assert_float_absolute_eq!(dist.stddev().unwrap(), 1.0f64.sqrt());
+
+        let dist = CustomDiscreteFinite::new([(1, 0.4), (2, 0.3), (3, 0.2), (4, 0.1)]);
+        assert_float_absolute_eq!(dist.stddev().unwrap(), 1.0f64.sqrt());
+
+        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.25), (3, 0.25), (4, 0.25)]);
+        assert_float_absolute_eq!(dist.stddev().unwrap(), 1.25f64.sqrt());
+    }
+
+    #[test]
+    fn custom_discrete_finite_pmf() {
+        //! Test that [CustomDiscreteFinite::pmf] returns the correct value.
+
+        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
+        assert_float_absolute_eq!(dist.pmf(0), 0.0);
+        assert_float_absolute_eq!(dist.pmf(1), 0.25);
+        assert_float_absolute_eq!(dist.pmf(2), 0.5);
+        assert_float_absolute_eq!(dist.pmf(3), 0.25);
+        assert_float_absolute_eq!(dist.pmf(4), 0.0);
+
+        let dist = CustomDiscreteFinite::new([(1, 0.25), (3, 0.5), (5, 0.25)]);
+        assert_float_absolute_eq!(dist.pmf(0), 0.0);
+        assert_float_absolute_eq!(dist.pmf(1), 0.25);
+        assert_float_absolute_eq!(dist.pmf(2), 0.0);
+        assert_float_absolute_eq!(dist.pmf(3), 0.5);
+        assert_float_absolute_eq!(dist.pmf(4), 0.0);
+        assert_float_absolute_eq!(dist.pmf(5), 0.25);
+        assert_float_absolute_eq!(dist.pmf(6), 0.0);
+
+        let dist = CustomDiscreteFinite::new([(-1, 0.25), (0, 0.5), (1, 0.25)]);
+        assert_float_absolute_eq!(dist.pmf(-2), 0.0);
+        assert_float_absolute_eq!(dist.pmf(-1), 0.25);
+        assert_float_absolute_eq!(dist.pmf(0), 0.5);
+        assert_float_absolute_eq!(dist.pmf(1), 0.25);
+        assert_float_absolute_eq!(dist.pmf(2), 0.0);
+
+        let dist = CustomDiscreteFinite::new([(5, 1), (6, 2), (7, 3), (8, 4)]);
+        assert_float_absolute_eq!(dist.pmf(4), 0.0);
+        assert_float_absolute_eq!(dist.pmf(5), 0.1);
+        assert_float_absolute_eq!(dist.pmf(6), 0.2);
+        assert_float_absolute_eq!(dist.pmf(7), 0.3);
+        assert_float_absolute_eq!(dist.pmf(8), 0.4);
+        assert_float_absolute_eq!(dist.pmf(9), 0.0);
+    }
+
+    #[test]
+    fn custom_discrete_finite_sample() {
+        //! Test that sampling from [CustomDiscreteFinite] is consistent with the distribution's properties.
+
+        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
+        let sample = Sample::from_values(dist.sample_iter(rng()).take(1_000_000));
+        for value in sample.iter() {
+            assert!([1, 2, 3].contains(value), "Sample {value} not in [1, 2, 3]");
+        }
+        let mean = sample.mean().unwrap();
+        let variance = sample.variance().unwrap();
+        assert_float_absolute_eq!(mean, 2.0, 0.05);
+        assert_float_absolute_eq!(variance, 0.5, 0.05);
     }
 }
