@@ -1,5 +1,6 @@
 use crate::Solution;
-use pmath::linalg::{Point, Vector};
+use pmath::geometry::Point;
+use pmath::linalg::Vector;
 use std::f64::consts::PI;
 
 problem!(Problem0102, 102, "Triangle Containment");
