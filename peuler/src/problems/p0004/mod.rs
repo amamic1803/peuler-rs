@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::digits::is_palindrome;
+use pmath::digit::is_palindrome;
 
 problem!(Problem0004, 4, "Largest Palindrome Product");
 

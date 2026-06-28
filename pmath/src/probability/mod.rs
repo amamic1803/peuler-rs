@@ -1,3 +1,3 @@
 //! Probability calculations.
 
-pub mod distributions;
+pub mod distribution;

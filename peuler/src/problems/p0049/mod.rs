@@ -1,7 +1,7 @@
 use crate::Solution;
 use itertools::Itertools;
-use pmath::digits::{digits, digits_to_int};
-use pmath::primes::sieve_of_eratosthenes;
+use pmath::digit::{digits, digits_to_int};
+use pmath::numth::prime::sieve_of_eratosthenes;
 use std::collections::BTreeSet;
 
 problem!(Problem0049, 49, "Prime Permutations");

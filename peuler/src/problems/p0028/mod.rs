@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::sequences::{OddNatNumSeq, OddNatNumSqSeq, Sequence};
+use pmath::sequence::{OddNatNumSeq, OddNatNumSqSeq, Sequence};
 
 problem!(Problem0028, 28, "Number Spiral Diagonals");
 

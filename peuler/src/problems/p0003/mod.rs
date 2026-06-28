@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::factors::prime_factors;
+use pmath::numth::factor::prime_factors;
 
 problem!(Problem0003, 3, "Largest Prime Factor");
 

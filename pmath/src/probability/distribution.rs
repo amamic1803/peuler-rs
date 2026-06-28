@@ -124,7 +124,7 @@ pub trait ContinuousDistribution<T>: Distribution<T> {
 /// are equally likely.
 /// # Example
 /// ```
-/// use pmath::probability::distributions::{
+/// use pmath::probability::distribution::{
 ///     ContinuousUniform, Distribution, ContinuousDistribution
 /// };
 ///
@@ -225,7 +225,7 @@ impl ContinuousDistribution<f64> for ContinuousUniform {
 /// $$
 /// # Example
 /// ```
-/// use pmath::probability::distributions::{
+/// use pmath::probability::distribution::{
 ///     DiscreteUniform, Distribution, DiscreteDistribution
 /// };
 ///
@@ -354,7 +354,7 @@ where
 /// $$
 /// # Example
 /// ```
-/// use pmath::probability::distributions::{
+/// use pmath::probability::distribution::{
 ///     CustomDiscreteFinite, Distribution, DiscreteDistribution
 /// };
 ///

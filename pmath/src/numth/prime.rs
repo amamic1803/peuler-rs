@@ -1,6 +1,7 @@
 //! Functions related to prime numbers.
 
-use crate::{gcd, newtons_method};
+use crate::core::gcd;
+use crate::analysis::root::newtons_method;
 use num_traits::{ConstOne, ConstZero, PrimInt, ToPrimitive};
 
 #[cfg_attr(doc, katexit::katexit)]
@@ -18,7 +19,7 @@ use num_traits::{ConstOne, ConstZero, PrimInt, ToPrimitive};
 /// * If `x` cannot be converted to [f64].
 /// # Example
 /// ```
-/// use pmath::primes::pcf;
+/// use pmath::numth::prime::pcf;
 ///
 /// assert_eq!(pcf(1), 0.0); // no primes <= 1
 /// assert_eq!(pcf(7), 4.0); // 2, 3, 5, 7
@@ -61,7 +62,7 @@ where
 /// * If `n` cannot be converted to [f64].
 /// # Example
 /// ```
-/// use pmath::primes::apcf;
+/// use pmath::numth::prime::apcf;
 ///
 /// assert_eq!(apcf(0), 0.0);  // zero primes just maps to zero
 /// assert_eq!(apcf(2), 3.0);
@@ -102,7 +103,7 @@ where
 /// * If either of the integers is negative.
 /// # Example
 /// ```
-/// use pmath::primes::coprime;
+/// use pmath::numth::prime::coprime;
 ///
 /// assert!(coprime(7, 20));
 /// assert!(!coprime(12, 18));
@@ -131,7 +132,7 @@ where
 /// * If `n` cannot be converted to [f64].
 /// # Example
 /// ```
-/// use pmath::primes::is_prime;
+/// use pmath::numth::prime::is_prime;
 ///
 /// // 7 is prime
 /// assert_eq!(is_prime(7), (true, 1));
@@ -183,7 +184,7 @@ where
 /// * If the sieve requires more elements than can be represented by [usize].
 /// # Example
 /// ```
-/// use pmath::primes::sieve_of_eratosthenes;
+/// use pmath::numth::prime::sieve_of_eratosthenes;
 ///
 /// // primes less than or equal to 10: 2, 3, 5, 7
 /// assert_eq!(sieve_of_eratosthenes(10), vec![2, 3, 5, 7]);

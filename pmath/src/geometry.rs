@@ -1,6 +1,6 @@
 //! Geometry module for 2D and 3D shapes and their properties.
 
-use crate::linalg::{Matrix, Vector};
+use crate::algebra::linear::{Matrix, Vector};
 use num_traits::{ConstOne, FromPrimitive, PrimInt, ToPrimitive};
 use std::borrow::Borrow;
 use std::ops::{

@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::sequences::CollatzSeq;
+use pmath::sequence::CollatzSeq;
 
 problem!(Problem0014, 14, "Longest Collatz Sequence");
 

@@ -1,6 +1,6 @@
 use crate::Solution;
 use itertools::Itertools;
-use pmath::digits::{digits, digits_to_int};
+use pmath::digit::{digits, digits_to_int};
 
 problem!(Problem0038, 38, "Pandigital Multiples");
 

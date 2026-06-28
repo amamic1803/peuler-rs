@@ -1,7 +1,7 @@
 use crate::Solution;
 use itertools::Itertools;
-use pmath::digits::{digits, digits_to_int};
-use pmath::primes::is_prime;
+use pmath::digit::{digits, digits_to_int};
+use pmath::numth::prime::is_prime;
 
 problem!(Problem0037, 37, "Truncatable Primes");
 

@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::primes::sieve_of_eratosthenes;
+use pmath::numth::prime::sieve_of_eratosthenes;
 use std::collections::HashSet;
 
 problem!(Problem0050, 50, "Consecutive Prime Sum");

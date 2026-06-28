@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::factors::distinct_prime_factors;
+use pmath::numth::factor::distinct_prime_factors;
 
 problem!(Problem0047, 47, "Distinct Primes Factors");
 

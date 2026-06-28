@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::digits::digits;
+use pmath::digit::digits;
 use pmath::factorial_0_to_n;
 
 problem!(Problem0074, 74, "Digit Factorial Chains");

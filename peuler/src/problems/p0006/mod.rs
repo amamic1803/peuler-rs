@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::sequences::{NatNumSeq, NatNumSqSeq, Sequence};
+use pmath::sequence::{NatNumSeq, NatNumSqSeq, Sequence};
 
 problem!(Problem0006, 6, "Sum Square Difference");
 

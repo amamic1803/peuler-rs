@@ -1,6 +1,6 @@
 use crate::Solution;
 use itertools::Itertools;
-use pmath::digits::digits;
+use pmath::digit::digits;
 use pmath::gcd;
 
 problem!(Problem0033, 33, "Digit Cancelling Fractions");

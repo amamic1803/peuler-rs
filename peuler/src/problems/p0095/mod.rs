@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::factors::sum_of_proper_divisors_0_to_n;
+use pmath::numth::factor::sum_of_proper_divisors_0_to_n;
 
 problem!(Problem0095, 95, "Amicable Chains");
 

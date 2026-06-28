@@ -1,6 +1,6 @@
 use crate::Solution;
 use pmath::ord;
-use pmath::primes::coprime;
+use pmath::numth::prime::coprime;
 
 problem!(Problem0026, 26, "Reciprocal Cycles");
 

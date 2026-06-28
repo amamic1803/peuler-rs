@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::digits::digits;
+use pmath::digit::digits;
 
 problem!(Problem0092, 92, "Square Digit Chains");
 

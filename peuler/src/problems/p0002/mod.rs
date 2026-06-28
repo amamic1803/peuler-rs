@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::sequences::FibonacciSeq;
+use pmath::sequence::FibonacciSeq;
 
 problem!(Problem0002, 2, "Even Fibonacci Numbers");
 

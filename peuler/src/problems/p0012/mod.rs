@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::factors::divisors;
+use pmath::numth::factor::divisors;
 
 problem!(Problem0012, 12, "Highly Divisible Triangular Number");
 

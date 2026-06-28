@@ -1,6 +1,6 @@
 use crate::Solution;
 use itertools::Itertools;
-use pmath::digits::{digits, is_permutation};
+use pmath::digit::{digits, is_permutation};
 
 problem!(Problem0098, 98, "Anagramic Squares");
 

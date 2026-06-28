@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::digits::is_palindrome;
+use pmath::digit::is_palindrome;
 
 problem!(Problem0036, 36, "Double-base Palindromes");
 

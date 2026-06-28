@@ -17,7 +17,7 @@ use std::ops::{
 /// Coordinates can be accessed directly because [Deref] and [DerefMut] traits are implemented.
 /// # Example
 /// ```
-/// use pmath::linalg::Vector;
+/// use pmath::algebra::linear::Vector;
 ///
 /// let vector = Vector::new([1, 2, 3]);
 /// assert_eq!(*vector, [1.0, 2.0, 3.0]);
@@ -62,7 +62,7 @@ impl<const N: usize> Vector<N> {
     /// * If the coordinates of the points cannot be converted to [f64].
     /// # Example
     /// ```
-    /// use pmath::linalg::Vector;
+    /// use pmath::algebra::linear::Vector;
     /// use pmath::geometry::Point;
     ///
     /// let point1 = Point::new([1, 2, 3]);
@@ -103,7 +103,7 @@ impl<const N: usize> Vector<N> {
     /// * If any of the vectors are zero.
     /// # Example
     /// ```
-    /// use pmath::linalg::Vector;
+    /// use pmath::algebra::linear::Vector;
     /// use std::f64::consts::FRAC_PI_2;
     ///
     /// let vector1 = Vector::new([1, 0]);
@@ -125,7 +125,7 @@ impl<const N: usize> Vector<N> {
     /// * The dot product of the two vectors.
     /// # Example
     /// ```
-    /// use pmath::linalg::Vector;
+    /// use pmath::algebra::linear::Vector;
     ///
     /// let vector1 = Vector::new([1, 2, 3]);
     /// let vector2 = Vector::new([4, 5, 6]);
@@ -144,7 +144,7 @@ impl<const N: usize> Vector<N> {
     /// * The magnitude of the vector.
     /// # Example
     /// ```
-    /// use pmath::linalg::Vector;
+    /// use pmath::algebra::linear::Vector;
     ///
     /// let vector = Vector::new([1, 2, 3]);
     /// assert_eq!(vector.magnitude(), 3.7416573867739413);
@@ -160,7 +160,7 @@ impl<const N: usize> Vector<N> {
     /// * If the vector is zero.
     /// # Example
     /// ```
-    /// use pmath::linalg::Vector;
+    /// use pmath::algebra::linear::Vector;
     ///
     /// let vector = Vector::new([1, 2, 3]);
     /// assert_eq!(*vector.normalize(), [0.2672612419124244, 0.5345224838248488, 0.8017837257372732]);
@@ -185,7 +185,7 @@ impl Vector<3> {
     /// * The cross product of two vectors.
     /// # Example
     /// ```
-    /// use pmath::linalg::Vector;
+    /// use pmath::algebra::linear::Vector;
     ///
     /// let vector1 = Vector::new([1, 0, 0]);
     /// let vector2 = Vector::new([0, 1, 0]);
@@ -342,7 +342,7 @@ impl_mul_scalar_by_vector!(
 /// Data can be accessed directly because [Deref] and [DerefMut] traits are implemented.
 /// # Example
 /// ```
-/// use pmath::linalg::{Matrix, Vector};
+/// use pmath::algebra::linear::{Matrix, Vector};
 ///
 /// let matrix = Matrix::new([[1, 2], [3, 4]]);
 /// assert_eq!(*matrix, [[1.0, 2.0], [3.0, 4.0]]);

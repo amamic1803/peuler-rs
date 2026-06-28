@@ -1,6 +1,6 @@
 use crate::Solution;
 use itertools::Itertools;
-use pmath::digits::digits_to_int;
+use pmath::digit::digits_to_int;
 use std::collections::HashSet;
 
 problem!(Problem0032, 32, "Pandigital Products");

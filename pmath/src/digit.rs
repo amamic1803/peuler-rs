@@ -1,4 +1,4 @@
-//! Functions for working with digits.
+//! Utilities for working with digits.
 
 use num_traits::{ConstOne, ConstZero, PrimInt};
 use std::borrow::Borrow;
@@ -11,7 +11,7 @@ use std::collections::HashMap;
 /// Digits are yielded in the least significant to the most significant order.
 /// # Example
 /// ```
-/// use pmath::digits::DigitsIter;
+/// use pmath::digit::DigitsIter;
 ///
 /// let mut iter = DigitsIter::new(123, 10);
 /// assert_eq!(iter.len(), 3);
@@ -154,7 +154,7 @@ where
 /// * The integer represented by the digits in the given radix.
 /// # Example
 /// ```
-/// use pmath::digits::{digits, digits_to_int};
+/// use pmath::digit::{digits, digits_to_int};
 ///
 /// let mut n = digits_to_int([3, 2, 1], 10);
 /// assert_eq!(n, 123);
@@ -201,7 +201,7 @@ where
 /// * If `radix` does not fit in the type `T`.
 /// # Example
 /// ```
-/// use pmath::digits::is_palindrome;
+/// use pmath::digit::is_palindrome;
 ///
 /// // 12321 is a palindrome
 /// assert!(is_palindrome(12321u16, 10));
@@ -258,7 +258,7 @@ where
 /// * If digits of `n` or `m` do not fit in the `usize` type.
 /// # Example
 /// ```
-/// use pmath::digits::is_permutation;
+/// use pmath::digit::is_permutation;
 ///
 /// // 123 and 321 are permutations
 /// assert!(is_permutation(123, 321, 10));
@@ -304,7 +304,7 @@ where
 /// * If `radix` does not fit in the type `T`.
 /// # Example
 /// ```
-/// use pmath::digits::reverse;
+/// use pmath::digit::reverse;
 ///
 /// // 123 -> 321
 /// assert_eq!(reverse(123u16, 10), 321);
@@ -322,12 +322,12 @@ where
 }
 
 /// Lowercase character representations of hexadecimal digits.
-pub const HEX_DIGITS_LOWER: [char; 16] = [
+pub const HEX_LOWER: [char; 16] = [
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
 ];
 
 /// Uppercase character representations of hexadecimal digits.
-pub const HEX_DIGITS_UPPER: [char; 16] = [
+pub const HEX_UPPER: [char; 16] = [
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
 ];
 

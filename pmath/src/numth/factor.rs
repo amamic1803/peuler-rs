@@ -1,6 +1,6 @@
 //! Factors and divisors of integers.
 
-use crate::primes::sieve_of_eratosthenes;
+use crate::numth::prime::sieve_of_eratosthenes;
 use num_traits::{ConstOne, ConstZero, PrimInt};
 use std::iter::Sum;
 use std::iter::from_fn;
@@ -11,7 +11,7 @@ use std::vec::IntoIter;
 /// Prime factors are yielded in ascending order.
 /// # Example
 /// ```
-/// use pmath::factors::PrimeFactors;
+/// use pmath::numth::factor::PrimeFactors;
 ///
 /// let mut iter = PrimeFactors::new(12);
 /// assert_eq!(iter.collect::<Vec<_>>(), vec![2, 2, 3]);
@@ -90,7 +90,7 @@ impl<T: PrimInt + ConstZero + ConstOne> Iterator for PrimeFactors<T> {
 /// With each factor, its multiplicity is also yielded.
 /// # Example
 /// ```
-/// use pmath::factors::DistinctPrimeFactors;
+/// use pmath::numth::factor::DistinctPrimeFactors;
 ///
 /// let mut iter = DistinctPrimeFactors::new(12);
 /// assert_eq!(iter.collect::<Vec<_>>(), vec![(2, 2), (3, 1)]);
@@ -199,7 +199,7 @@ pub fn distinct_prime_factors<T: PrimInt + ConstZero + ConstOne>(n: T) -> Distin
 /// The methods for length and summation are optimized to run in $O(1)$ time.
 /// # Example
 /// ```
-/// use pmath::factors::Divisors;
+/// use pmath::numth::factor::Divisors;
 /// use itertools::Itertools;
 ///
 /// let mut iter = Divisors::new(12);
@@ -365,7 +365,7 @@ impl<T: PrimInt + ConstOne + Sum<T>> ExactSizeIterator for Divisors<T> {}
 /// The methods for length and summation are optimized to run in $O(1)$ time.
 /// # Example
 /// ```
-/// use pmath::factors::ProperDivisors;
+/// use pmath::numth::factor::ProperDivisors;
 /// use itertools::Itertools;
 ///
 /// let mut iter = ProperDivisors::new(12);
@@ -488,7 +488,7 @@ pub fn proper_divisors<T: PrimInt + ConstZero + ConstOne>(n: T) -> ProperDivisor
 /// * If `n` cannot be converted to [usize].
 /// # Example
 /// ```
-/// use pmath::factors::num_of_divisors_0_to_n;
+/// use pmath::numth::factor::num_of_divisors_0_to_n;
 ///
 /// assert_eq!(num_of_divisors_0_to_n(10), vec![0, 1, 2, 2, 3, 2, 4, 2, 4, 3, 4]);
 /// ```
@@ -524,7 +524,7 @@ where
 /// * If `n` cannot be converted to [usize].
 /// # Example
 /// ```
-/// use pmath::factors::num_of_proper_divisors_0_to_n;
+/// use pmath::numth::factor::num_of_proper_divisors_0_to_n;
 ///
 /// assert_eq!(num_of_proper_divisors_0_to_n(10), vec![0, 0, 1, 1, 2, 1, 3, 1, 3, 2, 3]);
 /// ```
@@ -556,7 +556,7 @@ where
 /// * If `n` cannot be converted to [usize].
 /// # Example
 /// ```
-/// use pmath::factors::sum_of_divisors_0_to_n;
+/// use pmath::numth::factor::sum_of_divisors_0_to_n;
 ///
 /// assert_eq!(sum_of_divisors_0_to_n(1), vec![0, 1]);
 /// assert_eq!(sum_of_divisors_0_to_n(2), vec![0, 1, 3]);
@@ -593,7 +593,7 @@ where
 /// * If `n` cannot be converted to [usize].
 /// # Example
 /// ```
-/// use pmath::factors::sum_of_proper_divisors_0_to_n;
+/// use pmath::numth::factor::sum_of_proper_divisors_0_to_n;
 ///
 /// assert_eq!(sum_of_proper_divisors_0_to_n(1), vec![0, 0]);
 /// assert_eq!(sum_of_proper_divisors_0_to_n(2), vec![0, 0, 1]);
@@ -619,7 +619,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::primes::is_prime;
+    use crate::numth::prime::is_prime;
     use itertools::Itertools;
 
     // PrimeFactors tests

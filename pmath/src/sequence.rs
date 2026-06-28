@@ -50,7 +50,7 @@ where
 /// $$
 /// # Example
 /// ```
-/// use pmath::sequences::CollatzSeq;
+/// use pmath::sequence::CollatzSeq;
 ///
 /// assert_eq!(CollatzSeq::new(13).collect::<Vec<_>>(), vec![13, 40, 20, 10, 5, 16, 8, 4, 2, 1]);
 /// ```
@@ -113,7 +113,7 @@ impl<T> Sequence<T> for CollatzSeq<T> where T: PrimInt + ConstZero + ConstOne {}
 /// $$
 /// # Example
 /// ```
-/// use pmath::sequences::FibonacciSeq;
+/// use pmath::sequence::FibonacciSeq;
 ///
 /// assert_eq!(FibonacciSeq::new().take(10).collect::<Vec<u64>>(), vec![0, 1, 1, 2, 3, 5, 8, 13, 21, 34]);
 /// ```
@@ -187,7 +187,7 @@ impl<T> Sequence<T> for FibonacciSeq<T> where T: PrimInt + ConstZero {}
 /// $$
 /// # Example
 /// ```
-/// use pmath::sequences::{NatNumSeq, Sequence};
+/// use pmath::sequence::{NatNumSeq, Sequence};
 ///
 /// let mut nat = NatNumSeq::<u32>::new();
 /// let mut seq = Vec::new();
@@ -267,7 +267,7 @@ where
 /// $$
 /// # Example
 /// ```
-/// use pmath::sequences::{NatNumW0Seq, Sequence};
+/// use pmath::sequence::{NatNumW0Seq, Sequence};
 ///
 /// let mut nat_zero = NatNumW0Seq::<u32>::new();
 /// assert_eq!(nat_zero.sum_next_n(5), 10);
@@ -348,7 +348,7 @@ where
 /// $$
 /// # Example
 /// ```
-/// use pmath::sequences::{OddNatNumSeq, Sequence};
+/// use pmath::sequence::{OddNatNumSeq, Sequence};
 ///
 /// let mut odd_nat = OddNatNumSeq::<i32>::new();
 /// assert_eq!(odd_nat.sum_next_n(5), 25);
@@ -427,7 +427,7 @@ where
 /// $$
 /// # Example
 /// ```
-/// use pmath::sequences::{EvenNatNumSeq, Sequence};
+/// use pmath::sequence::{EvenNatNumSeq, Sequence};
 ///
 /// let mut even_nat = EvenNatNumSeq::<i32>::new();
 /// assert_eq!(even_nat.sum_next_n(5), 30);
@@ -508,7 +508,7 @@ where
 /// $$
 /// # Example
 /// ```
-/// use pmath::sequences::{EvenNatNumW0Seq, Sequence};
+/// use pmath::sequence::{EvenNatNumW0Seq, Sequence};
 ///
 /// let mut even_nat = EvenNatNumW0Seq::<i32>::new();
 /// assert_eq!(even_nat.sum_next_n(5), 20);
@@ -589,7 +589,7 @@ where
 /// $$
 /// # Example
 /// ```
-/// use pmath::sequences::{NatNumSqSeq, Sequence};
+/// use pmath::sequence::{NatNumSqSeq, Sequence};
 ///
 /// let mut squared_seq = NatNumSqSeq::<u32>::new();
 /// assert_eq!(squared_seq.sum_next_n(5), 55);
@@ -663,7 +663,7 @@ where
 /// $$
 /// # Example
 /// ```
-/// use pmath::sequences::{NatNumW0SqSeq, Sequence};
+/// use pmath::sequence::{NatNumW0SqSeq, Sequence};
 ///
 /// let mut squared_seq = NatNumW0SqSeq::<u32>::new();
 /// assert_eq!(squared_seq.sum_next_n(5), 30);
@@ -743,7 +743,7 @@ where
 /// $$
 /// # Example
 /// ```
-/// use pmath::sequences::{OddNatNumSqSeq, Sequence};
+/// use pmath::sequence::{OddNatNumSqSeq, Sequence};
 ///
 /// let mut squared_seq = OddNatNumSqSeq::<u32>::new();
 /// let mut seq = Vec::new();
@@ -827,7 +827,7 @@ where
 /// $$
 /// # Example
 /// ```
-/// use pmath::sequences::{EvenNatNumSqSeq, Sequence};
+/// use pmath::sequence::{EvenNatNumSqSeq, Sequence};
 ///
 /// let mut squared_seq = EvenNatNumSqSeq::<u32>::new();
 /// let mut seq = Vec::new();
@@ -909,7 +909,7 @@ where
 /// $$
 /// # Example
 /// ```
-/// use pmath::sequences::{EvenNatNumW0SqSeq, Sequence};
+/// use pmath::sequence::{EvenNatNumW0SqSeq, Sequence};
 ///
 /// let mut squared_seq = EvenNatNumW0SqSeq::<u32>::new();
 /// let mut seq = Vec::new();

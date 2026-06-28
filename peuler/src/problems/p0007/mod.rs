@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::primes::{apcf, sieve_of_eratosthenes};
+use pmath::numth::prime::{apcf, sieve_of_eratosthenes};
 
 problem!(Problem0007, 7, "10001st Prime");
 

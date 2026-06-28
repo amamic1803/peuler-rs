@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::primes::sieve_of_eratosthenes;
+use pmath::numth::prime::sieve_of_eratosthenes;
 
 problem!(Problem0010, 10, "Summation of Primes");
 
