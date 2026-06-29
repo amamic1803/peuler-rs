@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::phi_0_to_n;
+use pmath::numth::totient::phi_0_to_n;
 
 problem!(Problem0069, 69, "Totient Maximum");
 

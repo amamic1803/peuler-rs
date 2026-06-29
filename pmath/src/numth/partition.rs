@@ -24,7 +24,7 @@ use crate::numth::prime::sieve_of_eratosthenes;
 /// * If `n` is too large to fit in a [usize].
 /// # Example
 /// ```
-/// use pmath::partition_p;
+/// use pmath::numth::partition::partition_p;
 ///
 /// // Partitions of 5:
 /// // {5}
@@ -61,7 +61,7 @@ where
 /// * If `n` cannot be converted to [usize].
 /// # Example
 /// ```
-/// use pmath::partition_p_0_to_n;
+/// use pmath::numth::partition::partition_p_0_to_n;
 ///
 /// assert_eq!(partition_p_0_to_n(10), vec![1, 1, 2, 3, 5, 7, 11, 15, 22, 30, 42]);
 /// ```
@@ -130,7 +130,7 @@ where
 /// * If `n` is `0`, the function returns `1` (the empty partition $\\{\\}$).
 /// # Example
 /// ```
-/// use pmath::partition_prime;
+/// use pmath::numth::partition::partition_prime;
 ///
 /// // Prime partitions of 7: {7}, {5, 2}, {3, 2, 2}
 /// assert_eq!(partition_prime(7), 3);
@@ -158,7 +158,7 @@ where
 /// * If `n` cannot be converted to [usize].
 /// # Example
 /// ```
-/// use pmath::partition_prime_0_to_n;
+/// use pmath::numth::partition::partition_prime_0_to_n;
 ///
 /// assert_eq!(partition_prime_0_to_n(10), vec![1, 0, 1, 1, 1, 2, 2, 3, 3, 4, 5]);
 /// ```

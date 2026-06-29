@@ -15,7 +15,7 @@ use crate::core::{gcd, gcd_extended};
 /// $$
 /// # Example
 /// ```
-/// use pmath::CongruenceRelation;
+/// use pmath::numth::modular::CongruenceRelation;
 ///
 /// let c1 = CongruenceRelation::new(3, 5); // 3 === 3 (mod 5)
 /// let c2 = CongruenceRelation::new(8, 5); // 8 === 3 (mod 5)
@@ -84,7 +84,7 @@ where
 /// * If any of the moduli are negative.
 /// # Example
 /// ```
-/// use pmath::{system_of_linear_congruences, CongruenceRelation};
+/// use pmath::numth::modular::{system_of_linear_congruences, CongruenceRelation};
 ///
 /// let congruences = [
 ///    CongruenceRelation::new(9, 10),
@@ -165,7 +165,7 @@ where
 /// * If `a` and `n` are not coprime.
 /// # Example
 /// ```
-/// use pmath::ord;
+/// use pmath::numth::modular::ord;
 ///
 /// // ord(3, 7) = 6
 /// assert_eq!(ord(3, 7), 6);

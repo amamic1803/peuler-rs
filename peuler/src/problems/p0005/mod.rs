@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::lcm_multiple;
+use pmath::core::lcm_multiple;
 
 problem!(Problem0005, 5, "Smallest Multiple");
 

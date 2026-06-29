@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::SimpleContinuedFraction;
+use pmath::numth::continued_fraction::SimpleContinuedFraction;
 
 problem!(Problem0064, 64, "Odd Period Square Roots");
 

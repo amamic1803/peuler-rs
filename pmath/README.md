@@ -17,8 +17,9 @@ but has since evolved into a standalone crate.
 
 ## Example
 ```rust
-use pmath::{gcd, ord};
-use pmath::primes::is_prime;
+use pmath::core::gcd;
+use pmath::numth::modular::ord;
+use pmath::numth::prime::is_prime;
 
 assert_eq!(gcd(48, 18), 6);
 assert_eq!(ord(3, 7), 6);

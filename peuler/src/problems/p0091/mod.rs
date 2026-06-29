@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::gcd;
+use pmath::core::gcd;
 use std::cmp::min;
 
 problem!(Problem0091, 91, "Right Triangles with Integer Coordinates");

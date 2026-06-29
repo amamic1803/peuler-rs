@@ -1,5 +1,6 @@
 use crate::Solution;
-use pmath::{factorial_0_to_n, newtons_method};
+use pmath::core::factorial_0_to_n;
+use pmath::analysis::root::newtons_method;
 
 problem!(Problem0034, 34, "Digit Factorials");
 

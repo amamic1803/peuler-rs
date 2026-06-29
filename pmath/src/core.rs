@@ -1,4 +1,4 @@
-//! Core utilities
+//! Core mathematical functions.
 
 use std::borrow::Borrow;
 use num_traits::{ConstOne, ConstZero, PrimInt, Signed};
@@ -22,7 +22,7 @@ use num_traits::{ConstOne, ConstZero, PrimInt, Signed};
 /// * If `n` is negative.
 /// # Example
 /// ```
-/// use pmath::factorial;
+/// use pmath::core::factorial;
 ///
 /// // 5! = 120
 /// assert_eq!(factorial(5), 120);
@@ -55,7 +55,7 @@ where
 /// * If `n` cannot be converted to [usize].
 /// # Example
 /// ```
-/// use pmath::factorial_0_to_n;
+/// use pmath::core::factorial_0_to_n;
 ///
 /// assert_eq!(factorial_0_to_n(5), vec![1, 1, 2, 6, 24, 120]);
 /// ```
@@ -84,7 +84,7 @@ where
 /// * If `n` is negative.
 /// # Example
 /// ```
-/// use pmath::isqrt;
+/// use pmath::core::isqrt;
 ///
 /// // isqrt of 12 is 3
 /// assert_eq!(isqrt(12), 3);
@@ -122,7 +122,7 @@ where
 /// * If either of the integers is negative.
 /// # Example
 /// ```
-/// use pmath::gcd;
+/// use pmath::core::gcd;
 ///
 /// // gcd of 12 and 18 is 6
 /// assert_eq!(gcd(12, 18), 6);
@@ -156,7 +156,7 @@ where
 /// * If any of the integers are negative.
 /// # Example
 /// ```
-/// use pmath::gcd_multiple;
+/// use pmath::core::gcd_multiple;
 ///
 /// // gcd of 12, 18 and 24 is 6
 /// assert_eq!(gcd_multiple([12, 18, 24]), 6);
@@ -204,7 +204,7 @@ where
 /// * If either of the integers is negative.
 /// # Example
 /// ```
-/// use pmath::gcd_extended;
+/// use pmath::core::gcd_extended;
 ///
 /// assert_eq!(gcd_extended(12, 18), (6, -1, 1));  // 12 * -1 + 18 * 1 = 6
 /// assert_eq!(gcd_extended(0, 0), (0, 1, 0));     // 0 * 1 + 0 * 0 = 0
@@ -254,7 +254,7 @@ where
 /// * If either of the integers is negative.
 /// # Example
 /// ```
-/// use pmath::lcm;
+/// use pmath::core::lcm;
 ///
 /// // lcm of 12 and 18 is 36
 /// assert_eq!(lcm(12, 18), 36);
@@ -284,7 +284,7 @@ where
 /// * If any of the integers are negative.
 /// # Example
 /// ```
-/// use pmath::lcm_multiple;
+/// use pmath::core::lcm_multiple;
 ///
 /// // lcm of 12, 18 and 24 is 72
 /// assert_eq!(lcm_multiple([12, 18, 24]), 72);
@@ -320,11 +320,13 @@ mod tests {
     #[test]
     #[should_panic]
     fn factorial_negative() {
+        //! Test that [factorial] panics when called with negative argument.
         factorial(-1);
     }
 
     #[test]
     fn factorial_primitive_types() {
+        //! Test that [factorial] works with primitive types.
         // unsigned types
         assert_eq!(factorial(5u8), 120);
         assert_eq!(factorial(5u16), 120);
@@ -344,6 +346,7 @@ mod tests {
 
     #[test]
     fn factorial_verify() {
+        //! Verify correctness of [factorial].
         let mut f = 1;
         assert_eq!(factorial(0), f);
         for i in 1..=10 {
@@ -357,11 +360,13 @@ mod tests {
     #[test]
     #[should_panic]
     fn factorial_0_to_n_negative() {
+        //! Test that [factorial_0_to_n] panics when called with negative argument.
         factorial_0_to_n(-1);
     }
 
     #[test]
     fn factorial_0_to_n_primitive_types() {
+        //! Test that [factorial_0_to_n] works with primitive types.
         // unsigned types
         assert_eq!(factorial_0_to_n(5u8)[5], 120);
         assert_eq!(factorial_0_to_n(5u16)[5], 120);
@@ -381,6 +386,7 @@ mod tests {
 
     #[test]
     fn factorial_0_to_n_verify() {
+        //! Verify the correctness of [factorial_0_to_n].
         assert_eq!(factorial_0_to_n(0), vec![1]);
         assert_eq!(factorial_0_to_n(5), vec![1, 1, 2, 6, 24, 120]);
     }
@@ -389,6 +395,7 @@ mod tests {
 
     #[test]
     fn isqrt_verify() {
+        //! Verify the correctness of [isqrt].
         assert_eq!(isqrt(0), 0);
         assert_eq!(isqrt(1), 1);
         assert_eq!(isqrt(2), 1);
@@ -420,11 +427,13 @@ mod tests {
     #[test]
     #[should_panic]
     fn isqrt_negative() {
+        //! Test that [isqrt] panics when called with negative argument.
         isqrt(-1);
     }
 
     #[test]
     fn isqrt_primitive_types() {
+        //! Test that [isqrt] works with negative arguments.
         // unsigned types
         assert_eq!(isqrt(16u8), 4);
         assert_eq!(isqrt(16u16), 4);
@@ -447,22 +456,26 @@ mod tests {
     #[test]
     #[should_panic]
     fn gcd_negative() {
+        //! Test that [gcd] panics when called with negative argument.
         gcd(-1, 5);
     }
 
     #[test]
     fn gcd_zeros() {
+        //! Test that [gcd] outputs 0 when given zeros as arguments.
         assert_eq!(gcd(0, 0), 0);
     }
 
     #[test]
     fn gcd_zero() {
+        //! Test that [gcd] gives correct output when given 0 as one of the arguments.
         assert_eq!(gcd(0, 10), 10);
         assert_eq!(gcd(10, 0), 10);
     }
 
     #[test]
     fn gcd_primitive_types() {
+        //! Test that [gcd] works with primitive types.
         // unsigned types
         assert_eq!(gcd(12u8, 18u8), 6);
         assert_eq!(gcd(12u16, 18u16), 6);
@@ -482,6 +495,7 @@ mod tests {
 
     #[test]
     fn gcd_verify() {
+        //! Verify the correctness of [gcd].
         assert_eq!(gcd(25, 5), 5);
         assert_eq!(gcd(250, 5), 5);
         assert_eq!(gcd(12, 52), 4);
@@ -489,16 +503,129 @@ mod tests {
         assert_eq!(gcd(342, 456), 114);
     }
 
+    // gcd multiple
+
+    #[test]
+    #[should_panic]
+    fn gcd_multiple_negative() {
+        //! Test that [gcd_multiple] panics when given negative input.
+        gcd_multiple([-1, 5, 10]);
+    }
+
+    #[test]
+    fn gcd_multiple_zeros() {
+        //! Test that [gcd_multiple] gives 0 as output when given zeros as input.
+        assert_eq!(gcd_multiple([0, 0, 0]), 0);
+    }
+
+    #[test]
+    fn gcd_multiple_zero() {
+        //! Test that [gcd_multiple] gives correct output when given zero as one of the inputs.
+        assert_eq!(gcd_multiple([5, 0, 10]), 5);
+    }
+
+    #[test]
+    fn gcd_multiple_primitive_types() {
+        //! Test that [gcd_multiple] works with primitive types.
+        // unsigned types
+        assert_eq!(gcd_multiple([12u8, 18u8, 24u8]), 6);
+        assert_eq!(gcd_multiple([12u16, 18u16, 24u16]), 6);
+        assert_eq!(gcd_multiple([12u32, 18u32, 24u32]), 6);
+        assert_eq!(gcd_multiple([12u64, 18u64, 24u64]), 6);
+        assert_eq!(gcd_multiple([12u128, 18u128, 24u128]), 6);
+        assert_eq!(gcd_multiple([12usize, 18usize, 24usize]), 6);
+
+        // signed types
+        assert_eq!(gcd_multiple([12i8, 18i8, 24i8]), 6);
+        assert_eq!(gcd_multiple([12i16, 18i16, 24i16]), 6);
+        assert_eq!(gcd_multiple([12i32, 18i32, 24i32]), 6);
+        assert_eq!(gcd_multiple([12i64, 18i64, 24i64]), 6);
+        assert_eq!(gcd_multiple([12i128, 18i128, 24i128]), 6);
+        assert_eq!(gcd_multiple([12isize, 18isize, 24isize]), 6);
+    }
+
+    #[test]
+    fn gcd_multiple_iterables() {
+        //! Test that [gcd_multiple] works with various iterable arguments.
+        let args = [12, 18, 24];
+        assert_eq!(gcd_multiple(args), 6);
+        assert_eq!(gcd_multiple::<i32, _, _>(&args), 6);
+        assert_eq!(gcd_multiple(args.into_iter()), 6);
+        assert_eq!(gcd_multiple::<i32, _, _>(args.iter()), 6);
+        assert_eq!(gcd_multiple(args.to_vec()), 6);
+    }
+
+    #[test]
+    fn gcd_multiple_verify() {
+        //! Verify the correctness of [gcd_multiple].
+        assert_eq!(gcd_multiple([12, 18, 24]), 6);
+        assert_eq!(gcd_multiple([18, 24, 12]), 6);
+        assert_eq!(gcd_multiple([12, 52, 104]), 4);
+        assert_eq!(gcd_multiple([52, 12, 104]), 4);
+        assert_eq!(gcd_multiple([342, 456, 114]), 114);
+    }
+
+    // gcd extended
+
+    #[test]
+    #[should_panic]
+    fn gcd_extended_negative() {
+        //! Test that [gcd_extended] panics when given negative input.
+        gcd_extended(5, -1);
+    }
+
+    #[test]
+    fn gcd_extended_zeros() {
+        //! Test that [gcd_extended] gives 0 as output, when give zeros as input.
+        assert_eq!(gcd_extended(0, 0).0, 0);
+    }
+
+    #[test]
+    fn gcd_extended_zero() {
+        //! Test that [gcd_extended] gives correct output when given zero as one of the inputs.
+        let (g, _, y) = gcd_extended(0, 3);
+        assert_eq!(g, 3);
+        assert_eq!(y, 1);
+        let (g, x, _) = gcd_extended(3, 0);
+        assert_eq!(g, 3);
+        assert_eq!(x, 1);
+    }
+
+    #[test]
+    fn gcd_extended_primitive_types() {
+        //! Test that [gcd_extended] works with primitive types.
+        assert_eq!(gcd_extended(12i8, 18i8), (6, -1, 1));
+        assert_eq!(gcd_extended(12i16, 18i16), (6, -1, 1));
+        assert_eq!(gcd_extended(12i32, 18i32), (6, -1, 1));
+        assert_eq!(gcd_extended(12i64, 18i64), (6, -1, 1));
+        assert_eq!(gcd_extended(12i128, 18i128), (6, -1, 1));
+        assert_eq!(gcd_extended(12isize, 18isize), (6, -1, 1));
+    }
+
+    #[test]
+    fn gcd_extended_verify() {
+        //! Verify the correctness of [gcd_extended].
+        for i in 0..=100 {
+            for j in 0..=100 {
+                let (g, x, y) = gcd_extended(i, j);
+                assert_eq!(g, gcd(i, j));
+                assert_eq!(i * x + j * y, g);
+            }
+        }
+    }
+
     // lcm
 
     #[test]
     #[should_panic]
     fn lcm_negative() {
+        //! Test that [lcm] panics when given negative input.
         lcm(-1, 5);
     }
 
     #[test]
     fn lcm_zero() {
+        //! Test that [lcm] gives correct output for zero inputs.
         assert_eq!(lcm(0, 10), 0);
         assert_eq!(lcm(10, 0), 0);
         assert_eq!(lcm(0, 0), 0);
@@ -506,6 +633,7 @@ mod tests {
 
     #[test]
     fn lcm_primitive_types() {
+        //! Test that [lcm] works with primitive types.
         // unsigned types
         assert_eq!(lcm(12u8, 18u8), 36);
         assert_eq!(lcm(12u16, 18u16), 36);
@@ -525,6 +653,7 @@ mod tests {
 
     #[test]
     fn lcm_verify() {
+        //! Verify the correctness of [lcm].
         assert_eq!(lcm(12, 18), 36);
         assert_eq!(lcm(18, 12), 36);
         assert_eq!(lcm(12, 52), 156);
@@ -533,5 +662,61 @@ mod tests {
         assert_eq!(lcm(456, 342), 1368);
         assert_eq!(lcm(1, 66), 66);
         assert_eq!(lcm(66, 1), 66);
+    }
+
+    // lcm multiple
+
+    #[test]
+    #[should_panic]
+    fn lcm_multiple_negative() {
+        //! Test that [lcm_multiple] panics when given negative input.
+        lcm_multiple([-1, 18, 24]);
+    }
+
+    #[test]
+    fn lcm_multiple_zero() {
+        //! Test that [lcm_multiple] gives correct output when given zero inputs.
+        assert_eq!(lcm_multiple([0, 18, 24]), 0);
+    }
+
+    #[test]
+    fn lcm_multiple_primitive_types() {
+        //! Test that [lcm_multiple] works with primitive types.
+        // unsigned types
+        assert_eq!(lcm_multiple([12u8, 18u8, 24u8]), 72);
+        assert_eq!(lcm_multiple([12u16, 18u16, 24u16]), 72);
+        assert_eq!(lcm_multiple([12u32, 18u32, 24u32]), 72);
+        assert_eq!(lcm_multiple([12u64, 18u64, 24u64]), 72);
+        assert_eq!(lcm_multiple([12u128, 18u128, 24u128]), 72);
+        assert_eq!(lcm_multiple([12usize, 18usize, 24usize]), 72);
+
+        // signed types
+        assert_eq!(lcm_multiple([12i8, 18i8, 24i8]), 72);
+        assert_eq!(lcm_multiple([12i16, 18i16, 24i16]), 72);
+        assert_eq!(lcm_multiple([12i32, 18i32, 24i32]), 72);
+        assert_eq!(lcm_multiple([12i64, 18i64, 24i64]), 72);
+        assert_eq!(lcm_multiple([12i128, 18i128, 24i128]), 72);
+        assert_eq!(lcm_multiple([12isize, 18isize, 24isize]), 72);
+    }
+
+    #[test]
+    fn lcm_multiple_iterables() {
+        //! Test that [lcm_multiple] works with various iterables.
+        let args = [12, 18, 24];
+        assert_eq!(lcm_multiple(args), 72);
+        assert_eq!(lcm_multiple(args.into_iter()), 72);
+        assert_eq!(lcm_multiple(args.to_vec()), 72);
+        assert_eq!(lcm_multiple::<i32, _, _>(&args), 72);
+        assert_eq!(lcm_multiple::<i32, _, _>(args.iter()), 72);
+    }
+
+    #[test]
+    fn lcm_multiple_verify() {
+        //! Verify the correctness of [lcm_multiple].
+        assert_eq!(lcm_multiple([12, 18, 24]), 72);
+        assert_eq!(lcm_multiple([18, 12, 24]), 72);
+        assert_eq!(lcm_multiple([12, 52, 104]), 312);
+        assert_eq!(lcm_multiple([52, 12, 104]), 312);
+        assert_eq!(lcm_multiple([342, 456, 114]), 1368);
     }
 }

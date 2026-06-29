@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::newtons_method;
+use pmath::analysis::root::newtons_method;
 
 problem!(Problem0063, 63, "Powerful Digit Counts");
 

@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::isqrt;
+use pmath::core::isqrt;
 
 problem!(Problem0100, 100, "Arranged Probability");
 

@@ -355,10 +355,10 @@ where
 /// # Example
 /// ```
 /// use pmath::probability::distribution::{
-///     CustomDiscreteFinite, Distribution, DiscreteDistribution
+///     DiscreteCustomFinite, Distribution, DiscreteDistribution
 /// };
 ///
-/// let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
+/// let dist = DiscreteCustomFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
 /// assert!((dist.cdf(1) - 0.25).abs() < 1e-10);
 /// assert!((dist.cdf(2) - 0.75).abs() < 1e-10);
 /// assert!((dist.cdf(3) - 1.0).abs() < 1e-10);
@@ -369,11 +369,11 @@ where
 /// assert!((dist.variance().unwrap() - 0.5).abs() < 1e-10);
 /// assert!((dist.stddev().unwrap() - 0.5f64.sqrt()).abs() < 1e-10);
 /// ```
-pub struct CustomDiscreteFinite<T> {
+pub struct DiscreteCustomFinite<T> {
     items_map: HashMap<T, usize>,  // (value, index in items_vec)
     items_vec: Vec<(T, f64, f64)>, // (value, probability, cumulative_probability before this value)
 }
-impl<T> CustomDiscreteFinite<T>
+impl<T> DiscreteCustomFinite<T>
 where
     T: Ord + Hash + Copy + ToPrimitive,
 {
@@ -381,7 +381,7 @@ where
     /// # Arguments
     /// * `items` - An iterable collection of tuples where each tuple is `(value, probability)`.
     /// # Returns
-    /// * A new [CustomDiscreteFinite] distribution.
+    /// * A new [DiscreteCustomFinite] distribution.
     /// # Panics
     /// * If any probability is negative.
     /// * If the sum of all probabilities is `0`.
@@ -447,7 +447,7 @@ where
         self.items_vec.iter().map(|(val, prob, _)| (*val, *prob))
     }
 }
-impl<T> Distribution<T> for CustomDiscreteFinite<T>
+impl<T> Distribution<T> for DiscreteCustomFinite<T>
 where
     T: ToPrimitive + Copy,
 {
@@ -502,7 +502,7 @@ where
         Some(ex2 - self.mean()?.powi(2))
     }
 }
-impl<T> RandDistribution<T> for CustomDiscreteFinite<T>
+impl<T> RandDistribution<T> for DiscreteCustomFinite<T>
 where
     T: ToPrimitive + Copy,
 {
@@ -511,7 +511,7 @@ where
         self.items_vec[self.items_vec.partition_point(|item| item.2 <= rand_float) - 1].0
     }
 }
-impl<T> DiscreteDistribution<T> for CustomDiscreteFinite<T>
+impl<T> DiscreteDistribution<T> for DiscreteCustomFinite<T>
 where
     T: ToPrimitive + Copy + Hash + Eq,
 {
@@ -869,13 +869,13 @@ mod tests {
         assert_float_absolute_eq!(variance, 8.25, 0.05);
     }
 
-    // custom discrete finite distribution tests
+    // discrete custom finite distribution tests
 
     #[test]
-    fn custom_discrete_finite_new() {
-        //! Test that [CustomDiscreteFinite::new] creates a new distribution with the correct parameters.
+    fn discrete_custom_finite_new() {
+        //! Test that [DiscreteCustomFinite::new] creates a new distribution with the correct parameters.
 
-        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
         let items: Vec<(i32, f64)> = dist.items().collect();
         assert_eq!(items.len(), 3);
         assert_eq!(items[0].0, 1);
@@ -888,25 +888,25 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn custom_discrete_finite_new_negative_probability() {
-        //! Test that [CustomDiscreteFinite::new] panics when any probability is negative.
+    fn discrete_custom_finite_new_negative_probability() {
+        //! Test that [DiscreteCustomFinite::new] panics when any probability is negative.
 
-        CustomDiscreteFinite::new([(1, 0.5), (2, -0.1)]);
+        DiscreteCustomFinite::new([(1, 0.5), (2, -0.1)]);
     }
 
     #[test]
     #[should_panic]
-    fn custom_discrete_finite_new_zero_total_weight() {
-        //! Test that [CustomDiscreteFinite::new] panics when the sum of all probabilities is zero.
+    fn discrete_custom_finite_new_zero_total_weight() {
+        //! Test that [DiscreteCustomFinite::new] panics when the sum of all probabilities is zero.
 
-        CustomDiscreteFinite::new([(1, 0.0), (2, 0.0)]);
+        DiscreteCustomFinite::new([(1, 0.0), (2, 0.0)]);
     }
 
     #[test]
-    fn custom_discrete_finite_new_non_normalized_probabilities() {
-        //! Test that [CustomDiscreteFinite::new] correctly normalizes probabilities that don't sum to 1.
+    fn discrete_custom_finite_new_non_normalized_probabilities() {
+        //! Test that [DiscreteCustomFinite::new] correctly normalizes probabilities that don't sum to 1.
 
-        let dist = CustomDiscreteFinite::new([(1, 1.0), (2, 2.0), (3, 1.0)]);
+        let dist = DiscreteCustomFinite::new([(1, 1.0), (2, 2.0), (3, 1.0)]);
         let items: Vec<(i32, f64)> = dist.items().collect();
         assert_eq!(items.len(), 3);
         assert_eq!(items[0].0, 1);
@@ -918,12 +918,12 @@ mod tests {
     }
 
     #[test]
-    fn custom_discrete_finite_primitive_types() {
-        //! Test that [CustomDiscreteFinite::new] works with primitive types that can be converted to [f64].
+    fn discrete_custom_finite_primitive_types() {
+        //! Test that [DiscreteCustomFinite::new] works with primitive types that can be converted to [f64].
 
         // unsigned types
 
-        let dist = CustomDiscreteFinite::new([(1u8, 0.25), (2u8, 0.5), (3u8, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1u8, 0.25), (2u8, 0.5), (3u8, 0.25)]);
         let items: Vec<(u8, f64)> = dist.items().collect();
         assert_eq!(items.len(), 3);
         assert_eq!(items[0].0, 1);
@@ -932,7 +932,7 @@ mod tests {
         assert_float_absolute_eq!(items[1].1, 0.5);
         assert_eq!(items[2].0, 3);
         assert_float_absolute_eq!(items[2].1, 0.25);
-        let dist = CustomDiscreteFinite::new([(1u16, 0.25), (2u16, 0.5), (3u16, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1u16, 0.25), (2u16, 0.5), (3u16, 0.25)]);
         let items: Vec<(u16, f64)> = dist.items().collect();
         assert_eq!(items.len(), 3);
         assert_eq!(items[0].0, 1);
@@ -941,7 +941,7 @@ mod tests {
         assert_float_absolute_eq!(items[1].1, 0.5);
         assert_eq!(items[2].0, 3);
         assert_float_absolute_eq!(items[2].1, 0.25);
-        let dist = CustomDiscreteFinite::new([(1u32, 0.25), (2u32, 0.5), (3u32, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1u32, 0.25), (2u32, 0.5), (3u32, 0.25)]);
         let items: Vec<(u32, f64)> = dist.items().collect();
         assert_eq!(items.len(), 3);
         assert_eq!(items[0].0, 1);
@@ -950,7 +950,7 @@ mod tests {
         assert_float_absolute_eq!(items[1].1, 0.5);
         assert_eq!(items[2].0, 3);
         assert_float_absolute_eq!(items[2].1, 0.25);
-        let dist = CustomDiscreteFinite::new([(1u64, 0.25), (2u64, 0.5), (3u64, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1u64, 0.25), (2u64, 0.5), (3u64, 0.25)]);
         let items: Vec<(u64, f64)> = dist.items().collect();
         assert_eq!(items.len(), 3);
         assert_eq!(items[0].0, 1);
@@ -959,7 +959,7 @@ mod tests {
         assert_float_absolute_eq!(items[1].1, 0.5);
         assert_eq!(items[2].0, 3);
         assert_float_absolute_eq!(items[2].1, 0.25);
-        let dist = CustomDiscreteFinite::new([(1u128, 0.25), (2u128, 0.5), (3u128, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1u128, 0.25), (2u128, 0.5), (3u128, 0.25)]);
         let items: Vec<(u128, f64)> = dist.items().collect();
         assert_eq!(items.len(), 3);
         assert_eq!(items[0].0, 1);
@@ -968,7 +968,7 @@ mod tests {
         assert_float_absolute_eq!(items[1].1, 0.5);
         assert_eq!(items[2].0, 3);
         assert_float_absolute_eq!(items[2].1, 0.25);
-        let dist = CustomDiscreteFinite::new([(1usize, 0.25), (2usize, 0.5), (3usize, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1usize, 0.25), (2usize, 0.5), (3usize, 0.25)]);
         let items: Vec<(usize, f64)> = dist.items().collect();
         assert_eq!(items.len(), 3);
         assert_eq!(items[0].0, 1);
@@ -979,7 +979,7 @@ mod tests {
         assert_float_absolute_eq!(items[2].1, 0.25);
 
         // signed types
-        let dist = CustomDiscreteFinite::new([(1i8, 0.25), (2i8, 0.5), (3i8, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1i8, 0.25), (2i8, 0.5), (3i8, 0.25)]);
         let items: Vec<(i8, f64)> = dist.items().collect();
         assert_eq!(items.len(), 3);
         assert_eq!(items[0].0, 1);
@@ -988,7 +988,7 @@ mod tests {
         assert_float_absolute_eq!(items[1].1, 0.5);
         assert_eq!(items[2].0, 3);
         assert_float_absolute_eq!(items[2].1, 0.25);
-        let dist = CustomDiscreteFinite::new([(1i16, 0.25), (2i16, 0.5), (3i16, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1i16, 0.25), (2i16, 0.5), (3i16, 0.25)]);
         let items: Vec<(i16, f64)> = dist.items().collect();
         assert_eq!(items.len(), 3);
         assert_eq!(items[0].0, 1);
@@ -997,7 +997,7 @@ mod tests {
         assert_float_absolute_eq!(items[1].1, 0.5);
         assert_eq!(items[2].0, 3);
         assert_float_absolute_eq!(items[2].1, 0.25);
-        let dist = CustomDiscreteFinite::new([(1i32, 0.25), (2i32, 0.5), (3i32, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1i32, 0.25), (2i32, 0.5), (3i32, 0.25)]);
         let items: Vec<(i32, f64)> = dist.items().collect();
         assert_eq!(items.len(), 3);
         assert_eq!(items[0].0, 1);
@@ -1006,7 +1006,7 @@ mod tests {
         assert_float_absolute_eq!(items[1].1, 0.5);
         assert_eq!(items[2].0, 3);
         assert_float_absolute_eq!(items[2].1, 0.25);
-        let dist = CustomDiscreteFinite::new([(1i64, 0.25), (2i64, 0.5), (3i64, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1i64, 0.25), (2i64, 0.5), (3i64, 0.25)]);
         let items: Vec<(i64, f64)> = dist.items().collect();
         assert_eq!(items.len(), 3);
         assert_eq!(items[0].0, 1);
@@ -1015,7 +1015,7 @@ mod tests {
         assert_float_absolute_eq!(items[1].1, 0.5);
         assert_eq!(items[2].0, 3);
         assert_float_absolute_eq!(items[2].1, 0.25);
-        let dist = CustomDiscreteFinite::new([(1i128, 0.25), (2i128, 0.5), (3i128, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1i128, 0.25), (2i128, 0.5), (3i128, 0.25)]);
         let items: Vec<(i128, f64)> = dist.items().collect();
         assert_eq!(items.len(), 3);
         assert_eq!(items[0].0, 1);
@@ -1024,7 +1024,7 @@ mod tests {
         assert_float_absolute_eq!(items[1].1, 0.5);
         assert_eq!(items[2].0, 3);
         assert_float_absolute_eq!(items[2].1, 0.25);
-        let dist = CustomDiscreteFinite::new([(1isize, 0.25), (2isize, 0.5), (3isize, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1isize, 0.25), (2isize, 0.5), (3isize, 0.25)]);
         let items: Vec<(isize, f64)> = dist.items().collect();
         assert_eq!(items.len(), 3);
         assert_eq!(items[0].0, 1);
@@ -1036,17 +1036,17 @@ mod tests {
     }
 
     #[test]
-    fn custom_discrete_finite_cdf() {
-        //! Test that [CustomDiscreteFinite::cdf] returns the correct value.
+    fn discrete_custom_finite_cdf() {
+        //! Test that [DiscreteCustomFinite::cdf] returns the correct value.
 
-        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
         assert_float_absolute_eq!(dist.cdf(0), 0.0);
         assert_float_absolute_eq!(dist.cdf(1), 0.25);
         assert_float_absolute_eq!(dist.cdf(2), 0.75);
         assert_float_absolute_eq!(dist.cdf(3), 1.0);
         assert_float_absolute_eq!(dist.cdf(4), 1.0);
 
-        let dist = CustomDiscreteFinite::new([(1, 0.25), (3, 0.5), (5, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.25), (3, 0.5), (5, 0.25)]);
         assert_float_absolute_eq!(dist.cdf(0), 0.0);
         assert_float_absolute_eq!(dist.cdf(1), 0.25);
         assert_float_absolute_eq!(dist.cdf(2), 0.25);
@@ -1054,7 +1054,7 @@ mod tests {
         assert_float_absolute_eq!(dist.cdf(4), 0.75);
         assert_float_absolute_eq!(dist.cdf(5), 1.0);
 
-        let dist = CustomDiscreteFinite::new([(-1, 0.25), (0, 0.5), (1, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(-1, 0.25), (0, 0.5), (1, 0.25)]);
         assert_float_absolute_eq!(dist.cdf(-2), 0.0);
         assert_float_absolute_eq!(dist.cdf(-1), 0.25);
         assert_float_absolute_eq!(dist.cdf(0), 0.75);
@@ -1063,86 +1063,86 @@ mod tests {
     }
 
     #[test]
-    fn custom_discrete_finite_mean() {
-        //! Test that [CustomDiscreteFinite::mean] returns the correct value.
+    fn discrete_custom_finite_mean() {
+        //! Test that [DiscreteCustomFinite::mean] returns the correct value.
 
-        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
         assert_float_absolute_eq!(dist.mean().unwrap(), 2.0);
 
-        let dist = CustomDiscreteFinite::new([(-1, 0.25), (0, 0.5), (1, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(-1, 0.25), (0, 0.5), (1, 0.25)]);
         assert_float_absolute_eq!(dist.mean().unwrap(), 0.0);
 
-        let dist = CustomDiscreteFinite::new([(1, 0.25), (3, 0.5), (5, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.25), (3, 0.5), (5, 0.25)]);
         assert_float_absolute_eq!(dist.mean().unwrap(), 3.0);
 
-        let dist = CustomDiscreteFinite::new([(1, 0.1), (2, 0.2), (3, 0.3), (4, 0.4)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.1), (2, 0.2), (3, 0.3), (4, 0.4)]);
         assert_float_absolute_eq!(dist.mean().unwrap(), 3.0);
 
-        let dist = CustomDiscreteFinite::new([(1, 0.4), (2, 0.3), (3, 0.2), (4, 0.1)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.4), (2, 0.3), (3, 0.2), (4, 0.1)]);
         assert_float_absolute_eq!(dist.mean().unwrap(), 2.0);
 
-        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.25), (3, 0.25), (4, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.25), (2, 0.25), (3, 0.25), (4, 0.25)]);
         assert_float_absolute_eq!(dist.mean().unwrap(), 2.5);
     }
 
     #[test]
-    fn custom_discrete_finite_variance() {
-        //! Test that [CustomDiscreteFinite::variance] returns the correct value.
+    fn discrete_custom_finite_variance() {
+        //! Test that [DiscreteCustomFinite::variance] returns the correct value.
 
-        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
         assert_float_absolute_eq!(dist.variance().unwrap(), 0.5);
 
-        let dist = CustomDiscreteFinite::new([(-1, 0.25), (0, 0.5), (1, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(-1, 0.25), (0, 0.5), (1, 0.25)]);
         assert_float_absolute_eq!(dist.variance().unwrap(), 0.5);
 
-        let dist = CustomDiscreteFinite::new([(1, 0.25), (3, 0.5), (5, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.25), (3, 0.5), (5, 0.25)]);
         assert_float_absolute_eq!(dist.variance().unwrap(), 2.0);
 
-        let dist = CustomDiscreteFinite::new([(1, 0.1), (2, 0.2), (3, 0.3), (4, 0.4)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.1), (2, 0.2), (3, 0.3), (4, 0.4)]);
         assert_float_absolute_eq!(dist.variance().unwrap(), 1.0);
 
-        let dist = CustomDiscreteFinite::new([(1, 0.4), (2, 0.3), (3, 0.2), (4, 0.1)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.4), (2, 0.3), (3, 0.2), (4, 0.1)]);
         assert_float_absolute_eq!(dist.variance().unwrap(), 1.0);
 
-        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.25), (3, 0.25), (4, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.25), (2, 0.25), (3, 0.25), (4, 0.25)]);
         assert_float_absolute_eq!(dist.variance().unwrap(), 1.25);
     }
 
     #[test]
-    fn custom_discrete_finite_stddev() {
-        //! Test that [CustomDiscreteFinite::stddev] returns the correct value.
+    fn discrete_custom_finite_stddev() {
+        //! Test that [DiscreteCustomFinite::stddev] returns the correct value.
 
-        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
         assert_float_absolute_eq!(dist.stddev().unwrap(), 0.5f64.sqrt());
 
-        let dist = CustomDiscreteFinite::new([(-1, 0.25), (0, 0.5), (1, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(-1, 0.25), (0, 0.5), (1, 0.25)]);
         assert_float_absolute_eq!(dist.stddev().unwrap(), 0.5f64.sqrt());
 
-        let dist = CustomDiscreteFinite::new([(1, 0.25), (3, 0.5), (5, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.25), (3, 0.5), (5, 0.25)]);
         assert_float_absolute_eq!(dist.stddev().unwrap(), 2.0f64.sqrt());
 
-        let dist = CustomDiscreteFinite::new([(1, 0.1), (2, 0.2), (3, 0.3), (4, 0.4)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.1), (2, 0.2), (3, 0.3), (4, 0.4)]);
         assert_float_absolute_eq!(dist.stddev().unwrap(), 1.0f64.sqrt());
 
-        let dist = CustomDiscreteFinite::new([(1, 0.4), (2, 0.3), (3, 0.2), (4, 0.1)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.4), (2, 0.3), (3, 0.2), (4, 0.1)]);
         assert_float_absolute_eq!(dist.stddev().unwrap(), 1.0f64.sqrt());
 
-        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.25), (3, 0.25), (4, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.25), (2, 0.25), (3, 0.25), (4, 0.25)]);
         assert_float_absolute_eq!(dist.stddev().unwrap(), 1.25f64.sqrt());
     }
 
     #[test]
-    fn custom_discrete_finite_pmf() {
-        //! Test that [CustomDiscreteFinite::pmf] returns the correct value.
+    fn discrete_custom_finite_pmf() {
+        //! Test that [DiscreteCustomFinite::pmf] returns the correct value.
 
-        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
         assert_float_absolute_eq!(dist.pmf(0), 0.0);
         assert_float_absolute_eq!(dist.pmf(1), 0.25);
         assert_float_absolute_eq!(dist.pmf(2), 0.5);
         assert_float_absolute_eq!(dist.pmf(3), 0.25);
         assert_float_absolute_eq!(dist.pmf(4), 0.0);
 
-        let dist = CustomDiscreteFinite::new([(1, 0.25), (3, 0.5), (5, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.25), (3, 0.5), (5, 0.25)]);
         assert_float_absolute_eq!(dist.pmf(0), 0.0);
         assert_float_absolute_eq!(dist.pmf(1), 0.25);
         assert_float_absolute_eq!(dist.pmf(2), 0.0);
@@ -1151,14 +1151,14 @@ mod tests {
         assert_float_absolute_eq!(dist.pmf(5), 0.25);
         assert_float_absolute_eq!(dist.pmf(6), 0.0);
 
-        let dist = CustomDiscreteFinite::new([(-1, 0.25), (0, 0.5), (1, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(-1, 0.25), (0, 0.5), (1, 0.25)]);
         assert_float_absolute_eq!(dist.pmf(-2), 0.0);
         assert_float_absolute_eq!(dist.pmf(-1), 0.25);
         assert_float_absolute_eq!(dist.pmf(0), 0.5);
         assert_float_absolute_eq!(dist.pmf(1), 0.25);
         assert_float_absolute_eq!(dist.pmf(2), 0.0);
 
-        let dist = CustomDiscreteFinite::new([(5, 1), (6, 2), (7, 3), (8, 4)]);
+        let dist = DiscreteCustomFinite::new([(5, 1), (6, 2), (7, 3), (8, 4)]);
         assert_float_absolute_eq!(dist.pmf(4), 0.0);
         assert_float_absolute_eq!(dist.pmf(5), 0.1);
         assert_float_absolute_eq!(dist.pmf(6), 0.2);
@@ -1168,10 +1168,10 @@ mod tests {
     }
 
     #[test]
-    fn custom_discrete_finite_sample() {
-        //! Test that sampling from [CustomDiscreteFinite] is consistent with the distribution's properties.
+    fn discrete_custom_finite_sample() {
+        //! Test that sampling from [DiscreteCustomFinite] is consistent with the distribution's properties.
 
-        let dist = CustomDiscreteFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
+        let dist = DiscreteCustomFinite::new([(1, 0.25), (2, 0.5), (3, 0.25)]);
         let sample = Sample::from_values(dist.sample_iter(rng()).take(1_000_000));
         for value in sample.iter() {
             assert!([1, 2, 3].contains(value), "Sample {value} not in [1, 2, 3]");

@@ -30,7 +30,7 @@ use num_traits::{ConstOne, ConstZero, PrimInt};
 /// $$
 /// # Example
 /// ```
-/// use pmath::SimpleContinuedFraction;
+/// use pmath::numth::continued_fraction::SimpleContinuedFraction;
 ///
 /// // continued fraction of sqrt(2): [1; 2, 2, 2, ...]
 /// //     - coefficient 1 is not repeating
@@ -180,7 +180,7 @@ where
     ///   producing fractions that better and better approximate the value of the continued fraction.
     /// # Example
     /// ```
-    /// use pmath::SimpleContinuedFraction;
+    /// use pmath::numth::continued_fraction::SimpleContinuedFraction;
     /// use malachite::rational::Rational;
     ///
     /// let cf = SimpleContinuedFraction::new(vec![1, 2], Some(vec![3, 4]));

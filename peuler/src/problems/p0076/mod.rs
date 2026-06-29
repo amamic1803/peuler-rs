@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::partition_p;
+use pmath::numth::partition::partition_p;
 
 problem!(Problem0076, 76, "Counting Summations");
 

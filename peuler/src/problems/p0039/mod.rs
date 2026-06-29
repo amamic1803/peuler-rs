@@ -1,6 +1,6 @@
 use crate::Solution;
 use itertools::Itertools;
-use pmath::gcd;
+use pmath::core::gcd;
 
 problem!(Problem0039, 39, "Integer Right Triangles");
 

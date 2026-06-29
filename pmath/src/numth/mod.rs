@@ -1,4 +1,4 @@
-//! Number theory
+//! Number theory.
 
 pub mod continued_fraction;
 pub mod factor;

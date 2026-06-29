@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::partition_prime_0_to_n;
+use pmath::numth::partition::partition_prime_0_to_n;
 
 problem!(Problem0077, 77, "Prime Summations");
 

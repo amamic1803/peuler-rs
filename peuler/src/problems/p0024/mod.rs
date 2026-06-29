@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::factorial;
+use pmath::core::factorial;
 
 problem!(Problem0024, 24, "Lexicographic Permutations");
 

@@ -1,11 +1,9 @@
-//! Geometry module for 2D and 3D shapes and their properties.
+//! Geometry.
 
-use crate::algebra::linear::{Matrix, Vector};
-use num_traits::{ConstOne, FromPrimitive, PrimInt, ToPrimitive};
-use std::borrow::Borrow;
-use std::ops::{
-    Add, AddAssign, Deref, DerefMut, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign,
-};
+use std::ops::{Add, AddAssign, Deref, DerefMut, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+
+pub mod dim2;
+pub mod dim3;
 
 /// A point in an N-dimensional space.
 ///
@@ -214,138 +212,134 @@ impl_mul_scalar_by_point!(
     i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize, f32, f64
 );
 
-pub trait Shape2D {
-    /// Calculate the area of the shape.
-    /// # Returns
-    /// * The area of the shape.
-    fn area(&self) -> f64;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    /// Calculate the perimeter of the shape.
-    /// # Returns
-    /// * The perimeter of the shape.
-    fn perimeter(&self) -> f64;
-}
+    // point
 
-pub trait Shape3D {
-    /// Calculate the surface area of the shape.
-    /// # Returns
-    /// * The surface area of the shape.
-    fn surface_area(&self) -> f64;
-
-    /// Calculate the volume of the shape.
-    /// # Returns
-    /// * The volume of the shape.
-    fn volume(&self) -> f64;
-}
-
-pub struct Polygon<T> {
-    points: Vec<Point<T, 2>>,
-}
-impl<T: Copy + ToPrimitive> Polygon<T> {
-    /// Create a new [Polygon].
-    /// # Arguments
-    /// * `points` - An iterable collection of points that define the polygon.
-    /// # Returns
-    /// * A new [Polygon] instance.
-    pub fn new<U, V>(points: U) -> Self
-    where
-        U: IntoIterator<Item = V>,
-        V: Borrow<Point<T, 2>>,
-    {
-        let points = points.into_iter().map(|p| *p.borrow()).collect();
-        Self { points }
+    #[test]
+    #[should_panic]
+    fn point_new_zero_dimensions() {
+        //! Test that [Point::new] panics with zero dimensional input.
+        Point::<i32, 0>::new([]);
     }
 
-    /// Calculate the area of the polygon.
-    ///
-    /// Uses the shoelace formula.
-    /// # Returns
-    /// * The area of the polygon.
-    pub fn area(&self) -> f64 {
-        let mut area = 0.0;
-        for i in 0..self.points.len() {
-            let p1 = self.points[i];
-            let p2 = self.points[(i + 1) % self.points.len()];
-            let matrix = Matrix::new([[p1[0], p2[0]], [p1[1], p2[1]]]);
-            area += matrix.determinant();
-        }
-        (area / 2.0).abs()
+    #[test]
+    fn point_new() {
+        //! Test [Point::new].
+        let p = Point::new([1, 2]);
+        assert_eq!(*p, [1, 2]);
     }
 
-    /// Calculate the perimeter of the polygon.
-    /// # Returns
-    /// * The perimeter of the polygon.
-    pub fn perimeter(&self) -> f64 {
-        let mut perimeter = 0.0;
-        for i in 0..self.points.len() {
-            perimeter +=
-                Vector::from_points(self.points[i], self.points[(i + 1) % self.points.len()])
-                    .magnitude();
-        }
-        perimeter
-    }
-}
-impl<T> Polygon<T>
-where
-    T: Copy + PrimInt + ConstOne + FromPrimitive,
-{
-    /// Calculate the number of boundary points of the polygon.
-    ///
-    /// Boundary points are points with integer coordinates that lie on the edges of the polygon.
-    /// The polygon must be defined by points with integer coordinates.
-    /// # Returns
-    /// * The number of boundary points of the polygon.
-    pub fn boundary_points(&self) -> T {
-        let mut points_count = T::from_usize(self.points.len())
-            .expect("The number of points must be convertible to T");
-
-        for i in 0..self.points.len() {
-            // one of the coordinates is the same, so we can just add the difference of both coordinates
-            // the result will be the distance between the two points
-            // since we already counted all edge points, we just need to subtract 1
-            // to get the number of points between the two points
-
-            let p1 = self.points[i];
-            let p2 = self.points[(i + 1) % self.points.len()];
-            let diff0 = if p1[0] > p2[0] {
-                p1[0] - p2[0]
-            } else {
-                p2[0] - p1[0]
-            };
-            let diff1 = if p1[1] > p2[1] {
-                p1[1] - p2[1]
-            } else {
-                p2[1] - p1[1]
-            };
-            points_count = points_count + diff0 + diff1 - T::ONE;
-        }
-
-        points_count
+    #[test]
+    fn point_primitive_types() {
+        //! Test that [Point] works with primitive types.
+        // unsigned types
+        assert_eq!(*Point::new([1u8, 2u8]), [1u8, 2u8]);
+        assert_eq!(*Point::new([1u16, 2u16]), [1u16, 2u16]);
+        assert_eq!(*Point::new([1u32, 2u32]), [1u32, 2u32]);
+        assert_eq!(*Point::new([1u64, 2u64]), [1u64, 2u64]);
+        assert_eq!(*Point::new([1u128, 2u128]), [1u128, 2u128]);
+        assert_eq!(*Point::new([1usize, 2usize]), [1usize, 2usize]);
+        // signed types
+        assert_eq!(*Point::new([1i8, 2i8]), [1i8, 2i8]);
+        assert_eq!(*Point::new([1i16, 2i16]), [1i16, 2i16]);
+        assert_eq!(*Point::new([1i32, 2i32]), [1i32, 2i32]);
+        assert_eq!(*Point::new([1i64, 2i64]), [1i64, 2i64]);
+        assert_eq!(*Point::new([1i128, 2i128]), [1i128, 2i128]);
+        assert_eq!(*Point::new([1isize, 2isize]), [1isize, 2isize]);
+        // floating point types
+        assert_eq!(*Point::new([1f32, 2f32]), [1f32, 2f32]);
+        assert_eq!(*Point::new([1f64, 2f64]), [1f64, 2f64]);
     }
 
-    /// Calculate the number of interior points of the polygon.
-    ///
-    /// Interior points are points with integer coordinates that lie strictly inside the polygon.
-    /// The polygon must be defined by points with integer coordinates.
-    /// Uses the Pick's theorem.
-    pub fn interior_points(&self) -> T {
-        let area = self.area();
-        let boundary_points = self.boundary_points();
+    #[test]
+    fn point_dereference() {
+        //! Test that [Point] correctly implements
+        //! [Deref] and [DerefMut].
+        let mut p = Point::new([1, 2]);
+        assert_eq!(*p, [1, 2]);
+        *p =[1, 3];
+        assert_eq!(*p, [1, 3]);
+    }
 
-        // area = i + b/2 - 1
-        // i = interior points
-        // b = boundary points
-        // i = area - b/2 + 1
+    #[test]
+    fn point_add() {
+        //! Test that addition works for [Point].
+        let p = Point::new([1, 2]);
+        let p2 = Point::new([1, 3]);
+        let mut p3 = p + p2;
+        assert_eq!(*p3, [2, 5]);
+        p3 += Point::new([2, 3]);
+        assert_eq!(*p3, [4, 8]);
+    }
 
-        T::from_f64(
-            (area
-                - (boundary_points
-                    .to_f64()
-                    .expect("The number of boundary points must be convertible to f64"))
-                    / 2.0
-                + 1.0)
-                .round(),
-        )
-        .expect("The number of interior points must be convertible to T")
+    #[test]
+    fn point_sub() {
+        //! Test that subtraction works for [Point].
+        let p = Point::new([1, 2]);
+        let p2 = Point::new([1, 3]);
+        let mut p3 = p - p2;
+        assert_eq!(*p3, [0, -1]);
+        p3 -= Point::new([2, 3]);
+        assert_eq!(*p3, [-2, -4]);
+    }
+
+    #[test]
+    fn point_mul() {
+        //! Test that multiplication works for [Point].
+        let p = Point::new([1, 2]);
+        let p2 = Point::new([1, 3]);
+        let mut p3 = p * p2;
+        assert_eq!(*p3, [1, 6]);
+        p3 *= Point::new([2, 3]);
+        assert_eq!(*p3, [2, 18]);
+    }
+
+    #[test]
+    fn point_div() {
+        //! Test that division works for [Point].
+        let p = Point::new([24, 18]);
+        let p2 = Point::new([1, 2]);
+        let mut p3 = p / p2;
+        assert_eq!(*p3, [24, 9]);
+        p3 /= Point::new([12, 3]);
+        assert_eq!(*p3, [2, 3]);
+    }
+
+    #[test]
+    fn point_neg() {
+        //! Test that negation works for [Point].
+        let p = Point::new([1, 2]);
+        let p2 = -p;
+        assert_eq!(*p2, [-1, -2]);
+    }
+
+    #[test]
+    fn point_mul_primitives() {
+        //! Test that multiplication with scalars works for [Point].
+        let mut p = Point::new([1, 2]);
+        assert_eq!(*(p * 2), [2, 4]);
+        p *= 3;
+        assert_eq!(*p, [3, 6]);
+    }
+
+    #[test]
+    fn point_mul_primitives_reverse() {
+        //! Test that multiplication with [Point] works for scalars.
+        let p = Point::new([1, 2]);
+        let p2: Point<i32, 2> = 2 * p;
+        assert_eq!(*p2, [2, 4]);
+    }
+
+    #[test]
+    fn point_div_primitives() {
+        //! Test that division with scalars works for [Point].
+
+        let mut p = Point::new([15, 21]);
+        assert_eq!(*(p / 3), [5, 7]);
+        p /= 5;
+        assert_eq!(*p, [3, 4]);
     }
 }

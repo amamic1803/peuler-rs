@@ -13,7 +13,7 @@ use crate::numth::factor::distinct_prime_factors;
 /// * If `n` cannot be converted to [f64].
 /// # Example
 /// ```
-/// use pmath::phi;
+/// use pmath::numth::totient::phi;
 ///
 /// assert_eq!(phi(0), 0);
 /// assert_eq!(phi(1), 1);
@@ -42,7 +42,7 @@ where
 /// * If `n` cannot be converted to [usize].
 /// # Example
 /// ```
-/// use pmath::phi_0_to_n;
+/// use pmath::numth::totient::phi_0_to_n;
 ///
 /// assert_eq!(phi_0_to_n(5), vec![0, 1, 1, 2, 2, 4]);
 /// ```

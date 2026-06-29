@@ -1,6 +1,6 @@
 use crate::Solution;
 use pmath::digit::is_permutation;
-use pmath::phi_0_to_n;
+use pmath::numth::totient::phi_0_to_n;
 
 problem!(Problem0070, 70, "Totient Permutation");
 

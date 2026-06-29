@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::newtons_method;
+use pmath::analysis::root::newtons_method;
 
 problem!(Problem0030, 30, "Digit Fifth Powers");
 

@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::gcd;
+use pmath::core::gcd;
 
 problem!(Problem0075, 75, "Singular Integer Right Triangles");
 

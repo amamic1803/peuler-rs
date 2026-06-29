@@ -1,5 +1,5 @@
 use crate::Solution;
-use pmath::ord;
+use pmath::numth::modular::ord;
 use pmath::numth::prime::coprime;
 
 problem!(Problem0026, 26, "Reciprocal Cycles");

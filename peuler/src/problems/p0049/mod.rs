@@ -48,7 +48,7 @@ impl Solution for Problem0049 {
             prime_perms.sort_unstable();
 
             // check for arithmetic sequences
-            for (n1, n2, n3) in prime_perms.iter().tuple_combinations() {
+            for [n1, n2, n3] in prime_perms.iter().array_combinations() {
                 if n2 - n1 == n3 - n2 {
                     found_sequences.push([*n1, *n2, *n3]);
 

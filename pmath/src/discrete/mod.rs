@@ -1,3 +1,3 @@
-//! discrete maths
+//! Discrete mathematics.
 
 pub mod graph;

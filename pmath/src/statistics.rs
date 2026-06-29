@@ -1,4 +1,4 @@
-//! Statistical calculations.
+//! Statistics.
 
 use num_traits::{FromPrimitive, ToPrimitive};
 use std::borrow::Borrow;
