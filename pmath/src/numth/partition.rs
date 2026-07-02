@@ -1,5 +1,7 @@
-use num_traits::{ConstOne, ConstZero, PrimInt};
+//! Partition functions.
+
 use crate::numth::prime::sieve_of_eratosthenes;
+use num_traits::{ConstOne, ConstZero, PrimInt};
 
 #[cfg_attr(doc, katexit::katexit)]
 /// Partition function.
@@ -182,4 +184,174 @@ where
     }
 
     dp
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const PARTITION_P_TEST_SEQ: [usize; 41] = [
+        1, 1, 2, 3, 5, 7, 11, 15, 22, 30, 42, 56, 77, 101, 135, 176, 231, 297, 385, 490, 627, 792,
+        1002, 1255, 1575, 1958, 2436, 3010, 3718, 4565, 5604, 6842, 8349, 10143, 12310, 14883,
+        17977, 21637, 26015, 31185, 37338,
+    ];
+    const PARTITION_PRIME_TEST_SEQ: [usize; 41] = [
+        1, 0, 1, 1, 1, 2, 2, 3, 3, 4, 5, 6, 7, 9, 10, 12, 14, 17, 19, 23, 26, 30, 35, 40, 46, 52,
+        60, 67, 77, 87, 98, 111, 124, 140, 157, 175, 197, 219, 244, 272, 302,
+    ];
+
+    // partition_p
+
+    #[test]
+    fn partition_p_primitive_types() {
+        //! Test that [partition_p] works with primitive integer types.
+
+        // unsigned types
+        assert_eq!(partition_p(5u8), 7);
+        assert_eq!(partition_p(5u16), 7);
+        assert_eq!(partition_p(5u32), 7);
+        assert_eq!(partition_p(5u64), 7);
+        assert_eq!(partition_p(5u128), 7);
+        assert_eq!(partition_p(5usize), 7);
+
+        // signed types
+        assert_eq!(partition_p(5i8), 7);
+        assert_eq!(partition_p(5i16), 7);
+        assert_eq!(partition_p(5i32), 7);
+        assert_eq!(partition_p(5i64), 7);
+        assert_eq!(partition_p(5i128), 7);
+        assert_eq!(partition_p(5isize), 7);
+    }
+
+    #[test]
+    fn partition_p_negative() {
+        //! Test that [partition_p] returns correct value 0 for negative inputs.
+        assert_eq!(partition_p(-1), 0);
+        assert_eq!(partition_p(-10), 0);
+    }
+
+    #[test]
+    fn partition_p_verify() {
+        //! Verify the correctness of [partition_p].
+        for (i, val) in PARTITION_P_TEST_SEQ.into_iter().enumerate() {
+            assert_eq!(partition_p(i), val);
+        }
+    }
+
+    // partition_p_0_to_n
+
+    #[test]
+    fn partition_p_0_to_n_primitive_types() {
+        //! Test that [partition_p_0_to_n] works with primitive integer types.
+        // unsigned types
+        assert_eq!(partition_p_0_to_n(5u8), vec![1, 1, 2, 3, 5, 7]);
+        assert_eq!(partition_p_0_to_n(5u16), vec![1, 1, 2, 3, 5, 7]);
+        assert_eq!(partition_p_0_to_n(5u32), vec![1, 1, 2, 3, 5, 7]);
+        assert_eq!(partition_p_0_to_n(5u64), vec![1, 1, 2, 3, 5, 7]);
+        assert_eq!(partition_p_0_to_n(5u128), vec![1, 1, 2, 3, 5, 7]);
+        assert_eq!(partition_p_0_to_n(5usize), vec![1, 1, 2, 3, 5, 7]);
+
+        // signed types
+        assert_eq!(partition_p_0_to_n(5i8), vec![1, 1, 2, 3, 5, 7]);
+        assert_eq!(partition_p_0_to_n(5i16), vec![1, 1, 2, 3, 5, 7]);
+        assert_eq!(partition_p_0_to_n(5i32), vec![1, 1, 2, 3, 5, 7]);
+        assert_eq!(partition_p_0_to_n(5i64), vec![1, 1, 2, 3, 5, 7]);
+        assert_eq!(partition_p_0_to_n(5i128), vec![1, 1, 2, 3, 5, 7]);
+        assert_eq!(partition_p_0_to_n(5isize), vec![1, 1, 2, 3, 5, 7]);
+    }
+
+    #[test]
+    #[should_panic]
+    fn partition_p_0_to_n_negative() {
+        //! Test that [partition_p_0_to_n] panics for negative inputs.
+        partition_p_0_to_n(-1);
+    }
+
+    #[test]
+    fn partition_p_0_to_n_verify() {
+        //! Verify the correctness of [partition_p_0_to_n].
+        for i in 0..PARTITION_P_TEST_SEQ.len() {
+            let calculated = partition_p_0_to_n(i);
+            let actual = PARTITION_P_TEST_SEQ[0..=i].to_vec();
+            assert_eq!(calculated, actual);
+        }
+    }
+
+    // partition_prime
+
+    #[test]
+    fn partition_prime_primitive_types() {
+        //! Test that [partition_prime] works with primitive integer types.
+
+        // unsigned types
+        assert_eq!(partition_prime(7u8), 3);
+        assert_eq!(partition_prime(7u16), 3);
+        assert_eq!(partition_prime(7u32), 3);
+        assert_eq!(partition_prime(7u64), 3);
+        assert_eq!(partition_prime(7u128), 3);
+        assert_eq!(partition_prime(7usize), 3);
+
+        // signed types
+        assert_eq!(partition_prime(7i8), 3);
+        assert_eq!(partition_prime(7i16), 3);
+        assert_eq!(partition_prime(7i32), 3);
+        assert_eq!(partition_prime(7i64), 3);
+        assert_eq!(partition_prime(7i128), 3);
+        assert_eq!(partition_prime(7isize), 3);
+    }
+
+    #[test]
+    fn partition_prime_negative() {
+        //! Test that [partition_prime] returns 0 when given negative input.
+        assert_eq!(partition_prime(-1), 0);
+        assert_eq!(partition_prime(-10), 0);
+    }
+
+    #[test]
+    fn partition_prime_verify() {
+        //! Verify the correctness of [partition_prime].
+        for (i, val) in PARTITION_PRIME_TEST_SEQ.into_iter().enumerate() {
+            assert_eq!(partition_prime(i), val);
+        }
+    }
+
+    // partition_prime_0_to_n
+
+    #[test]
+    fn partition_prime_0_to_n_primitive_types() {
+        //! Test that [partition_prime_0_to_n] works with primitive integer types.
+
+        // unsigned types
+        assert_eq!(partition_prime_0_to_n(5u8), vec![1, 0, 1, 1, 1, 2]);
+        assert_eq!(partition_prime_0_to_n(5u16), vec![1, 0, 1, 1, 1, 2]);
+        assert_eq!(partition_prime_0_to_n(5u32), vec![1, 0, 1, 1, 1, 2]);
+        assert_eq!(partition_prime_0_to_n(5u64), vec![1, 0, 1, 1, 1, 2]);
+        assert_eq!(partition_prime_0_to_n(5u128), vec![1, 0, 1, 1, 1, 2]);
+        assert_eq!(partition_prime_0_to_n(5usize), vec![1, 0, 1, 1, 1, 2]);
+
+        // signed types
+        assert_eq!(partition_prime_0_to_n(5i8), vec![1, 0, 1, 1, 1, 2]);
+        assert_eq!(partition_prime_0_to_n(5i16), vec![1, 0, 1, 1, 1, 2]);
+        assert_eq!(partition_prime_0_to_n(5i32), vec![1, 0, 1, 1, 1, 2]);
+        assert_eq!(partition_prime_0_to_n(5i64), vec![1, 0, 1, 1, 1, 2]);
+        assert_eq!(partition_prime_0_to_n(5i128), vec![1, 0, 1, 1, 1, 2]);
+        assert_eq!(partition_prime_0_to_n(5isize), vec![1, 0, 1, 1, 1, 2]);
+    }
+
+    #[test]
+    #[should_panic]
+    fn partition_prime_0_to_n_negative() {
+        //! Test that [partition_prime_0_to_n] panics when given negative input.
+        partition_prime_0_to_n(-1);
+    }
+
+    #[test]
+    fn partition_prime_0_to_n_verify() {
+        //! Verify the correctness of [partition_prime_0_to_n].
+        for i in 0..PARTITION_PRIME_TEST_SEQ.len() {
+            let calculated = partition_prime_0_to_n(i);
+            let actual = PARTITION_PRIME_TEST_SEQ[0..=i].to_vec();
+            assert_eq!(calculated, actual);
+        }
+    }
 }

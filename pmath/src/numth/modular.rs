@@ -1,6 +1,6 @@
-use std::borrow::Borrow;
-use num_traits::{ConstOne, ConstZero, Euclid, PrimInt, Signed};
 use crate::core::{gcd, gcd_extended};
+use num_traits::{ConstOne, ConstZero, Euclid, PrimInt, Signed};
+use std::borrow::Borrow;
 
 #[cfg_attr(doc, katexit::katexit)]
 /// Congruence relation.
@@ -149,7 +149,6 @@ where
     Some(a)
 }
 
-
 #[cfg_attr(doc, katexit::katexit)]
 /// Multiplicative order.
 ///
@@ -198,4 +197,9 @@ where
     // if we reach this point, it means we didn't find the order,
     // so a and n are not coprime
     panic!("a and n are not coprime.");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
 }

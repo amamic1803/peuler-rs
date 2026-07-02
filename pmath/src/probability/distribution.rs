@@ -422,7 +422,7 @@ where
         }
 
         // sort items_vec by value
-        items_vec.sort_unstable_by(|a, b| a.0.cmp(&b.0));
+        items_vec.sort_unstable_by_key(|a| a.0);
 
         // update items_map with new indices after sorting,
         // normalize probabilities and calculate cumulative probabilities

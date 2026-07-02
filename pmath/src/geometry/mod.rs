@@ -1,6 +1,8 @@
 //! Geometry.
 
-use std::ops::{Add, AddAssign, Deref, DerefMut, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use std::ops::{
+    Add, AddAssign, Deref, DerefMut, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign,
+};
 
 pub mod dim2;
 pub mod dim3;
@@ -20,7 +22,7 @@ pub mod dim3;
 /// *point = [4, 5, 6];
 /// assert_eq!(*point, [4, 5, 6]);
 /// ```
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Point<T, const N: usize> {
     coords: [T; N],
 }
@@ -260,7 +262,7 @@ mod tests {
         //! [Deref] and [DerefMut].
         let mut p = Point::new([1, 2]);
         assert_eq!(*p, [1, 2]);
-        *p =[1, 3];
+        *p = [1, 3];
         assert_eq!(*p, [1, 3]);
     }
 
