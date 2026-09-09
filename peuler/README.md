@@ -41,7 +41,7 @@ This crate also provides a command line interface (CLI) binary named `peuler`.
 
 You can install it via `cargo`:
 ```sh
-cargo install --features=cli peuler
+cargo install peuler
 ```
 
 Then, to solve the [*first Project Euler problem*](https://projecteuler.net/problem=1), run:
@@ -53,12 +53,6 @@ For more information, run:
 ```sh
 peuler --help
 ```
-
-
-## Features
-This crate has the following optional (disabled by default) features:
-- `cli`: Enables the optional dependencies for building the CLI binary.
-
 
 ## License
 This project is licensed under the [MIT License](https://github.com/amamic1803/peuler-rs/blob/main/LICENSE).
