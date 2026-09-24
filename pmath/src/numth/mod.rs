@@ -1,6 +1,6 @@
 //! Number theory.
 
-pub mod continued_fraction;
+pub mod cf;
 pub mod factor;
 pub mod modular;
 pub mod partition;

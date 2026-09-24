@@ -2,7 +2,7 @@ use crate::Solution;
 use malachite::Natural;
 use malachite::base::num::arithmetic::traits::Pow;
 use malachite::rational::Rational;
-use pmath::numth::continued_fraction::SimpleContinuedFraction;
+use pmath::numth::cf::SimpleContinuedFraction;
 
 problem!(Problem0080, 80, "Square Root Digital Expansion");
 

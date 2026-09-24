@@ -1,7 +1,7 @@
 use crate::Solution;
 use malachite::Natural;
 use malachite::base::num::conversion::traits::Digits;
-use pmath::numth::continued_fraction::SimpleContinuedFraction;
+use pmath::numth::cf::SimpleContinuedFraction;
 
 problem!(Problem0065, 65, "Convergents of e");
 

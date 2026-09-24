@@ -1,7 +1,7 @@
 use crate::Solution;
 use malachite::Natural;
 use malachite::base::num::basic::traits::{One, Zero};
-use pmath::numth::continued_fraction::SimpleContinuedFraction;
+use pmath::numth::cf::SimpleContinuedFraction;
 
 problem!(Problem0066, 66, "Diophantine Equation");
 

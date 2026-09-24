@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["peuler", "pmath", "website/scripts/wasm"]
+members = ["peuler", "pmath", "web", "xtask"]
 
 [profile.release]
 lto = true
