@@ -7,7 +7,7 @@ macro_rules! problem {
         pub struct $struct_name;
         impl $struct_name {
             #[doc = concat!("Create a new [", stringify!($struct_name), "] instance.")]
-            pub fn new() -> Self {
+            pub const fn new() -> Self {
                 Self {}
             }
         }
