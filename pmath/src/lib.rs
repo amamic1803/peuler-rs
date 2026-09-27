@@ -3,8 +3,8 @@
 pub mod algebra;
 pub mod analysis;
 pub mod core;
-pub mod discrete;
 pub mod digit;
+pub mod discrete;
 pub mod geometry;
 pub mod numth;
 pub mod probability;

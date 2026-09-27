@@ -1,7 +1,7 @@
 //! Core mathematical functions.
 
-use std::borrow::Borrow;
 use num_traits::{ConstOne, ConstZero, PrimInt, Signed};
+use std::borrow::Borrow;
 
 #[cfg_attr(doc, katexit::katexit)]
 /// Factorial of an integer.

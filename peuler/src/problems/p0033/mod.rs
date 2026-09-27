@@ -1,7 +1,7 @@
 use crate::Solution;
 use itertools::Itertools;
-use pmath::digit::digits;
 use pmath::core::gcd;
+use pmath::digit::digits;
 
 problem!(Problem0033, 33, "Digit Cancelling Fractions");
 

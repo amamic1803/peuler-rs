@@ -1,12 +1,12 @@
 //! Continued fractions module.
 
+use malachite::base::num::basic::traits::{One, Zero};
+use malachite::{Integer, Rational};
+use num_traits::{ConstOne, ConstZero, PrimInt};
 use std::borrow::Borrow;
 use std::collections::HashSet;
 use std::hash::Hash;
 use std::{iter, mem};
-use malachite::{Integer, Rational};
-use malachite::base::num::basic::traits::{One, Zero};
-use num_traits::{ConstOne, ConstZero, PrimInt};
 
 #[cfg_attr(doc, katexit::katexit)]
 /// Simple continued fraction.
@@ -252,9 +252,9 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use malachite::base::rounding_modes::RoundingMode;
-    use malachite::base::num::conversion::traits::RoundingFrom;
     use assert_float_eq::assert_float_absolute_eq;
+    use malachite::base::num::conversion::traits::RoundingFrom;
+    use malachite::base::rounding_modes::RoundingMode;
 
     #[test]
     fn simple_continued_fraction_new() {
@@ -293,7 +293,11 @@ mod tests {
 
         for i in 2..=100 {
             let cf = SimpleContinuedFraction::from_sqrt(i);
-            let approx = f64::rounding_from(cf.convergents().take(25).last().unwrap(), RoundingMode::Nearest).0;
+            let approx = f64::rounding_from(
+                cf.convergents().take(25).last().unwrap(),
+                RoundingMode::Nearest,
+            )
+            .0;
             let actual = (i as f64).sqrt();
             assert_float_absolute_eq!(approx, actual, 1e-6);
         }
@@ -343,17 +347,41 @@ mod tests {
 
         let cf = SimpleContinuedFraction::new(vec![1, 2], Some(vec![3, 4]));
         let mut convergents = cf.convergents();
-        assert_eq!(convergents.next().unwrap(), Rational::const_from_unsigneds(1, 1));
-        assert_eq!(convergents.next().unwrap(), Rational::const_from_unsigneds(3, 2));
-        assert_eq!(convergents.next().unwrap(), Rational::const_from_unsigneds(10, 7));
-        assert_eq!(convergents.next().unwrap(), Rational::const_from_unsigneds(43, 30));
-        assert_eq!(convergents.next().unwrap(), Rational::const_from_unsigneds(139, 97));
-        assert_eq!(convergents.next().unwrap(), Rational::const_from_unsigneds(599, 418));
+        assert_eq!(
+            convergents.next().unwrap(),
+            Rational::const_from_unsigneds(1, 1)
+        );
+        assert_eq!(
+            convergents.next().unwrap(),
+            Rational::const_from_unsigneds(3, 2)
+        );
+        assert_eq!(
+            convergents.next().unwrap(),
+            Rational::const_from_unsigneds(10, 7)
+        );
+        assert_eq!(
+            convergents.next().unwrap(),
+            Rational::const_from_unsigneds(43, 30)
+        );
+        assert_eq!(
+            convergents.next().unwrap(),
+            Rational::const_from_unsigneds(139, 97)
+        );
+        assert_eq!(
+            convergents.next().unwrap(),
+            Rational::const_from_unsigneds(599, 418)
+        );
 
         let cf = SimpleContinuedFraction::new(vec![1, 2], None);
         let mut convergents = cf.convergents();
-        assert_eq!(convergents.next().unwrap(), Rational::const_from_unsigneds(1, 1));
-        assert_eq!(convergents.next().unwrap(), Rational::const_from_unsigneds(3, 2));
+        assert_eq!(
+            convergents.next().unwrap(),
+            Rational::const_from_unsigneds(1, 1)
+        );
+        assert_eq!(
+            convergents.next().unwrap(),
+            Rational::const_from_unsigneds(3, 2)
+        );
         assert!(convergents.next().is_none());
     }
 }

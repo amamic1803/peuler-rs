@@ -3,32 +3,21 @@
 macro_rules! problem {
     ($struct_name:ident, $id:literal, $title:literal) => {
         #[doc = concat!("[*", $title, "*](https://projecteuler.net/problem=", $id, ")")]
-        #[derive(Copy, Clone)]
-        pub struct $struct_name {
-            id: usize,
-            title: &'static str,
-        }
+        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+        pub struct $struct_name;
         impl $struct_name {
             #[doc = concat!("Create a new [", stringify!($struct_name), "] instance.")]
             pub fn new() -> Self {
-                Self {
-                    id: $id,
-                    title: $title,
-                }
-            }
-        }
-        impl Default for $struct_name {
-            fn default() -> Self {
-                Self::new()
+                Self {}
             }
         }
         impl crate::Problem for $struct_name {
             fn id(&self) -> usize {
-                self.id
+                $id
             }
 
             fn title(&self) -> &str {
-                self.title
+                $title
             }
         }
     };

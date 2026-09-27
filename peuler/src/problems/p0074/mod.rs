@@ -1,6 +1,6 @@
 use crate::Solution;
-use pmath::digit::digits;
 use pmath::core::factorial_0_to_n;
+use pmath::digit::digits;
 
 problem!(Problem0074, 74, "Digit Factorial Chains");
 

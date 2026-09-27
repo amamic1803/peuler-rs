@@ -62,24 +62,66 @@ mod tests {
         let root = 2.0;
 
         // unsigned types
-        assert!((newtons_method(1u8, precision, function, derivative).unwrap() - root).abs() < precision);
-        assert!((newtons_method(1u16, precision, function, derivative).unwrap() - root).abs() < precision);
-        assert!((newtons_method(1u32, precision, function, derivative).unwrap() - root).abs() < precision);
-        assert!((newtons_method(1u64, precision, function, derivative).unwrap() - root).abs() < precision);
-        assert!((newtons_method(1u128, precision, function, derivative).unwrap() - root).abs() < precision);
-        assert!((newtons_method(1usize, precision, function, derivative).unwrap() - root).abs() < precision);
+        assert!(
+            (newtons_method(1u8, precision, function, derivative).unwrap() - root).abs()
+                < precision
+        );
+        assert!(
+            (newtons_method(1u16, precision, function, derivative).unwrap() - root).abs()
+                < precision
+        );
+        assert!(
+            (newtons_method(1u32, precision, function, derivative).unwrap() - root).abs()
+                < precision
+        );
+        assert!(
+            (newtons_method(1u64, precision, function, derivative).unwrap() - root).abs()
+                < precision
+        );
+        assert!(
+            (newtons_method(1u128, precision, function, derivative).unwrap() - root).abs()
+                < precision
+        );
+        assert!(
+            (newtons_method(1usize, precision, function, derivative).unwrap() - root).abs()
+                < precision
+        );
 
         // signed types
-        assert!((newtons_method(1i8, precision, function, derivative).unwrap() - root).abs() < precision);
-        assert!((newtons_method(1i16, precision, function, derivative).unwrap() - root).abs() < precision);
-        assert!((newtons_method(1i32, precision, function, derivative).unwrap() - root).abs() < precision);
-        assert!((newtons_method(1i64, precision, function, derivative).unwrap() - root).abs() < precision);
-        assert!((newtons_method(1i128, precision, function, derivative).unwrap() - root).abs() < precision);
-        assert!((newtons_method(1isize, precision, function, derivative).unwrap() - root).abs() < precision);
+        assert!(
+            (newtons_method(1i8, precision, function, derivative).unwrap() - root).abs()
+                < precision
+        );
+        assert!(
+            (newtons_method(1i16, precision, function, derivative).unwrap() - root).abs()
+                < precision
+        );
+        assert!(
+            (newtons_method(1i32, precision, function, derivative).unwrap() - root).abs()
+                < precision
+        );
+        assert!(
+            (newtons_method(1i64, precision, function, derivative).unwrap() - root).abs()
+                < precision
+        );
+        assert!(
+            (newtons_method(1i128, precision, function, derivative).unwrap() - root).abs()
+                < precision
+        );
+        assert!(
+            (newtons_method(1isize, precision, function, derivative).unwrap() - root).abs()
+                < precision
+        );
 
         // float types
-        assert!((newtons_method(1.0f32, precision, function, derivative).unwrap() - root).abs() < precision);
-        assert!((newtons_method(1.0f64, precision, function, derivative).unwrap() - root).abs() < precision);
+        assert!(
+            (newtons_method(1.0f32, precision, function, derivative).unwrap() - root).abs()
+                < precision
+        );
+        assert!(
+            (newtons_method(1.0f64, precision, function, derivative).unwrap() - root).abs()
+                < precision
+        );
     }
 
     #[test]
@@ -88,7 +130,10 @@ mod tests {
         let function = |x| x * x - 4.0;
         let derivative = |x| 2.0 * x;
         let root = 2.0;
-        assert!((newtons_method(1.0, precision, function, derivative).unwrap() - root).abs() < precision);
+        assert!(
+            (newtons_method(1.0, precision, function, derivative).unwrap() - root).abs()
+                < precision
+        );
 
         let function = |x| x;
         let derivative = |_| 0.0;

@@ -1,4 +1,4 @@
-import init, { PEuler } from "./build-wasm/wasm.js";
+import init, { PEuler } from "../wasm.js";
 
 await init();
 let peuler = new PEuler();

@@ -94,7 +94,7 @@ where
     /// * The solution to the system of congruences and the modulus up to which the solution is unique, or [None] if no solution exists.
     pub fn crt(&self, other: &Congruence<T>) -> Option<(T, T)>
     where
-        T: Signed
+        T: Signed,
     {
         let a1 = self.a;
         let n1 = self.n;
@@ -113,7 +113,10 @@ where
         let (_, m1, m2) = gcd_extended(n1_reduced, n2_reduced);
 
         let new_n = n1_reduced * n2;
-        Some(((a1 * n2_reduced * m2 + a2 * n1_reduced * m1).rem_euclid(&new_n), new_n))
+        Some((
+            (a1 * n2_reduced * m2 + a2 * n1_reduced * m1).rem_euclid(&new_n),
+            new_n,
+        ))
     }
 }
 
@@ -226,8 +229,8 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::numth::prime::coprime;
     use super::*;
+    use crate::numth::prime::coprime;
 
     #[test]
     fn congruence_new() {

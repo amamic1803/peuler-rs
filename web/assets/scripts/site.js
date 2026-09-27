@@ -1,4 +1,4 @@
-import init, { Sample } from "./build-wasm/wasm.js";
+import init, { Sample } from "../wasm.js";
 
 await init();
 

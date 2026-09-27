@@ -1,7 +1,7 @@
 //! Functions related to prime numbers.
 
-use crate::core::gcd;
 use crate::analysis::root::newtons_method;
+use crate::core::gcd;
 use num_traits::{ConstOne, ConstZero, PrimInt, ToPrimitive};
 
 #[cfg_attr(doc, katexit::katexit)]
