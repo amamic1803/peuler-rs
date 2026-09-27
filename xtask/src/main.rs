@@ -1,8 +1,8 @@
 use clap::{Parser, Subcommand};
 use std::error::Error;
-use std::{fs, io};
 use std::io::Write;
 use std::path::PathBuf;
+use std::{fs, io};
 use xshell::{Shell, cmd};
 use xtask_wasm::{DevServer, Dist, Request, WasmOpt};
 
@@ -178,7 +178,11 @@ impl Executable for WebCmd {
             }
             Self::Serve(dev_server) => {
                 println!("Starting development server at http://localhost:8000");
-                dev_server.xtask("web").arg("dist").request_handler(static_request_handler).start()?;
+                dev_server
+                    .xtask("web")
+                    .arg("dist")
+                    .request_handler(static_request_handler)
+                    .start()?;
                 Ok(())
             }
         }
@@ -225,7 +229,10 @@ fn static_request_handler(request: Request<'_>) -> xtask_wasm::anyhow::Result<()
         return Ok(());
     }
 
-    let content_type = match full_path.extension().and_then(|extension| extension.to_str()) {
+    let content_type = match full_path
+        .extension()
+        .and_then(|extension| extension.to_str())
+    {
         Some("html") => "text/html; charset=utf-8",
         Some("css") => "text/css; charset=utf-8",
         Some("js") => "application/javascript",
