@@ -22,7 +22,7 @@ pub mod dim3;
 /// *point = [4, 5, 6];
 /// assert_eq!(*point, [4, 5, 6]);
 /// ```
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub struct Point<T, const N: usize> {
     coords: [T; N],
 }

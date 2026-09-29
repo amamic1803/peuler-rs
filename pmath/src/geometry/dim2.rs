@@ -4,8 +4,8 @@ use crate::algebra::linear::{Matrix, Vector};
 use crate::core::gcd;
 use crate::geometry::Point;
 use num_traits::{ConstOne, ConstZero, FromPrimitive, PrimInt, ToPrimitive};
+use std::borrow::Borrow;
 use std::f64::consts::PI;
-use std::ops::{Deref, DerefMut};
 
 /// A 2D shape.
 pub trait Shape2D {
@@ -22,8 +22,7 @@ pub trait Shape2D {
 
 /// A polygon in 2D space.
 ///
-/// The polygon is defined by `N` points, vertices.
-/// Points can be accessed directly since [Polygon] implements [Deref] and [DerefMut] traits.
+/// The polygon is defined by a list of points in 2D space.
 /// # Example
 /// ```
 /// use pmath::geometry::Point;
@@ -35,18 +34,40 @@ pub trait Shape2D {
 /// assert!((polygon.area() - 12.0).abs() < 1e-10);
 /// assert!((polygon.perimeter() - 14.0).abs() < 1e-10);
 /// ```
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub struct Polygon<T, const N: usize> {
-    points: [Point<T, 2>; N],
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Polygon<T> {
+    points: Vec<Point<T, 2>>,
 }
-impl<T, const N: usize> Polygon<T, N> {
+impl<T> Polygon<T>
+where
+    T: Clone,
+{
     /// Create a new [Polygon].
     /// # Arguments
     /// * `points` - The points of the polygon. The order matters since it defines the edges of the polygon.
     /// # Returns
     /// * A new [Polygon] instance.
-    pub fn new(points: [Point<T, 2>; N]) -> Self {
+    pub fn new<U, V>(points: U) -> Self
+    where
+        U: IntoIterator<Item = V>,
+        V: Borrow<Point<T, 2>>,
+    {
+        let points = points.into_iter().map(|p| (*p.borrow()).clone()).collect();
         Self { points }
+    }
+
+    /// Get a reference to the points of the polygon.
+    /// # Returns
+    /// * A reference to the points of the polygon.
+    pub fn points(&self) -> &[Point<T, 2>] {
+        &self.points
+    }
+
+    /// Get a mutable reference to the points of the polygon.
+    /// # Returns
+    /// * A mutable reference to the points of the polygon.
+    pub fn points_mut(&mut self) -> &mut Vec<Point<T, 2>> {
+        &mut self.points
     }
 
     /// The number of boundary points of the polygon.
@@ -113,7 +134,7 @@ impl<T, const N: usize> Polygon<T, N> {
         .expect("The number of interior points must be convertible to T")
     }
 }
-impl<T, const N: usize> Shape2D for Polygon<T, N>
+impl<T> Shape2D for Polygon<T>
 where
     T: Copy + ToPrimitive,
 {
@@ -139,18 +160,6 @@ where
         perimeter
     }
 }
-impl<T, const N: usize> Deref for Polygon<T, N> {
-    type Target = [Point<T, 2>; N];
-
-    fn deref(&self) -> &Self::Target {
-        &self.points
-    }
-}
-impl<T, const N: usize> DerefMut for Polygon<T, N> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.points
-    }
-}
 
 /// A triangle in 2D space.
 /// # Example
@@ -164,11 +173,14 @@ impl<T, const N: usize> DerefMut for Polygon<T, N> {
 /// assert!((triangle.area() - 12.0).abs() < 1e-10);
 /// assert!((triangle.perimeter() - 18.0).abs() < 1e-10);
 /// ```
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Triangle<T> {
-    polygon: Polygon<T, 3>,
+    polygon: Polygon<T>,
 }
-impl<T> Triangle<T> {
+impl<T> Triangle<T>
+where
+    T: Clone,
+{
     /// Create a new [Triangle].
     /// # Arguments
     /// * `points` - The points/vertices of the triangle.
@@ -201,9 +213,9 @@ impl<T> Triangle<T> {
 
         let mut angle_sum = 0.0;
 
-        let vec1 = Vector::from_points(*point, self.polygon[0]);
-        let vec2 = Vector::from_points(*point, self.polygon[1]);
-        let vec3 = Vector::from_points(*point, self.polygon[2]);
+        let vec1 = Vector::from_points(*point, self.polygon.points()[0]);
+        let vec2 = Vector::from_points(*point, self.polygon.points()[1]);
+        let vec3 = Vector::from_points(*point, self.polygon.points()[2]);
 
         angle_sum += vec1.angle_between(&vec2);
         angle_sum += vec2.angle_between(&vec3);
@@ -211,17 +223,25 @@ impl<T> Triangle<T> {
 
         (angle_sum - 2.0 * PI).abs() < 1e-10
     }
-    /// Get reference to the vertices of the triangle.
+
+    /// Get a reference to the points of the triangle.
     /// # Returns
-    /// * A reference to the vertices of the triangle.
-    pub fn get_points(&self) -> &[Point<T, 2>; 3] {
-        &self.polygon
+    /// * A reference to the points of the triangle.
+    pub fn points(&self) -> &[Point<T, 2>; 3] {
+        unsafe { self.polygon.points().try_into().unwrap_unchecked() }
     }
-    /// Get mutable reference to the vertices of the triangle
+
+    /// Get a mutable reference to the points of the triangle.
     /// # Returns
-    /// * A mutable reference to the vertices of the triangle.
-    pub fn get_points_mut(&mut self) -> &mut [Point<T, 2>; 3] {
-        &mut self.polygon
+    /// * A mutable reference to the points of the triangle.
+    pub fn points_mut(&mut self) -> &mut [Point<T, 2>; 3] {
+        unsafe {
+            self.polygon
+                .points_mut()
+                .as_mut_slice()
+                .try_into()
+                .unwrap_unchecked()
+        }
     }
 }
 impl<T> Shape2D for Triangle<T>
@@ -255,12 +275,12 @@ mod tests {
             Point::new([0, 1]),
         ];
         let polygon = Polygon::new(points);
-        assert_eq!(polygon.points, points);
+        assert_eq!(polygon.points(), points);
     }
 
     #[test]
-    fn polygon_deref() {
-        //! Test that [Deref] and [DerefMut] implementations work on [Polygon].
+    fn polygon_points() {
+        //! Test that [Polygon::points] and [Polygon::points_mut] work.
 
         let points = [
             Point::new([0, 0]),
@@ -269,16 +289,16 @@ mod tests {
             Point::new([0, 1]),
         ];
         let mut polygon = Polygon::new(points);
-        assert_eq!(*polygon, points);
+        assert_eq!(polygon.points(), points);
 
-        let points2 = [
+        let new_points = [
             Point::new([0, 0]),
             Point::new([2, 0]),
             Point::new([2, 2]),
             Point::new([0, 2]),
         ];
-        *polygon = points2;
-        assert_eq!(*polygon, points2);
+        *polygon.points_mut() = new_points.to_vec();
+        assert_eq!(polygon.points(), new_points);
     }
 
     #[test]
@@ -479,6 +499,19 @@ mod tests {
     }
 
     #[test]
+    fn triangle_points() {
+        //! Test that [Triangle::points] and [Triangle::points_mut] work.
+
+        let points = [Point::new([0, 0]), Point::new([1, 0]), Point::new([1, 1])];
+        let mut triangle = Triangle::new(points);
+        assert_eq!(triangle.points(), &points);
+
+        let new_points = [Point::new([0, 0]), Point::new([2, 0]), Point::new([2, 2])];
+        *triangle.points_mut() = new_points;
+        assert_eq!(triangle.points(), &new_points);
+    }
+
+    #[test]
     fn triangle_contains() {
         //! Test that [Triangle::contains] works correctly.
 
@@ -489,17 +522,6 @@ mod tests {
         assert!(triangle.contains(&Point::new([0.5, 0.001])));
         assert!(!triangle.contains(&Point::new([0.5, -0.001])));
         assert!(!triangle.contains(&Point::new([2, 2])));
-    }
-
-    #[test]
-    fn triangle_get_points() {
-        //! Test [Triangle::get_points] and [Triangle::get_points_mut] methods.
-
-        let points = [Point::new([0, 0]), Point::new([1, 0]), Point::new([1, 1])];
-        let mut triangle = Triangle::new(points);
-        assert_eq!(triangle.get_points(), &points);
-        triangle.get_points_mut()[1] = Point::new([0, 1]);
-        assert_eq!(triangle.get_points()[1], Point::new([0, 1]));
     }
 
     #[test]
