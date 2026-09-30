@@ -8,7 +8,7 @@ use std::hash::Hash;
 use std::iter;
 use std::rc::Rc;
 
-/// A directed graph with weighted, non-negative edges.
+/// A directed graph with weighted edges.
 /// # Example
 /// ```
 /// use pmath::discrete::graph::{Graph, Vertex};
@@ -181,7 +181,6 @@ where
     /// * `value` - The weight of the edge, or `None` to remove the edge.
     /// # Panics
     /// * If either `vertex1` or `vertex2` is not present in the graph.
-    /// * If `value` is negative.
     pub fn set_edge(&mut self, vertex1: &Vertex<T>, vertex2: &Vertex<T>, value: Option<U>) {
         let id1 = match self.vertex2id.get(vertex1) {
             Some(id) => *id,
@@ -198,9 +197,6 @@ where
 
         match value {
             Some(v) => {
-                if v < U::ZERO {
-                    panic!("Edge value must be non-negative.");
-                }
                 edges1.insert(id2, v);
             }
             None => {
@@ -218,7 +214,6 @@ where
     /// * `value` - The weight of the edges, or `None` to remove the edges.
     /// # Panics
     /// * If either `vertex1` or `vertex2` is not present in the graph.
-    /// * If `value` is negative.
     pub fn set_edge_bidirectional(
         &mut self,
         vertex1: &Vertex<T>,
@@ -1083,6 +1078,148 @@ mod tests {
     const TEST_GRAPH_HAM_PATH_FIXED_ENDS_MIN_COST: i32 = 21; // A to D
     const TEST_GRAPH_HAM_PATH_FIXED_ENDS_MAX_COST: i32 = 57; // A to D
 
+    const TEST_GRAPH2_SIZE: usize = 10;
+    const TEST_GRAPH2_VERTICES: [Vertex<&str>; TEST_GRAPH2_SIZE] = [
+        Vertex::new("A"),
+        Vertex::new("B"),
+        Vertex::new("C"),
+        Vertex::new("D"),
+        Vertex::new("E"),
+        Vertex::new("F"),
+        Vertex::new("G"),
+        Vertex::new("H"),
+        Vertex::new("I"),
+        Vertex::new("J"),
+    ];
+    const TEST_GRAPH2_ADJACENCY_MATRIX: [[Option<i32>; TEST_GRAPH2_SIZE]; TEST_GRAPH2_SIZE] = [
+        [
+            None,
+            None,
+            Some(2),
+            Some(-1),
+            None,
+            None,
+            Some(5),
+            Some(-4),
+            None,
+            None,
+        ],
+        [
+            None,
+            None,
+            Some(-4),
+            None,
+            Some(9),
+            Some(3),
+            None,
+            Some(-2),
+            None,
+            None,
+        ],
+        [
+            Some(-1),
+            None,
+            None,
+            Some(2),
+            Some(-7),
+            None,
+            Some(1),
+            None,
+            None,
+            None,
+        ],
+        [
+            None,
+            Some(4),
+            None,
+            None,
+            Some(-9),
+            Some(2),
+            Some(-4),
+            None,
+            None,
+            None,
+        ],
+        [
+            None,
+            Some(-4),
+            None,
+            Some(9),
+            None,
+            Some(-1),
+            None,
+            Some(9),
+            None,
+            None,
+        ],
+        [
+            Some(5),
+            None,
+            None,
+            None,
+            None,
+            None,
+            Some(-7),
+            None,
+            Some(4),
+            Some(-8),
+        ],
+        [
+            None,
+            None,
+            None,
+            None,
+            None,
+            Some(6),
+            None,
+            Some(-1),
+            Some(3),
+            Some(-7),
+        ],
+        [
+            Some(-4),
+            Some(6),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            Some(-5),
+            Some(3),
+        ],
+        [
+            Some(2),
+            None,
+            Some(-7),
+            Some(2),
+            None,
+            None,
+            None,
+            None,
+            None,
+            Some(-2),
+        ],
+        [
+            None,
+            Some(-6),
+            Some(6),
+            None,
+            Some(-1),
+            None,
+            None,
+            None,
+            Some(5),
+            None,
+        ],
+    ];
+    const TEST_GRAPH2_HAM_CYCLE_MIN_COST: i32 = -46;
+    const TEST_GRAPH2_HAM_CYCLE_MAX_COST: i32 = 47;
+    const TEST_GRAPH2_HAM_PATH_MIN_COST: i32 = -45;
+    const TEST_GRAPH2_HAM_PATH_MAX_COST: i32 = 48;
+    const TEST_GRAPH2_HAM_PATH_FIXED_ENDS_MIN_COST: i32 = -31; // A to D
+    const TEST_GRAPH2_HAM_PATH_FIXED_ENDS_MAX_COST: i32 = 28; // A to D
+
     fn init_test_graph() -> Graph<&'static str, i32> {
         let mut graph = Graph::<&str, i32>::new();
         for vertex in TEST_GRAPH_VERTICES.iter() {
@@ -1092,6 +1229,21 @@ mod tests {
             for (j, weight) in TEST_GRAPH_ADJACENCY_MATRIX[i].iter().enumerate() {
                 if let Some(w) = weight {
                     graph.set_edge(vertex, &TEST_GRAPH_VERTICES[j], Some(*w));
+                }
+            }
+        }
+        graph
+    }
+
+    fn init_test_graph2() -> Graph<&'static str, i32> {
+        let mut graph = Graph::<&str, i32>::new();
+        for vertex in TEST_GRAPH2_VERTICES.iter() {
+            graph.add(vertex);
+        }
+        for (i, vertex) in TEST_GRAPH2_VERTICES.iter().enumerate() {
+            for (j, weight) in TEST_GRAPH2_ADJACENCY_MATRIX[i].iter().enumerate() {
+                if let Some(w) = weight {
+                    graph.set_edge(vertex, &TEST_GRAPH2_VERTICES[j], Some(*w));
                 }
             }
         }
@@ -1370,17 +1522,6 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
-    fn graph_set_edge_negative() {
-        //! Test that [Graph::set_edge] panics when trying to set a negative edge weight.
-
-        let mut graph = init_test_graph();
-        let vertex1 = TEST_GRAPH_VERTICES[0];
-        let vertex2 = TEST_GRAPH_VERTICES[1];
-        graph.set_edge(&vertex1, &vertex2, Some(-1));
-    }
-
-    #[test]
     fn graph_set_edge_bidirectional() {
         //! Test that [Graph::set_edge] correctly sets the edge weight in both directions for an undirected graph.
 
@@ -1415,18 +1556,7 @@ mod tests {
 
         let mut graph = init_test_graph();
         let nonexistent_vertex = Vertex::new("Z");
-        graph.set_edge(&nonexistent_vertex, &TEST_GRAPH_VERTICES[0], Some(1));
-    }
-
-    #[test]
-    #[should_panic]
-    fn graph_set_edge_bidirectional_negative() {
-        //! Test that [Graph::set_edge] panics when trying to set a negative edge weight in both directions for an undirected graph.
-
-        let mut graph = init_test_graph();
-        let vertex1 = TEST_GRAPH_VERTICES[0];
-        let vertex2 = TEST_GRAPH_VERTICES[1];
-        graph.set_edge(&vertex1, &vertex2, Some(-1));
+        graph.set_edge_bidirectional(&nonexistent_vertex, &TEST_GRAPH_VERTICES[0], Some(1));
     }
 
     #[test]
@@ -1443,6 +1573,20 @@ mod tests {
                 .iter()
                 .enumerate()
                 .filter_map(|(j, weight)| weight.as_ref().map(|w| (&TEST_GRAPH_VERTICES[j], *w)))
+                .collect();
+            assert_eq!(neighbors, expected_neighbors);
+        }
+
+        let graph = init_test_graph2();
+        assert_eq!(graph.len(), TEST_GRAPH2_SIZE);
+        assert!(!graph.is_empty());
+
+        for (i, vertex) in TEST_GRAPH2_VERTICES.iter().enumerate() {
+            let neighbors: HashSet<_> = graph.neighbors(vertex).collect();
+            let expected_neighbors: HashSet<_> = TEST_GRAPH2_ADJACENCY_MATRIX[i]
+                .iter()
+                .enumerate()
+                .filter_map(|(j, weight)| weight.as_ref().map(|w| (&TEST_GRAPH2_VERTICES[j], *w)))
                 .collect();
             assert_eq!(neighbors, expected_neighbors);
         }
@@ -1475,6 +1619,20 @@ mod tests {
             let v2 = cycle[(i + 1) % cycle.len()];
             assert!(graph.edge(v1, v2).is_some());
         }
+
+        let graph = init_test_graph2();
+        let cycle = graph.hamiltonian_cycle();
+        assert!(cycle.is_some());
+        let cycle = cycle.unwrap();
+        assert_eq!(
+            cycle.iter().copied().collect::<HashSet<_>>().len(),
+            TEST_GRAPH2_SIZE
+        );
+        for i in 0..cycle.len() {
+            let v1 = cycle[i];
+            let v2 = cycle[(i + 1) % cycle.len()];
+            assert!(graph.edge(v1, v2).is_some());
+        }
     }
 
     #[test]
@@ -1493,6 +1651,24 @@ mod tests {
         );
 
         // check that the cost is correct
+        let mut calculated_cost = 0;
+        for i in 0..cycle.len() {
+            let v1 = cycle[i];
+            let v2 = cycle[(i + 1) % cycle.len()];
+            calculated_cost += graph.edge(v1, v2).unwrap();
+        }
+        assert_eq!(cost, calculated_cost);
+
+        let graph = init_test_graph2();
+        let result = graph.hamiltonian_cycle_min();
+        assert!(result.is_some());
+
+        let (cost, cycle) = result.unwrap();
+        assert_eq!(cost, TEST_GRAPH2_HAM_CYCLE_MIN_COST);
+        assert_eq!(
+            cycle.iter().copied().collect::<HashSet<_>>().len(),
+            TEST_GRAPH2_SIZE
+        );
         let mut calculated_cost = 0;
         for i in 0..cycle.len() {
             let v1 = cycle[i];
@@ -1524,6 +1700,24 @@ mod tests {
             calculated_cost += graph.edge(v1, v2).unwrap();
         }
         assert_eq!(cost, calculated_cost);
+
+        let graph = init_test_graph2();
+        let result = graph.hamiltonian_cycle_max();
+        assert!(result.is_some());
+
+        let (cost, cycle) = result.unwrap();
+        assert_eq!(cost, TEST_GRAPH2_HAM_CYCLE_MAX_COST);
+        assert_eq!(
+            cycle.iter().copied().collect::<HashSet<_>>().len(),
+            TEST_GRAPH2_SIZE
+        );
+        let mut calculated_cost = 0;
+        for i in 0..cycle.len() {
+            let v1 = cycle[i];
+            let v2 = cycle[(i + 1) % cycle.len()];
+            calculated_cost += graph.edge(v1, v2).unwrap();
+        }
+        assert_eq!(cost, calculated_cost);
     }
 
     #[test]
@@ -1537,6 +1731,20 @@ mod tests {
         assert_eq!(
             path.iter().copied().collect::<HashSet<_>>().len(),
             TEST_GRAPH_SIZE
+        );
+        for i in 0..path.len() - 1 {
+            let v1 = path[i];
+            let v2 = path[i + 1];
+            assert!(graph.edge(v1, v2).is_some());
+        }
+
+        let graph = init_test_graph2();
+        let path = graph.hamiltonian_path();
+        assert!(path.is_some());
+        let path = path.unwrap();
+        assert_eq!(
+            path.iter().copied().collect::<HashSet<_>>().len(),
+            TEST_GRAPH2_SIZE
         );
         for i in 0..path.len() - 1 {
             let v1 = path[i];
@@ -1558,6 +1766,26 @@ mod tests {
         assert_eq!(
             path.iter().copied().collect::<HashSet<_>>().len(),
             TEST_GRAPH_SIZE
+        );
+
+        // check that the cost is correct
+        let mut calculated_cost = 0;
+        for i in 0..path.len() - 1 {
+            let v1 = path[i];
+            let v2 = path[i + 1];
+            calculated_cost += graph.edge(v1, v2).unwrap();
+        }
+        assert_eq!(cost, calculated_cost);
+
+        let graph = init_test_graph2();
+        let result = graph.hamiltonian_path_min();
+        assert!(result.is_some());
+
+        let (cost, path) = result.unwrap();
+        assert_eq!(cost, TEST_GRAPH2_HAM_PATH_MIN_COST);
+        assert_eq!(
+            path.iter().copied().collect::<HashSet<_>>().len(),
+            TEST_GRAPH2_SIZE
         );
 
         // check that the cost is correct
@@ -1593,6 +1821,26 @@ mod tests {
             calculated_cost += graph.edge(v1, v2).unwrap();
         }
         assert_eq!(cost, calculated_cost);
+
+        let graph = init_test_graph2();
+        let result = graph.hamiltonian_path_max();
+        assert!(result.is_some());
+
+        let (cost, path) = result.unwrap();
+        assert_eq!(cost, TEST_GRAPH2_HAM_PATH_MAX_COST);
+        assert_eq!(
+            path.iter().copied().collect::<HashSet<_>>().len(),
+            TEST_GRAPH2_SIZE
+        );
+
+        // check that the cost is correct
+        let mut calculated_cost = 0;
+        for i in 0..path.len() - 1 {
+            let v1 = path[i];
+            let v2 = path[i + 1];
+            calculated_cost += graph.edge(v1, v2).unwrap();
+        }
+        assert_eq!(cost, calculated_cost);
     }
 
     #[test]
@@ -1610,6 +1858,24 @@ mod tests {
         assert_eq!(
             path.iter().copied().collect::<HashSet<_>>().len(),
             TEST_GRAPH_SIZE
+        );
+        for i in 0..path.len() - 1 {
+            let v1 = path[i];
+            let v2 = path[i + 1];
+            assert!(graph.edge(v1, v2).is_some());
+        }
+
+        let graph = init_test_graph2();
+        let start_vertex = TEST_GRAPH2_VERTICES[0];
+        let end_vertex = TEST_GRAPH2_VERTICES[1];
+        let path = graph.hamiltonian_path_fixed_ends(&start_vertex, &end_vertex);
+        assert!(path.is_some());
+        let path = path.unwrap();
+        assert_eq!(*path.first().unwrap(), &start_vertex);
+        assert_eq!(*path.last().unwrap(), &end_vertex);
+        assert_eq!(
+            path.iter().copied().collect::<HashSet<_>>().len(),
+            TEST_GRAPH2_SIZE
         );
         for i in 0..path.len() - 1 {
             let v1 = path[i];
@@ -1663,6 +1929,28 @@ mod tests {
             calculated_cost += graph.edge(v1, v2).unwrap();
         }
         assert_eq!(cost, calculated_cost);
+
+        let graph = init_test_graph2();
+        let start_vertex = TEST_GRAPH2_VERTICES[0];
+        let end_vertex = TEST_GRAPH2_VERTICES[3];
+        let result = graph.hamiltonian_path_fixed_ends_min(&start_vertex, &end_vertex);
+        assert!(result.is_some());
+        let (cost, path) = result.unwrap();
+        assert_eq!(cost, TEST_GRAPH2_HAM_PATH_FIXED_ENDS_MIN_COST);
+        assert_eq!(*path.first().unwrap(), &start_vertex);
+        assert_eq!(*path.last().unwrap(), &end_vertex);
+        assert_eq!(
+            path.iter().copied().collect::<HashSet<_>>().len(),
+            TEST_GRAPH2_SIZE
+        );
+        // check that the cost is correct
+        let mut calculated_cost = 0;
+        for i in 0..path.len() - 1 {
+            let v1 = path[i];
+            let v2 = path[i + 1];
+            calculated_cost += graph.edge(v1, v2).unwrap();
+        }
+        assert_eq!(cost, calculated_cost);
     }
 
     #[test]
@@ -1701,6 +1989,28 @@ mod tests {
         assert_eq!(
             path.iter().copied().collect::<HashSet<_>>().len(),
             TEST_GRAPH_SIZE
+        );
+        // check that the cost is correct
+        let mut calculated_cost = 0;
+        for i in 0..path.len() - 1 {
+            let v1 = path[i];
+            let v2 = path[i + 1];
+            calculated_cost += graph.edge(v1, v2).unwrap();
+        }
+        assert_eq!(cost, calculated_cost);
+
+        let graph = init_test_graph2();
+        let start_vertex = TEST_GRAPH2_VERTICES[0];
+        let end_vertex = TEST_GRAPH2_VERTICES[3];
+        let result = graph.hamiltonian_path_fixed_ends_max(&start_vertex, &end_vertex);
+        assert!(result.is_some());
+        let (cost, path) = result.unwrap();
+        assert_eq!(cost, TEST_GRAPH2_HAM_PATH_FIXED_ENDS_MAX_COST);
+        assert_eq!(*path.first().unwrap(), &start_vertex);
+        assert_eq!(*path.last().unwrap(), &end_vertex);
+        assert_eq!(
+            path.iter().copied().collect::<HashSet<_>>().len(),
+            TEST_GRAPH2_SIZE
         );
         // check that the cost is correct
         let mut calculated_cost = 0;
